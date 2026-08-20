@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>平日禁酒トラッカー</title>
+<meta name="description" content="平日だけ禁酒。連続記録と旦那さんとの精算、体重を記録するアプリ。">
+<meta name="theme-color" content="#2f9e6e">
+<style>
+:root{
+  --bg:#f6f4f1; --card:#ffffff; --text:#201e1b; --muted:#807870; --line:#e8e2da;
+  --sober:#2f9e6e; --sober-bg:#e6f5ee; --drank:#d9584f; --drank-bg:#fceceb;
+  --accent:#3d7f93; --accent-bg:#e8f1f4; --gold:#c98a2e; --off:#f0ece7;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.05);
+  --r:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#141517; --card:#1d1f22; --text:#eceae7; --muted:#948d85; --line:#2c2f33;
+    --sober:#4cbb8a; --sober-bg:#172b23; --drank:#e57a71; --drank-bg:#301d1c;
+    --accent:#69aac0; --accent-bg:#16262c; --gold:#e0a94e; --off:#232629;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  -webkit-font-smoothing:antialiased; line-height:1.6;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 32px) env(safe-area-inset-left);
+}
+.app{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:17px;margin:4px 0 14px;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+h1 .sub{font-size:12px;color:var(--muted);font-weight:400}
+h2{font-size:14px;margin:0 0 10px;color:var(--muted);letter-spacing:.04em}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+
+/* ---- streak hero ---- */
+.hero{text-align:center;padding:22px 16px 18px;background:linear-gradient(160deg,var(--sober-bg),var(--card) 70%)}
+.hero .label{font-size:12px;color:var(--muted);letter-spacing:.14em}
+.hero .streak{font-size:64px;line-height:1.05;font-weight:800;color:var(--sober);letter-spacing:-.03em;margin:6px 0 0;font-variant-numeric:tabular-nums}
+.hero .streak .unit{font-size:22px;font-weight:700;margin-left:4px}
+.hero .note{font-size:13px;color:var(--muted);margin-top:6px}
+.hero .best{display:inline-block;margin-top:10px;font-size:12px;color:var(--gold);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 12px}
+
+/* ---- money ---- */
+.money{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.money .amount{font-size:34px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.money .amount.plus{color:var(--sober)} .money .amount.minus{color:var(--drank)}
+.money .who{font-size:12px;color:var(--muted);margin-top:2px}
+.money .settle{font-size:12px;color:var(--muted);text-align:right}
+.breakdown{display:flex;gap:8px;margin-top:14px}
+.chip{flex:1;text-align:center;border-radius:12px;padding:8px 4px;background:var(--off);font-size:12px;color:var(--muted)}
+.chip b{display:block;font-size:19px;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.chip.s b{color:var(--sober)} .chip.d b{color:var(--drank)}
+.progress{height:6px;border-radius:99px;background:var(--off);margin-top:14px;overflow:hidden;display:flex}
+.progress i{display:block;height:100%}
+.progress .ps{background:var(--sober)} .progress .pd{background:var(--drank)}
+
+/* ---- calendar ---- */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.calhead .m{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.navbtn{width:34px;height:34px;border-radius:10px;background:var(--off);font-size:16px;line-height:1;display:grid;place-items:center}
+.navbtn:active{opacity:.6}
+.today-btn{font-size:12px;color:var(--accent);background:var(--accent-bg);border-radius:999px;padding:4px 12px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.dow span{text-align:center;font-size:11px;color:var(--muted)}
+.dow span.sat{color:#5b8fb9} .dow span.sun{color:#c2716b}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{aspect-ratio:1/1.12;border-radius:12px;background:var(--off);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;padding:2px;transition:transform .08s}
+.cell:active{transform:scale(.94)}
+.cell.blank{background:transparent;pointer-events:none}
+.cell .d{font-size:13px;font-variant-numeric:tabular-nums;font-weight:600}
+.cell .mark{font-size:15px;line-height:1}
+.cell .w{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cell.target{background:var(--card);border:1px solid var(--line)}
+.cell.sober{background:var(--sober-bg);border-color:transparent} .cell.sober .d{color:var(--sober)}
+.cell.drank{background:var(--drank-bg);border-color:transparent} .cell.drank .d{color:var(--drank)}
+.cell.off .d{color:var(--muted)}
+.cell.today{outline:2px solid var(--accent);outline-offset:1px}
+.cell.future{opacity:.45}
+.cell .hd{position:absolute;top:2px;right:4px;font-size:8px;color:var(--gold)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* ---- weight ---- */
+.wstats{display:flex;gap:8px;margin-bottom:12px}
+.wstats .chip b{color:var(--accent)}
+.chart{width:100%;height:150px;display:block}
+.chart .grid-l{stroke:var(--line);stroke-width:1}
+.chart .line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.chart .area{fill:var(--accent);opacity:.08}
+.chart .dot{fill:var(--card);stroke:var(--accent);stroke-width:2}
+.chart .goal{stroke:var(--gold);stroke-width:1.5;stroke-dasharray:4 4}
+.chart text{font-size:9px;fill:var(--muted)}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
+
+/* ---- history ---- */
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.row:last-child{border-bottom:none}
+.row .l .t{font-weight:600}
+.row .l .s{font-size:11px;color:var(--muted)}
+.row .v{font-weight:700;font-variant-numeric:tabular-nums}
+.row .v.plus{color:var(--sober)} .row .v.minus{color:var(--drank)}
+.row .badge{font-size:10px;background:var(--accent-bg);color:var(--accent);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.total{display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:2px solid var(--line);font-size:14px}
+.total b{font-size:18px;font-variant-numeric:tabular-nums}
+
+/* ---- settings ---- */
+details.card>summary{list-style:none;cursor:pointer;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+details.card>summary::-webkit-details-marker{display:none}
+details[open]>summary{margin-bottom:14px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;border-bottom:1px solid var(--line)}
+.field:last-of-type{border-bottom:none}
+.field .lab{flex:1}
+.field .lab small{display:block;font-size:11px;color:var(--muted)}
+input[type=number],input[type=text]{
+  font:inherit;background:var(--off);border:1px solid var(--line);color:var(--text);
+  border-radius:10px;padding:7px 10px;width:110px;text-align:right;font-variant-numeric:tabular-nums;
+}
+input:focus{outline:2px solid var(--accent);outline-offset:0}
+.switch{width:46px;height:27px;border-radius:99px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.switch[aria-checked=true]{background:var(--sober)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch[aria-checked=true]::after{transform:translateX(19px)}
+.btns{display:flex;gap:8px;margin-top:14px}
+.btn{flex:1;text-align:center;background:var(--off);border-radius:12px;padding:10px;font-size:13px}
+.btn.danger{color:var(--drank)}
+
+/* ---- day editor ---- */
+dialog{
+  border:none;padding:0;background:transparent;max-width:520px;width:100%;
+  margin:auto auto 0;
+}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));box-shadow:var(--shadow)}
+@media(min-width:560px){dialog{margin:auto}.sheet{border-radius:20px}}
+.sheet .dt{font-size:18px;font-weight:700}
+.sheet .dtsub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.choices{display:flex;gap:8px}
+.choice{flex:1;border-radius:14px;padding:14px 6px;background:var(--off);text-align:center;font-size:13px;font-weight:600;border:2px solid transparent}
+.choice .ic{display:block;font-size:22px;margin-bottom:2px}
+.choice.sel-s{background:var(--sober-bg);border-color:var(--sober);color:var(--sober)}
+.choice.sel-d{background:var(--drank-bg);border-color:var(--drank);color:var(--drank)}
+.choice.sel-n{border-color:var(--muted)}
+.wrow{display:flex;align-items:center;gap:10px;margin-top:18px}
+.wrow label{font-size:13px;flex:1}
+.wrow label small{display:block;color:var(--muted);font-size:11px}
+.closebtn{width:100%;margin-top:18px;background:var(--text);color:var(--card);border-radius:14px;padding:13px;font-size:15px;font-weight:600}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--text);color:var(--bg);
+  padding:9px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:99
+}
+.toast.on{opacity:.95;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🍵 平日禁酒トラッカー <span class="sub" id="todayLabel"></span></h1>
+
+  <div class="card hero">
+    <div class="label">平日禁酒 連続記録</div>
+    <div class="streak"><span id="streakNum">0</span><span class="unit">日</span></div>
+    <div class="note" id="streakNote"></div>
+    <div class="best" id="bestStreak"></div>
+  </div>
+
+  <div class="card">
+    <div class="money">
+      <div>
+        <div class="amount" id="monthAmount">¥0</div>
+        <div class="who" id="monthWho">今月の精算</div>
+      </div>
+      <div class="settle" id="settleInfo"></div>
+    </div>
+    <div class="progress" id="monthProgress"></div>
+    <div class="breakdown">
+      <div class="chip s"><b id="cntSober">0</b>禁酒</div>
+      <div class="chip d"><b id="cntDrank">0</b>飲んだ</div>
+      <div class="chip"><b id="cntLeft">0</b>残り平日</div>
+      <div class="chip"><b id="cntMax">¥0</b>満額なら</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="calhead">
+      <button class="navbtn" id="prevM" aria-label="前の月">‹</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="m" id="calMonth"></span>
+        <button class="today-btn" id="toToday">今月</button>
+      </div>
+      <button class="navbtn" id="nextM" aria-label="次の月">›</button>
+    </div>
+    <div class="dow"><span class="sun">日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="sat">土</span></div>
+    <div class="grid" id="calGrid"></div>
+    <div class="legend">
+      <span><i style="background:var(--sober)"></i>禁酒</span>
+      <span><i style="background:var(--drank)"></i>飲んだ</span>
+      <span><i style="background:var(--card);border:1px solid var(--line)"></i>平日（未記録）</span>
+      <span><i style="background:var(--off)"></i>対象外（土日祝）</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>体重の記録</h2>
+    <div class="wstats">
+      <div class="chip"><b id="wNow">–</b>現在</div>
+      <div class="chip"><b id="wDiff">–</b>開始から</div>
+      <div class="chip"><b id="wMonth">–</b>今月</div>
+      <div class="chip"><b id="wGoal">–</b>目標まで</div>
+    </div>
+    <div id="chartWrap"></div>
+  </div>
+
+  <div class="card">
+    <h2>月別の精算</h2>
+    <div id="history"></div>
+    <div class="total"><span>累計（旦那との貸し借り）</span><b id="grandTotal">¥0</b></div>
+  </div>
+
+  <details class="card">
+    <summary><span>⚙️ 設定・データ</span><span>▾</span></summary>
+    <div class="field">
+      <span class="lab">1日あたりの金額<small>禁酒したらもらう／飲んだら払う</small></span>
+      <input type="number" id="setAmount" min="0" step="100" inputmode="numeric">
+    </div>
+    <div class="field">
+      <span class="lab">祝日は対象外にする<small>祝日は飲んでもノーカウント</small></span>
+      <button class="switch" id="setHoliday" role="switch" aria-checked="true" aria-label="祝日は対象外にする"></button>
+    </div>
+    <div class="field">
+      <span class="lab">目標体重（kg）<small>グラフに目標ラインを表示</small></span>
+      <input type="number" id="setGoal" step="0.1" inputmode="decimal" placeholder="未設定">
+    </div>
+    <div class="btns">
+      <button class="btn" id="exportBtn">データを書き出す</button>
+      <button class="btn" id="importBtn">読み込む</button>
+    </div>
+    <div class="btns">
+      <button class="btn danger" id="resetBtn">全データを削除</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <p style="font-size:11px;color:var(--muted);margin:14px 0 0">
+      データはこの端末のブラウザ内（localStorage）にだけ保存されます。機種変更やブラウザのデータ削除で消えるので、ときどき書き出してバックアップしてください。
+    </p>
+  </details>
+</div>
+
+<dialog id="dayDialog"><form method="dialog" class="sheet">
+  <div class="dt" id="dlgDate"></div>
+  <div class="dtsub" id="dlgSub"></div>
+  <div class="choices">
+    <button type="button" class="choice" data-status="sober"><span class="ic">🍵</span>禁酒した</button>
+    <button type="button" class="choice" data-status="drank"><span class="ic">🍺</span>飲んだ</button>
+    <button type="button" class="choice" data-status=""><span class="ic">–</span>未記録</button>
+  </div>
+  <div class="wrow">
+    <label for="dlgWeight">体重<small id="dlgWeightHint">前回との差</small></label>
+    <input type="number" id="dlgWeight" step="0.1" inputmode="decimal" placeholder="kg">
+  </div>
+  <button class="closebtn" value="close">閉じる</button>
+</form></dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+const KEY="heijitsu-kinshu-v1";
+const DEFAULTS={amount:500,excludeHolidays:true,goalWeight:""};
+const pad=n=>String(n).padStart(2,"0");
+const $=s=>document.querySelector(s);
+
+/* ---------- state ---------- */
+let data={records:{},settings:{...DEFAULTS}};
+try{
+  const raw=localStorage.getItem(KEY);
+  if(raw){
+    const p=JSON.parse(raw);
+    if(p&&typeof p==="object"){
+      data.records=(p.records&&typeof p.records==="object")?p.records:{};
+      data.settings={...DEFAULTS,...(p.settings||{})};
+    }
+  }
+}catch(e){ console.warn("読み込みに失敗しました",e); }
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){ toast("保存できませんでした"); } };
+
+/* ---------- date utils ---------- */
+const keyOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseKey=k=>{const[y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d);};
+const TODAY=(()=>{const d=new Date();d.setHours(0,0,0,0);return d;})();
+const TODAY_KEY=keyOf(TODAY);
+const WD=["日","月","火","水","木","金","土"];
+
+/* ---------- 日本の祝日（1980-2099の近似式ベース） ---------- */
+const holidayCache={};
+function holidaysOf(year){
+  if(holidayCache[year])return holidayCache[year];
+  const h={};
+  const set=(m,d,name)=>{h[`${year}-${pad(m)}-${pad(d)}`]=name;};
+  const nthMon=(m,n)=>{const f=new Date(year,m-1,1);return 1+((8-f.getDay())%7)+7*(n-1);};
+  const equinox=(base)=>Math.floor(base+0.242194*(year-1980)-Math.floor((year-1980)/4));
+  set(1,1,"元日");
+  set(1,nthMon(1,2),"成人の日");
+  set(2,11,"建国記念の日");
+  set(2,23,"天皇誕生日");
+  set(3,equinox(20.8431),"春分の日");
+  set(4,29,"昭和の日");
+  set(5,3,"憲法記念日"); set(5,4,"みどりの日"); set(5,5,"こどもの日");
+  set(7,nthMon(7,3),"海の日");
+  set(8,11,"山の日");
+  set(9,nthMon(9,3),"敬老の日");
+  set(9,equinox(23.2488),"秋分の日");
+  set(10,nthMon(10,2),"スポーツの日");
+  set(11,3,"文化の日");
+  set(11,23,"勤労感謝の日");
+  // 振替休日：日曜と重なったら次の平日へ
+  for(const k of Object.keys(h).sort()){
+    if(parseKey(k).getDay()===0){
+      const d=parseKey(k);
+      do{ d.setDate(d.getDate()+1); }while(h[keyOf(d)]);
+      h[keyOf(d)]="振替休日";
+    }
+  }
+  // 国民の休日：祝日に挟まれた平日（実質は9月のみ）
+  for(let m=1;m<=12;m++){
+    const last=new Date(year,m,0).getDate();
+    for(let d=2;d<last;d++){
+      const cur=new Date(year,m-1,d);
+      if(h[keyOf(cur)]||cur.getDay()===0)continue;
+      const prev=new Date(year,m-1,d-1), next=new Date(year,m-1,d+1);
+      if(h[keyOf(prev)]&&h[keyOf(next)])h[keyOf(cur)]="国民の休日";
+    }
+  }
+  holidayCache[year]=h;
+  return h;
+}
+const holidayName=k=>holidaysOf(parseKey(k).getFullYear())[k]||null;
+
+/* ---------- 対象日（＝平日）判定 ---------- */
+function isTargetDay(k){
+  const w=parseKey(k).getDay();
+  if(w===0||w===6)return false;
+  if(data.settings.excludeHolidays&&holidayName(k))return false;
+  return true;
+}
+const statusOf=k=>(data.records[k]&&data.records[k].status)||"";
+const weightOf=k=>(data.records[k]&&typeof data.records[k].weight==="number")?data.records[k].weight:null;
+
+/* ---------- 集計 ---------- */
+function currentStreak(){
+  const d=new Date(TODAY); let n=0;
+  for(let i=0;i<3660;i++){
+    const k=keyOf(d);
+    if(isTargetDay(k)){
+      const st=statusOf(k);
+      if(st==="sober")n++;
+      else if(st==="drank")break;
+      else if(i!==0)break;      // 今日の未記録だけは大目に見る
+    }
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+function bestStreak(){
+  const keys=Object.keys(data.records).filter(k=>statusOf(k)).sort();
+  if(!keys.length)return 0;
+  const d=parseKey(keys[0]); let best=0,run=0;
+  while(d<=TODAY){
+    const k=keyOf(d);
+    if(isTargetDay(k)){
+      const st=statusOf(k);
+      if(st==="sober"){run++;best=Math.max(best,run);}
+      else if(st==="drank")run=0;
+      else if(k!==TODAY_KEY)run=0;
+    }
+    d.setDate(d.getDate()+1);
+  }
+  return best;
+}
+function monthStats(y,m){ // m: 0-11
+  const last=new Date(y,m+1,0).getDate();
+  let target=0,sober=0,drank=0,left=0,offDrank=0;
+  for(let i=1;i<=last;i++){
+    const k=keyOf(new Date(y,m,i));
+    const st=statusOf(k);
+    if(!isTargetDay(k)){ if(st==="drank")offDrank++; continue; }
+    target++;
+    if(st==="sober")sober++;
+    else if(st==="drank")drank++;
+    else if(parseKey(k)>TODAY)left++;
+  }
+  const unit=Number(data.settings.amount)||0;
+  return {target,sober,drank,left,offDrank,amount:(sober-drank)*unit,max:target*unit,
+          unrecorded:target-sober-drank-left};
+}
+const yen=n=>(n<0?"−¥":"¥")+Math.abs(n).toLocaleString("ja-JP");
+const signedYen=n=>(n>0?"+¥":n<0?"−¥":"¥")+Math.abs(n).toLocaleString("ja-JP");
+
+/* ---------- 表示 ---------- */
+let viewY=TODAY.getFullYear(), viewM=TODAY.getMonth();
+
+function renderHero(){
+  const s=currentStreak();
+  $("#streakNum").textContent=s;
+  const b=bestStreak();
+  $("#bestStreak").textContent=`🏆 最長記録 ${b}日`;
+  let note;
+  if(statusOf(TODAY_KEY)==="drank")note=isTargetDay(TODAY_KEY)?"今日はリセット。明日からまた1日目！":"今日は対象外の日。記録は途切れません";
+  else if(!isTargetDay(TODAY_KEY))note="今日は対象外の日（土日祝）。ゆっくりどうぞ🍶";
+  else if(statusOf(TODAY_KEY)==="sober")note="今日の分、記録ずみ。えらい！";
+  else note="今日はまだ未記録。夜になったら付けましょう";
+  $("#streakNote").textContent=note;
+}
+
+function renderMoney(){
+  const st=monthStats(viewY,viewM);
+  const isCur=(viewY===TODAY.getFullYear()&&viewM===TODAY.getMonth());
+  const el=$("#monthAmount");
+  el.textContent=signedYen(st.amount);
+  el.className="amount "+(st.amount>0?"plus":st.amount<0?"minus":"");
+  $("#monthWho").textContent=
+    `${viewM+1}月分 ${st.amount>0?"旦那さんからもらう":st.amount<0?"旦那さんに払う":"±0"}`;
+  const lastDay=new Date(viewY,viewM+1,0);
+  const days=Math.ceil((lastDay-TODAY)/86400000);
+  $("#settleInfo").innerHTML= isCur
+    ? `月末精算日<br><b>${viewM+1}/${lastDay.getDate()}(${WD[lastDay.getDay()]})</b>${days>0?`　あと${days}日`:"　今日！"}`
+    : `${viewY}年${viewM+1}月<br>精算ずみの月`;
+  $("#cntSober").textContent=st.sober;
+  $("#cntDrank").textContent=st.drank;
+  $("#cntLeft").textContent=st.left;
+  $("#cntMax").textContent=yen(st.max);
+  const p=$("#monthProgress");
+  p.innerHTML="";
+  if(st.target){
+    const mk=(cls,n)=>{const i=document.createElement("i");i.className=cls;i.style.width=(n/st.target*100)+"%";return i;};
+    p.appendChild(mk("ps",st.sober)); p.appendChild(mk("pd",st.drank));
+  }
+}
+
+function renderCalendar(){
+  $("#calMonth").textContent=`${viewY}年 ${viewM+1}月`;
+  const grid=$("#calGrid"); grid.innerHTML="";
+  const first=new Date(viewY,viewM,1);
+  const last=new Date(viewY,viewM+1,0).getDate();
+  for(let i=0;i<first.getDay();i++){
+    const b=document.createElement("div"); b.className="cell blank"; grid.appendChild(b);
+  }
+  for(let d=1;d<=last;d++){
+    const date=new Date(viewY,viewM,d), k=keyOf(date);
+    const st=statusOf(k), w=weightOf(k), hd=holidayName(k), tgt=isTargetDay(k);
+    const c=document.createElement("button");
+    c.type="button";
+    c.className="cell "+(tgt?"target ":"off ")+(st==="sober"?"sober ":st==="drank"?"drank ":"")+
+      (k===TODAY_KEY?"today ":"")+(date>TODAY?"future":"");
+    c.dataset.key=k;
+    c.setAttribute("aria-label",`${viewM+1}月${d}日${hd?" "+hd:""} ${st==="sober"?"禁酒":st==="drank"?"飲んだ":"未記録"}`);
+    c.innerHTML=`${hd?`<span class="hd">祝</span>`:""}<span class="d">${d}</span>`+
+      `<span class="mark">${st==="sober"?"🍵":st==="drank"?"🍺":"&nbsp;"}</span>`+
+      `<span class="w">${w!==null?w.toFixed(1):"&nbsp;"}</span>`;
+    grid.appendChild(c);
+  }
+}
+
+function weightSeries(){
+  return Object.keys(data.records)
+    .filter(k=>weightOf(k)!==null).sort()
+    .map(k=>({k,d:parseKey(k),v:weightOf(k)}));
+}
+function renderWeight(){
+  const s=weightSeries();
+  const goal=parseFloat(data.settings.goalWeight);
+  const fmt=v=>v.toFixed(1);
+  const diff=v=>(v>0?"+":v<0?"−":"±")+Math.abs(v).toFixed(1);
+  if(!s.length){
+    $("#wNow").textContent="–"; $("#wDiff").textContent="–";
+    $("#wMonth").textContent="–"; $("#wGoal").textContent="–";
+    $("#chartWrap").innerHTML='<p class="empty">カレンダーの日付をタップして<br>体重を記録すると、ここにグラフが出ます</p>';
+    return;
+  }
+  const now=s[s.length-1], start=s[0];
+  $("#wNow").textContent=fmt(now.v);
+  $("#wDiff").textContent=s.length>1?diff(now.v-start.v):"–";
+  const inMonth=s.filter(p=>p.d.getFullYear()===viewY&&p.d.getMonth()===viewM);
+  $("#wMonth").textContent=inMonth.length>1?diff(inMonth[inMonth.length-1].v-inMonth[0].v):"–";
+  $("#wGoal").textContent=isFinite(goal)?diff(now.v-goal):"–";
+
+  const pts=s.slice(-90);
+  const W=520,H=150,PL=30,PR=10,PT=14,PB=20;
+  const xs=pts.map(p=>p.d.getTime());
+  const minX=Math.min(...xs), maxX=Math.max(...xs)||minX+1;
+  let minY=Math.min(...pts.map(p=>p.v)), maxY=Math.max(...pts.map(p=>p.v));
+  if(isFinite(goal)){minY=Math.min(minY,goal);maxY=Math.max(maxY,goal);}
+  if(maxY-minY<1){const c=(maxY+minY)/2;minY=c-0.6;maxY=c+0.6;}
+  const padY=(maxY-minY)*0.15; minY-=padY; maxY+=padY;
+  const X=t=>PL+(maxX===minX?0.5:(t-minX)/(maxX-minX))*(W-PL-PR);
+  const Y=v=>PT+(1-(v-minY)/(maxY-minY))*(H-PT-PB);
+  const line=pts.map((p,i)=>`${i?"L":"M"}${X(p.d.getTime()).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
+  const area=`${line} L${X(maxX).toFixed(1)},${Y(minY).toFixed(1)} L${X(minX).toFixed(1)},${Y(minY).toFixed(1)} Z`;
+  let svg=`<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="体重の推移">`;
+  for(let i=0;i<=2;i++){
+    const v=minY+(maxY-minY)*i/2, y=Y(v).toFixed(1);
+    svg+=`<line class="grid-l" x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}"/>`+
+         `<text x="2" y="${(+y+3).toFixed(1)}">${v.toFixed(1)}</text>`;
+  }
+  if(isFinite(goal)&&goal>=minY&&goal<=maxY){
+    svg+=`<line class="goal" x1="${PL}" y1="${Y(goal).toFixed(1)}" x2="${W-PR}" y2="${Y(goal).toFixed(1)}"/>`;
+  }
+  svg+=`<path class="area" d="${area}"/><path class="line" d="${line}"/>`;
+  const lastP=pts[pts.length-1];
+  svg+=`<circle class="dot" cx="${X(lastP.d.getTime()).toFixed(1)}" cy="${Y(lastP.v).toFixed(1)}" r="4"/>`;
+  const lab=p=>`${p.d.getMonth()+1}/${p.d.getDate()}`;
+  svg+=`<text x="${PL}" y="${H-5}">${lab(pts[0])}</text>`+
+       `<text x="${W-PR}" y="${H-5}" text-anchor="end">${lab(lastP)}</text></svg>`;
+  $("#chartWrap").innerHTML=svg;
+}
+
+function renderHistory(){
+  const months=new Set();
+  Object.keys(data.records).forEach(k=>{ if(statusOf(k))months.add(k.slice(0,7)); });
+  months.add(`${TODAY.getFullYear()}-${pad(TODAY.getMonth()+1)}`);
+  const list=[...months].sort().reverse().slice(0,24);
+  const box=$("#history"); box.innerHTML="";
+  let total=0;
+  [...months].forEach(mk=>{
+    const[y,m]=mk.split("-").map(Number);
+    total+=monthStats(y,m-1).amount;
+  });
+  list.forEach(mk=>{
+    const[y,m]=mk.split("-").map(Number);
+    const st=monthStats(y,m-1);
+    const cur=(y===TODAY.getFullYear()&&m-1===TODAY.getMonth());
+    const row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`<div class="l"><div class="t">${y}年${m}月${cur?'<span class="badge">今月・確定前</span>':""}</div>`+
+      `<div class="s">禁酒 ${st.sober}日 / 飲んだ ${st.drank}日${st.unrecorded>0?` / 未記録 ${st.unrecorded}日`:""}</div></div>`+
+      `<div class="v ${st.amount>0?"plus":st.amount<0?"minus":""}">${signedYen(st.amount)}</div>`;
+    row.addEventListener("click",()=>{viewY=y;viewM=m-1;renderAll();window.scrollTo({top:0,behavior:"smooth"});});
+    box.appendChild(row);
+  });
+  if(!list.length)box.innerHTML='<p class="empty">まだ記録がありません</p>';
+  const g=$("#grandTotal");
+  g.textContent=signedYen(total);
+  g.style.color=total>0?"var(--sober)":total<0?"var(--drank)":"";
+}
+
+function renderSettings(){
+  $("#setAmount").value=data.settings.amount;
+  $("#setHoliday").setAttribute("aria-checked",String(!!data.settings.excludeHolidays));
+  $("#setGoal").value=data.settings.goalWeight;
+}
+function renderAll(){ renderHero(); renderMoney(); renderCalendar(); renderWeight(); renderHistory(); }
+
+/* ---------- 日別エディタ ---------- */
+const dlg=$("#dayDialog");
+let editKey=null;
+function openDay(k){
+  editKey=k;
+  const d=parseKey(k), hd=holidayName(k), tgt=isTargetDay(k);
+  $("#dlgDate").textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${WD[d.getDay()]})`;
+  const unit=Number(data.settings.amount)||0;
+  $("#dlgSub").textContent= tgt
+    ? `平日・精算対象日（禁酒 +${yen(unit)} / 飲んだ −${yen(unit)}）`
+    : `対象外の日${hd?`・${hd}`:""}　飲んでも記録は途切れません`;
+  const w=weightOf(k);
+  $("#dlgWeight").value=w!==null?w:"";
+  const prev=weightSeries().filter(p=>p.k<k).pop();
+  $("#dlgWeightHint").textContent=prev?`前回 ${prev.v.toFixed(1)}kg（${prev.d.getMonth()+1}/${prev.d.getDate()}）`:"kg で入力";
+  syncChoices();
+  dlg.showModal();
+}
+function syncChoices(){
+  const st=statusOf(editKey);
+  dlg.querySelectorAll(".choice").forEach(b=>{
+    b.classList.remove("sel-s","sel-d","sel-n");
+    if(b.dataset.status===st)b.classList.add(st==="sober"?"sel-s":st==="drank"?"sel-d":"sel-n");
+  });
+}
+function setRecord(k,fn){
+  const rec=data.records[k]||{};
+  fn(rec);
+  if(!rec.status&&typeof rec.weight!=="number")delete data.records[k];
+  else data.records[k]=rec;
+  save(); renderAll();
+}
+dlg.querySelectorAll(".choice").forEach(b=>{
+  b.addEventListener("click",()=>{
+    const s=b.dataset.status;
+    setRecord(editKey,r=>{ if(s)r.status=s; else delete r.status; });
+    syncChoices();
+    if(s&&isTargetDay(editKey)){
+      const unit=Number(data.settings.amount)||0;
+      toast(s==="sober"?`🍵 ${yen(unit)}ゲット！`:`🍺 ${yen(unit)}の支払い…`);
+    }
+  });
+});
+$("#dlgWeight").addEventListener("change",e=>{
+  const v=parseFloat(e.target.value);
+  setRecord(editKey,r=>{ if(isFinite(v)&&v>0)r.weight=Math.round(v*10)/10; else delete r.weight; });
+});
+$("#calGrid").addEventListener("click",e=>{
+  const c=e.target.closest(".cell[data-key]");
+  if(c)openDay(c.dataset.key);
+});
+
+/* ---------- 操作 ---------- */
+function shiftMonth(n){
+  const d=new Date(viewY,viewM+n,1);
+  viewY=d.getFullYear(); viewM=d.getMonth(); renderAll();
+}
+$("#prevM").addEventListener("click",()=>shiftMonth(-1));
+$("#nextM").addEventListener("click",()=>shiftMonth(1));
+$("#toToday").addEventListener("click",()=>{viewY=TODAY.getFullYear();viewM=TODAY.getMonth();renderAll();});
+$("#setAmount").addEventListener("change",e=>{
+  const v=Math.max(0,Math.round(Number(e.target.value)||0));
+  data.settings.amount=v; e.target.value=v; save(); renderAll();
+});
+$("#setHoliday").addEventListener("click",e=>{
+  data.settings.excludeHolidays=!data.settings.excludeHolidays;
+  e.currentTarget.setAttribute("aria-checked",String(data.settings.excludeHolidays));
+  save(); renderAll();
+});
+$("#setGoal").addEventListener("change",e=>{
+  const v=parseFloat(e.target.value);
+  data.settings.goalWeight=isFinite(v)&&v>0?v:"";
+  e.target.value=data.settings.goalWeight; save(); renderWeight();
+});
+$("#exportBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`kinshu-backup-${TODAY_KEY}.json`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("バックアップを書き出しました");
+});
+$("#importBtn").addEventListener("click",()=>$("#importFile").click());
+$("#importFile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const p=JSON.parse(r.result);
+      if(!p||typeof p!=="object"||typeof p.records!=="object")throw new Error("形式が違います");
+      if(!confirm("いまのデータを、読み込んだデータで置き換えます。よろしいですか？"))return;
+      data.records=p.records; data.settings={...DEFAULTS,...(p.settings||{})};
+      save(); renderSettings(); renderAll(); toast("読み込みました");
+    }catch(err){ alert("読み込めませんでした: "+err.message); }
+  };
+  r.readAsText(f); e.target.value="";
+});
+$("#resetBtn").addEventListener("click",()=>{
+  if(!confirm("すべての記録を削除します。元に戻せません。よろしいですか？"))return;
+  data={records:{},settings:{...DEFAULTS}};
+  save(); renderSettings(); renderAll(); toast("削除しました");
+});
+let toastTimer;
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("on"),1800);
+}
+
+/* ---------- init ---------- */
+$("#todayLabel").textContent=`${TODAY.getMonth()+1}/${TODAY.getDate()}(${WD[TODAY.getDay()]})`;
+renderSettings(); renderAll();
+})();
+</script>
+</body>
+</html>
