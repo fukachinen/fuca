@@ -42,5 +42,6 @@
 
 - `index.html` — アプリ本体。単体でブラウザで開けます（ビルド不要）
 - `manifest.webmanifest` / `icon-180.png` / `icon-512.png` — ホーム画面に追加したときのアイコン設定
-- `.github/workflows/pages.yml` — このブランチに push すると GitHub Pages へ自動で公開されます
+- 公開は GitHub Pages（リポジトリ設定 → Pages → Source: Deploy from a branch → ブランチ `claude/weekday-sobriety-tracker-d0h3pn` の `/ (root)`）。このブランチに push すればそのまま反映されます
+- `.nojekyll` — Pages の Jekyll 処理を止めるための空ファイル
 - `node build-artifact.mjs` — `index.html` から Artifact 公開用の `dist/artifact.html` を生成（外側の `<html>`/`<head>`/`<body>` を外すだけ）。Artifact 版を更新するときは、ビルドして同じURLに再公開します
