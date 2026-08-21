@@ -2,8 +2,9 @@
 
 平日だけ禁酒するためのカレンダーアプリ。連続記録・旦那さんとの精算・体重を1画面で管理します。
 
-- **公開URL（本人のみ・Artifact）**: https://claude.ai/code/artifact/187c271c-14d7-4149-bf02-83a9a73991f4
+- **公開URL（ログイン不要・誰でもアクセス可）**: https://fukachinen.github.io/fuca/
 - スマホでこのURLを開き、ブラウザの「ホーム画面に追加」をしておくとアプリのように使えます。
+- 同期つきの非公開版（自分のアカウントでログインして使う Artifact）: https://claude.ai/code/artifact/187c271c-14d7-4149-bf02-83a9a73991f4
 
 ## つかい方
 
@@ -31,6 +32,7 @@
 
 ## データの保存先
 
+- **公開URL（GitHub Pages）で開いた場合は、記録は開いた端末のブラウザの中（localStorage）だけに保存されます。** 他の人がURLを開いても、その人には空の状態が表示され、あなたの記録は見えません。逆に、スマホとパソコンで記録は共有されません
 - Artifact として開いた場合は、記録が **ページ自体（`data/records.json`）に保存** されます。スマホでもパソコンでも同じ記録が見られます。開いた端末にも控え（localStorage）が残り、記録ごとの更新時刻で新しいほうを採用して統合します
 - ファイルを直接開いた場合（`index.html` をブラウザで開く）は、その端末の localStorage だけに保存されます
 - 画面右上の表示で保存状態がわかります：`保存ずみ` / `保存中` / `この端末に保存`
@@ -39,5 +41,6 @@
 ## 開発
 
 - `index.html` — アプリ本体。単体でブラウザで開けます（ビルド不要）
-- `node build-artifact.mjs` — `index.html` から Artifact 公開用の `dist/artifact.html` を生成（外側の `<html>`/`<head>`/`<body>` を外すだけ）
-- 更新するときは `index.html` を直し、ビルドして、同じURLに再公開します
+- `manifest.webmanifest` / `icon-180.png` / `icon-512.png` — ホーム画面に追加したときのアイコン設定
+- `.github/workflows/pages.yml` — このブランチに push すると GitHub Pages へ自動で公開されます
+- `node build-artifact.mjs` — `index.html` から Artifact 公開用の `dist/artifact.html` を生成（外側の `<html>`/`<head>`/`<body>` を外すだけ）。Artifact 版を更新するときは、ビルドして同じURLに再公開します
