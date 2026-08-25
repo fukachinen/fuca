@@ -258,21 +258,23 @@ PIC_TMPL = (
     '<xdr:oneCellAnchor>'
     '<xdr:from><xdr:col>{col}</xdr:col><xdr:colOff>{coloff}</xdr:colOff>'
     '<xdr:row>{row}</xdr:row><xdr:rowOff>{rowoff}</xdr:rowOff></xdr:from>'
-    '<xdr:ext cx="{size}" cy="{size}"/>'
+    '<xdr:ext cx="{cx}" cy="{cy}"/>'
     '<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="{pid}" name="{name}"/>'
     '<xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
     '<xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/'
     'relationships" r:embed="{rid}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>'
-    '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{size}" cy="{size}"/></a:xfrm>'
+    '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{cx}" cy="{cy}"/></a:xfrm>'
     '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic>'
     '<xdr:clientData/></xdr:oneCellAnchor>')
 
-def add_pictures(parts, order, drawing_part, items, col_width_chars, row_height_pt):
+def add_pictures(parts, order, drawing_part, items, col_width_chars, row_height_pt, margin_pt=3):
     """items = [(列index0始まり, 行index1始まり, 画像パス, 名前), ...]
 
     セル内画像（richValue）は対応していないビューアだと表示されないため、
-    セルの範囲に収まる正方形の図形として配置する。
+    セルの範囲に収まる図形として配置する。縦横比は保ったまま縮小し、セル内で中央に置く。
     """
+    from PIL import Image
+
     drawing = parts[drawing_part].decode('utf-8')
     rels_part = re.sub(r'xl/drawings/(drawing\d+\.xml)', r'xl/drawings/_rels/\1.rels', drawing_part)
     if rels_part not in parts:
@@ -289,22 +291,27 @@ def add_pictures(parts, order, drawing_part, items, col_width_chars, row_height_
     media_no = 1 + max(int(m) for m in re.findall(r'xl/media/image(\d+)\.', '\n'.join(parts)))
     pid = 1 + max(int(m) for m in re.findall(r'<xdr:cNvPr id="(\d+)"', drawing))
 
+    box_w = (round(col_width_chars * 7) + 5) * EMU_PER_PX - 2 * round(margin_pt * EMU_PER_PT)
+    box_h = round(row_height_pt * EMU_PER_PT) - 2 * round(margin_pt * EMU_PER_PT)
     cell_w = (round(col_width_chars * 7) + 5) * EMU_PER_PX
     cell_h = round(row_height_pt * EMU_PER_PT)
-    size = cell_h - 2 * round(3 * EMU_PER_PT)          # 上下に約3ptの余白
-    coloff, rowoff = (cell_w - size) // 2, (cell_h - size) // 2
 
     for col, row, path, name in items:
-        media = 'xl/media/image%d.png' % media_no
+        px_w, px_h = Image.open(path).size
+        scale = min(box_w / px_w, box_h / px_h)
+        cx, cy = round(px_w * scale), round(px_h * scale)
+
+        ext = os.path.splitext(path)[1].lower()
+        media = 'xl/media/image%d%s' % (media_no, '.jpeg' if ext in ('.jpg', '.jpeg') else ext)
         parts[media] = open(path, 'rb').read()
         order.append(media)
         rels = rels.replace('</Relationships>',
             '<Relationship Id="rId%d" Type="http://schemas.openxmlformats.org/officeDocument/'
-            '2006/relationships/image" Target="../media/image%d.png"/></Relationships>'
-            % (drawing_rid, media_no))
+            '2006/relationships/image" Target="../%s"/></Relationships>'
+            % (drawing_rid, media.split('xl/', 1)[1]))
         drawing = drawing.replace('</xdr:wsDr>', PIC_TMPL.format(
-            col=col, coloff=coloff, row=row - 1, rowoff=rowoff, size=size,
-            pid=pid, name=html.escape(name, quote=True),
+            col=col, coloff=(cell_w - cx) // 2, row=row - 1, rowoff=(cell_h - cy) // 2,
+            cx=cx, cy=cy, pid=pid, name=html.escape(name, quote=True),
             rid='rId%d' % drawing_rid) + '</xdr:wsDr>')
         media_no, drawing_rid, pid = media_no + 1, drawing_rid + 1, pid + 1
 

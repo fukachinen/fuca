@@ -28,10 +28,10 @@ INBATH = [
     ('つるりんちょ。シャンプー BOOSTER',    '400mL', 5200, '2026-07-01', 'img/2.png'),
 ]
 OUTBATH = [
-    ('いるかのせなか。オイル',    '80mL',  4350, '2026-08-15', None),
-    ('いるかのせなか。CMCミルク', '140g',  4720, '2026-08-15', None),
-    ('いるかのせなか。フォーム',  '180mL', 4350, '2026-08-15', None),
-    ('いるかのせなか。ミスト',    '150mL', 4200, '2026-08-15', None),
+    ('いるかのせなか。オイル',    '80mL',  4350, '2026-08-15', 'img/iluca-oil.jpeg'),
+    ('いるかのせなか。CMCミルク', '140g',  4720, '2026-08-15', 'img/iluca-milk.jpeg'),
+    ('いるかのせなか。フォーム',  '180mL', 4350, '2026-08-15', 'img/iluca-foam.jpeg'),
+    ('いるかのせなか。ミスト',    '150mL', 4200, '2026-08-15', 'img/iluca-mist.jpeg'),
 ]
 
 H_COL_WIDTH = 27.69921875        # 元ファイルの H 列幅
@@ -61,11 +61,11 @@ def main(out_path):
     outbath_first = OUTBATH_ROW + len(INBATH) - 1   # インバスの追加行のぶんだけ下がる
     fill(parts, SHEET, entries_for(inbath_first, INBATH) + entries_for(outbath_first, OUTBATH))
 
-    photo_rows = [inbath_first + i for i in range(len(INBATH))]
-    set_row_height(parts, SHEET, photo_rows, PHOTO_ROW_HEIGHT)
+    pictures = ([(inbath_first + i, INBATH[i]) for i in range(len(INBATH))]
+                + [(outbath_first + i, OUTBATH[i]) for i in range(len(OUTBATH))])
+    set_row_height(parts, SHEET, [row for row, _ in pictures], PHOTO_ROW_HEIGHT)
     add_pictures(parts, order, DRAWING,
-                 [(7, row, photo, name)                              # 7 = H 列
-                  for row, (name, _, _, _, photo) in zip(photo_rows, INBATH)],
+                 [(7, row, item[4], item[0]) for row, item in pictures],   # 7 = H 列
                  H_COL_WIDTH, PHOTO_ROW_HEIGHT)
 
     set_sheets(parts, [(BRAND, 'rId1', 8)])
