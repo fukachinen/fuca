@@ -5,7 +5,7 @@
 ・1ジャンルに複数アイテムのため、62行目の直下に5行を追加（ジャンル名も記入）
 """
 from build import (load_parts, save_parts, insert_rows, shift_table,
-                   shift_drawing, fill, set_sheets)
+                   shift_drawing, fill, set_sheets, embed_cell_images)
 
 SHEET = 'xl/worksheets/sheet1.xml'
 GENRE_ROW = 62          # ライフスタイル／インバスヘアケア
@@ -15,13 +15,14 @@ CAUTION = ('シャンプー、コンディショナー、トリートメント�
 BRAND, KANA = 'つるりんちょ。', 'つるりんちょ'
 RELEASE = '2026-07-01'
 
+# 商品名, イチオシ（サイズ）, 税込価格, 商品写真（キリヌキ png）
 ITEMS = [
-    ('つるりんちょ。シャンプー REGULAR',    '400mL', 5200),
-    ('つるりんちょ。トリートメント REGULAR', '380g',  5560),
-    ('つるりんちょ。シャンプー REPAIR',     '400mL', 5200),
-    ('つるりんちょ。トリートメント REPAIR',  '380g',  5560),
-    ('つるりんちょ。トリートメント AIR',     '380g',  5560),
-    ('つるりんちょ。シャンプー BOOSTER',    '400mL', 5200),
+    ('つるりんちょ。シャンプー REGULAR',    '400mL', 5200, 'img/1.png'),
+    ('つるりんちょ。トリートメント REGULAR', '380g',  5560, 'img/4.png'),
+    ('つるりんちょ。シャンプー REPAIR',     '400mL', 5200, 'img/3.png'),
+    ('つるりんちょ。トリートメント REPAIR',  '380g',  5560, 'img/6.png'),
+    ('つるりんちょ。トリートメント AIR',     '380g',  5560, 'img/5.png'),
+    ('つるりんちょ。シャンプー BOOSTER',    '400mL', 5200, 'img/2.png'),
 ]
 
 def main(out_path):
@@ -38,8 +39,12 @@ def main(out_path):
 
     entries = [{'row': GENRE_ROW + i, 'brand': BRAND, 'kana': KANA, 'product': name,
                 'oshi': size, 'release': RELEASE, 'price': price}
-               for i, (name, size, price) in enumerate(ITEMS)]
+               for i, (name, size, price, _) in enumerate(ITEMS)]
     fill(parts, SHEET, entries)
+
+    embed_cell_images(parts, order, SHEET,
+                      {'H%d' % (GENRE_ROW + i): photo
+                       for i, (_, _, _, photo) in enumerate(ITEMS)})
 
     set_sheets(parts, [(BRAND, 'rId1', 8)])
     save_parts(parts, out_path, order)
