@@ -248,3 +248,78 @@ def embed_cell_images(parts, order, sheet_part, mapping):
     e('xl/richData/rdrichvalue.xml', rv)
     e('xl/metadata.xml', meta)
     e(sheet_part, sheet)
+
+
+# ---- 商品写真をセル上に配置（図形アンカー方式） -----------------------------
+
+EMU_PER_PX, EMU_PER_PT = 9525, 12700
+
+PIC_TMPL = (
+    '<xdr:oneCellAnchor>'
+    '<xdr:from><xdr:col>{col}</xdr:col><xdr:colOff>{coloff}</xdr:colOff>'
+    '<xdr:row>{row}</xdr:row><xdr:rowOff>{rowoff}</xdr:rowOff></xdr:from>'
+    '<xdr:ext cx="{size}" cy="{size}"/>'
+    '<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="{pid}" name="{name}"/>'
+    '<xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>'
+    '<xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/'
+    'relationships" r:embed="{rid}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>'
+    '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{size}" cy="{size}"/></a:xfrm>'
+    '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic>'
+    '<xdr:clientData/></xdr:oneCellAnchor>')
+
+def add_pictures(parts, order, drawing_part, items, col_width_chars, row_height_pt):
+    """items = [(列index0始まり, 行index1始まり, 画像パス, 名前), ...]
+
+    セル内画像（richValue）は対応していないビューアだと表示されないため、
+    セルの範囲に収まる正方形の図形として配置する。
+    """
+    drawing = parts[drawing_part].decode('utf-8')
+    rels_part = re.sub(r'xl/drawings/(drawing\d+\.xml)', r'xl/drawings/_rels/\1.rels', drawing_part)
+    if rels_part not in parts:
+        parts[rels_part] = (b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n'
+                            b'<Relationships xmlns="http://schemas.openxmlformats.org/package'
+                            b'/2006/relationships"></Relationships>')
+        order.append(rels_part)
+        drawing_rid = 1
+    else:
+        drawing_rid = 1 + max(int(m) for m in
+                              re.findall(r'Id="rId(\d+)"', parts[rels_part].decode('utf-8')))
+    rels = parts[rels_part].decode('utf-8')
+
+    media_no = 1 + max(int(m) for m in re.findall(r'xl/media/image(\d+)\.', '\n'.join(parts)))
+    pid = 1 + max(int(m) for m in re.findall(r'<xdr:cNvPr id="(\d+)"', drawing))
+
+    cell_w = (round(col_width_chars * 7) + 5) * EMU_PER_PX
+    cell_h = round(row_height_pt * EMU_PER_PT)
+    size = cell_h - 2 * round(3 * EMU_PER_PT)          # 上下に約3ptの余白
+    coloff, rowoff = (cell_w - size) // 2, (cell_h - size) // 2
+
+    for col, row, path, name in items:
+        media = 'xl/media/image%d.png' % media_no
+        parts[media] = open(path, 'rb').read()
+        order.append(media)
+        rels = rels.replace('</Relationships>',
+            '<Relationship Id="rId%d" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/image" Target="../media/image%d.png"/></Relationships>'
+            % (drawing_rid, media_no))
+        drawing = drawing.replace('</xdr:wsDr>', PIC_TMPL.format(
+            col=col, coloff=coloff, row=row - 1, rowoff=rowoff, size=size,
+            pid=pid, name=html.escape(name, quote=True),
+            rid='rId%d' % drawing_rid) + '</xdr:wsDr>')
+        media_no, drawing_rid, pid = media_no + 1, drawing_rid + 1, pid + 1
+
+    parts[rels_part] = rels.encode('utf-8')
+    parts[drawing_part] = drawing.encode('utf-8')
+
+
+def set_row_height(parts, sheet_part, rows, pt):
+    """画像を置く行だけ行高を上げる（他の行はフォームのまま）。"""
+    xml = parts[sheet_part].decode('utf-8')
+    for r in rows:
+        m = re.search(r'<row r="%d"[^>]*?>' % r, xml)
+        tag = m.group(0)
+        new = re.sub(r' ht="[\d.]+"', ' ht="%s"' % pt, tag)
+        if ' ht=' not in tag:
+            new = tag[:-1] + ' ht="%s" customHeight="1">' % pt
+        xml = xml[:m.start()] + new + xml[m.end():]
+    parts[sheet_part] = xml.encode('utf-8')
