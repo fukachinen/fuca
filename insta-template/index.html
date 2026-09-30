@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F7F2E8">
+<meta name="format-detection" content="telephone=no">
+<title>インスタ投稿テンプレート ｜ 髪にドラマを。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   インスタ投稿テンプレート（受講生向け）
+   生成り × コーラルピンク × 紺 ／ 手書き風見出し
+   ========================================================================= */
+:root{
+  color-scheme: light;
+  --kinari:#F7F2E8; --kinari-2:#FFFCF6; --surface:#FFFFFF;
+  --coral:#EE8E7C; --coral-btn:#D35C47; --coral-ink:#BF4E3A; --coral-soft:#FCE6DF; --coral-mark:rgba(238,142,124,.34);
+  --navy:#1F2F4D; --navy-2:#2E4168; --navy-soft:#5B6780; --rule:#E7DDCB;
+  --ok:#2F8062; --ok-soft:#DDF0E7; --warn:#B86A0E; --warn-soft:#FDF0DC; --bad:#C9362B; --bad-soft:#FBE1DE;
+  --font-hand:"Klee One","Zen Kaku Gothic New",sans-serif;
+  --font-logo:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --font-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
+  --r:16px; --r-sm:10px;
+  --shadow:0 2px 10px rgba(31,47,77,.06), 0 1px 3px rgba(31,47,77,.05);
+  --tabbar-h:64px;
+  --safe-b:env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%; -webkit-font-smoothing:antialiased;}
+body{
+  margin:0; background:var(--kinari); color:var(--navy);
+  font-family:var(--font-body); font-size:15px; line-height:1.75; letter-spacing:.01em;
+  padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 24px);
+  background-image:radial-gradient(circle at 10% 0%, rgba(255,255,255,.7), transparent 40%);
+}
+button, input, textarea{font-family:inherit; color:inherit;}
+button{cursor:pointer;}
+.wrap{max-width:560px; margin:0 auto; padding:0 16px;}
+.hand{font-family:var(--font-hand); font-weight:600;}
+.muted{color:var(--navy-soft);}
+.small{font-size:12.5px;}
+[hidden]{display:none !important;}
+
+/* ---------- Header ---------- */
+.hd{position:sticky; top:0; z-index:30; background:rgba(247,242,232,.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule); padding-top:env(safe-area-inset-top,0px);}
+.hd-in{max-width:560px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:12px;}
+.logo{font-family:var(--font-logo); font-weight:800; font-size:17px; letter-spacing:.06em; line-height:1.1; white-space:nowrap;}
+.logo small{display:block; font-family:var(--font-hand); font-weight:600; font-size:12px; letter-spacing:.04em; color:var(--coral-ink); margin-top:3px;}
+.hd .howto{margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--navy); background:var(--surface);
+  border-radius:999px; padding:7px 14px; font-size:13px; font-weight:700;}
+.hd .howto svg{width:16px; height:16px;}
+
+/* ---------- Title ---------- */
+.ttl{padding:22px 0 6px;}
+.ttl h1{font-family:var(--font-hand); font-weight:600; font-size:25px; line-height:1.45; margin:0; letter-spacing:.02em;}
+.ttl h1 .mk{background:linear-gradient(transparent 58%, var(--coral-mark) 58%); padding:0 2px;}
+.ttl p{margin:6px 0 0; font-size:13.5px; color:var(--navy-soft);}
+
+/* ---------- Card ---------- */
+.card{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); box-shadow:var(--shadow); padding:18px 16px; margin-top:16px;}
+.card-h{display:flex; align-items:center; gap:10px; margin:0 0 12px;}
+.card-h h2{font-family:var(--font-hand); font-weight:600; font-size:19px; margin:0; line-height:1.4;}
+.card-h .aside{margin-left:auto; font-size:12px; color:var(--navy-soft);}
+
+/* ---------- Progress ---------- */
+.prog-top{display:flex; align-items:baseline; gap:8px;}
+.prog-top .count{font-family:var(--font-hand); font-weight:600; font-size:22px;}
+.prog-top .count b{color:var(--coral-ink); font-size:28px;}
+.prog-top .reset{margin-left:auto; background:none; border:0; font-size:12px; color:var(--navy-soft); text-decoration:underline; padding:4px;}
+.steps{list-style:none; margin:12px 0 0; padding:0; display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:4px;}
+.steps .arw{color:var(--coral); font-weight:700; font-size:14px;}
+.step{appearance:none; width:100%; border:1.5px solid var(--rule); background:var(--kinari-2); border-radius:12px; padding:8px 4px 7px;
+  display:flex; flex-direction:column; align-items:center; gap:3px; font-size:12px; font-weight:700; line-height:1.3; min-height:66px;}
+.step .dot{width:26px; height:26px; border-radius:50%; border:1.5px solid var(--navy-soft); display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color:var(--navy-soft); background:var(--surface);}
+.step .purpose{font-size:10.5px; font-weight:500; color:var(--navy-soft);}
+.step.current{border-color:var(--navy); background:var(--surface);}
+.step.current .dot{border-color:var(--navy); color:var(--navy);}
+.step.done{border-color:var(--ok); background:var(--ok-soft);}
+.step.done .dot{border-color:var(--ok); background:var(--ok); color:#fff;}
+.prog-msg{margin:12px 0 0; font-size:13px; padding:10px 12px; border-radius:var(--r-sm); background:var(--coral-soft);}
+.prog-msg.all{background:var(--ok-soft); color:var(--ok); font-weight:700;}
+
+/* ---------- Settings ---------- */
+details.settings > summary{list-style:none; display:flex; align-items:center; gap:10px; cursor:pointer;}
+details.settings > summary::-webkit-details-marker{display:none;}
+details.settings > summary h2{font-family:var(--font-hand); font-weight:600; font-size:19px; margin:0;}
+details.settings > summary .state{margin-left:auto; font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; background:var(--warn-soft); color:var(--warn);}
+details.settings > summary .state.ok{background:var(--ok-soft); color:var(--ok);}
+details.settings > summary .chev{width:18px; height:18px; flex:none; transition:transform .2s;}
+details.settings[open] > summary .chev{transform:rotate(180deg);}
+.settings .note{font-size:12.5px; color:var(--navy-soft); margin:10px 0 4px;}
+
+/* ---------- Fields ---------- */
+.field{margin-top:14px;}
+.field > label, .field > .lbl{display:flex; align-items:baseline; gap:8px; font-weight:700; font-size:14px; margin-bottom:6px;}
+.field .num{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--navy); color:#fff; font-size:11px; flex:none; transform:translateY(-1px);}
+.field .hint{display:block; font-weight:400; font-size:12px; color:var(--navy-soft); margin:-2px 0 6px;}
+input[type=text], textarea{
+  width:100%; font-size:16px; /* iOSの自動ズーム防止 */ line-height:1.6;
+  border:1.5px solid var(--rule); background:var(--kinari-2); border-radius:12px; padding:10px 12px; outline:none;
+  transition:border-color .15s, background .15s; -webkit-appearance:none;
+}
+textarea{resize:vertical; min-height:72px; overflow:hidden;}
+input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(--surface);}
+.field.over input, .field.over textarea{border-color:var(--bad); background:var(--bad-soft);}
+.cnt{display:flex; justify-content:flex-end; gap:6px; font-size:12px; color:var(--navy-soft); margin-top:4px; font-variant-numeric:tabular-nums;}
+.cnt.warn{color:var(--warn); font-weight:700;}
+.cnt.bad{color:var(--bad); font-weight:700;}
+
+.seg{display:grid; grid-template-columns:repeat(3,1fr); gap:6px;}
+.seg label{position:relative;}
+.seg input{position:absolute; opacity:0; pointer-events:none;}
+.seg span{display:flex; align-items:center; justify-content:center; text-align:center; min-height:48px; padding:6px 4px; border:1.5px solid var(--rule);
+  border-radius:12px; background:var(--kinari-2); font-size:12.5px; font-weight:700; line-height:1.35;}
+.seg input:checked + span{border-color:var(--navy); background:var(--navy); color:#fff;}
+.seg input:focus-visible + span{outline:3px solid var(--coral); outline-offset:2px;}
+
+.auto-line{margin-top:14px; border:1.5px dashed var(--coral); border-radius:12px; padding:10px 12px; background:var(--coral-soft); font-size:14px;}
+.auto-line .tag{display:inline-block; font-size:11px; font-weight:700; color:#fff; background:var(--coral-btn); border-radius:999px; padding:1px 9px; margin-bottom:4px;}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; font-weight:700; font-size:14px;
+  padding:10px 18px; border:1.5px solid transparent; min-height:44px; text-decoration:none; transition:transform .1s, background .15s;}
+.btn:active{transform:scale(.97);}
+.btn-ghost{background:var(--surface); border-color:var(--navy); color:var(--navy);}
+.btn-soft{background:var(--coral-soft); color:var(--coral-ink); border-color:transparent;}
+.btn-copy{width:100%; background:var(--coral-btn); color:#fff; font-size:17px; min-height:56px; box-shadow:0 6px 16px rgba(211,92,71,.3);}
+.btn-copy.copied{background:var(--ok); box-shadow:0 6px 16px rgba(47,128,98,.26);}
+.btn svg{width:18px; height:18px; flex:none;}
+.row-btns{display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;}
+
+/* ---------- Panels ---------- */
+.panel-head{margin-top:24px; display:flex; align-items:center; gap:12px;}
+.panel-head .badge{flex:none; width:44px; height:44px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-hand); font-weight:600; font-size:18px;}
+.panel-head h2{font-family:var(--font-hand); font-weight:600; font-size:23px; margin:0; line-height:1.3;}
+.panel-head .goal{font-size:12.5px; color:var(--navy-soft); margin-top:2px;}
+.panel-head .goal b{color:var(--coral-ink);}
+
+.part-h{display:flex; align-items:center; gap:10px; margin:0 0 4px;}
+.part-h .no{font-family:var(--font-hand); font-weight:600; font-size:15px; color:#fff; background:var(--coral-btn); border-radius:999px; padding:2px 12px; flex:none;}
+.part-h h3{font-family:var(--font-hand); font-weight:600; font-size:19px; margin:0; line-height:1.35;}
+.part-lead{font-size:13px; color:var(--navy-soft); margin:6px 0 0;}
+.sub-h{font-family:var(--font-hand); font-weight:600; font-size:16px; margin:18px 0 8px; display:flex; align-items:center; gap:8px;}
+.sub-h::before{content:""; width:16px; height:2px; background:var(--coral); border-radius:2px;}
+
+.tips{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px;}
+.tips li{position:relative; padding:8px 10px 8px 32px; background:var(--kinari-2); border-radius:10px; font-size:13.5px; line-height:1.6;}
+.tips li::before{content:"✓"; position:absolute; left:10px; top:8px; font-weight:700; color:var(--coral-ink);}
+.tips li b{color:var(--navy);}
+
+/* ---------- Photos (見本) ---------- */
+.ph{position:relative; overflow:hidden; background:#ddd; border-radius:10px;}
+.ph img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:var(--pos,50% 35%);
+  transform:scale(var(--z,1)); transform-origin:var(--pos,50% 35%); display:block;}
+.ph.before img{filter:grayscale(.75) contrast(.9) brightness(.97);}
+.ph .sample{position:absolute; top:6px; left:6px; font-size:9.5px; font-weight:700; letter-spacing:.06em; color:#fff; background:rgba(31,47,77,.72); border-radius:4px; padding:1px 6px;}
+.ph .lab{position:absolute; left:0; right:0; bottom:0; padding:14px 6px 5px; font-size:11px; font-weight:700; color:#fff; text-align:center;
+  background:linear-gradient(transparent, rgba(0,0,0,.55)); letter-spacing:.04em;}
+
+/* Reel cover diagram */
+.cover-demo{display:grid; grid-template-columns:minmax(0,190px) 1fr; gap:14px; align-items:center; margin-top:12px;}
+.cover{position:relative; aspect-ratio:9/16; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(31,47,77,.18);}
+.cover .ph{position:absolute; inset:0; border-radius:0;}
+.cover .cut{position:absolute; left:0; right:0; height:12.5%; background:repeating-linear-gradient(135deg, rgba(31,47,77,.72) 0 6px, rgba(31,47,77,.6) 6px 12px);
+  color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.2; z-index:2;}
+.cover .cut.top{top:0;} .cover .cut.bottom{bottom:0;}
+.cover .safe{position:absolute; left:6%; right:6%; top:12.5%; bottom:12.5%; border:2px dashed #fff; border-radius:6px; z-index:2;
+  display:flex; align-items:center; justify-content:center; padding:8px;}
+.cover .safe .tx{font-family:var(--font-hand); font-weight:600; color:var(--navy); background:rgba(255,252,246,.92); border-radius:8px; padding:6px 8px;
+  font-size:13px; line-height:1.4; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.15); word-break:break-word; max-width:100%;}
+.cover .safe .tx .mk{background:linear-gradient(transparent 60%, var(--coral-mark) 60%);}
+.cover .safe-lbl{position:absolute; top:calc(12.5% + 6px); right:8%; z-index:3; font-size:9.5px; font-weight:700; background:var(--coral-btn); color:#fff; border-radius:4px; padding:1px 5px;}
+.legend{list-style:none; margin:0; padding:0; display:grid; gap:10px; font-size:12.5px; line-height:1.55;}
+.legend li{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:start;}
+.legend .sw{width:18px; height:18px; border-radius:4px; margin-top:2px;}
+.legend .sw.cut{background:repeating-linear-gradient(135deg, var(--navy) 0 4px, var(--navy-2) 4px 8px);}
+.legend .sw.safe{border:2px dashed var(--coral-btn);}
+.legend b{display:block; font-size:13px;}
+
+/* Timeline */
+.timeline{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px; position:relative;}
+.tl{display:flex; flex-direction:column; gap:6px;}
+.tl .ph{aspect-ratio:9/16;}
+.tl .sec{font-size:11px; font-weight:700; color:var(--coral-ink); font-variant-numeric:tabular-nums;}
+.tl .t{font-family:var(--font-hand); font-weight:600; font-size:14.5px; line-height:1.3;}
+.tl .d{font-size:11.5px; color:var(--navy-soft); line-height:1.5;}
+
+/* Carousel */
+.carousel{display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory; padding:4px 2px 10px; margin:10px -16px 0; padding-left:16px; padding-right:16px;
+  -webkit-overflow-scrolling:touch; scrollbar-width:thin;}
+.slide{flex:none; width:150px; scroll-snap-align:start; display:flex; flex-direction:column; gap:6px;}
+.slide .no{font-size:11px; font-weight:700; color:var(--coral-ink);}
+.slide .nm{font-family:var(--font-hand); font-weight:600; font-size:14px; line-height:1.3;}
+.slide .ds{font-size:11.5px; color:var(--navy-soft); line-height:1.45;}
+.slide .frame{aspect-ratio:4/5; border-radius:10px; overflow:hidden; position:relative; box-shadow:0 3px 10px rgba(31,47,77,.14);}
+.slide .frame > .ph{position:absolute; inset:0; border-radius:0;}
+.swipe-hint{font-size:11.5px; color:var(--navy-soft); text-align:right; margin-top:-2px;}
+
+/* Knowledge slide design */
+.ks{position:absolute; inset:0; background:var(--kinari-2); padding:12px 11px; display:flex; flex-direction:column; font-size:10px; line-height:1.45; color:var(--navy);}
+.ks .pg{position:absolute; right:8px; bottom:6px; font-size:8.5px; color:var(--navy-soft);}
+.ks .brand{font-family:var(--font-logo); font-size:7.5px; letter-spacing:.08em; color:var(--navy-soft);}
+.ks .kk{display:inline-block; align-self:flex-start; background:var(--coral); color:#fff; font-weight:700; font-size:8.5px; border-radius:999px; padding:0 7px; margin-bottom:4px;}
+.ks .big{font-family:var(--font-hand); font-weight:600; font-size:14px; line-height:1.4; word-break:break-word;}
+.ks .big .mk{background:linear-gradient(transparent 60%, var(--coral-mark) 60%);}
+.ks .body{font-size:9.5px; color:var(--navy); margin-top:6px; word-break:break-word;}
+.ks.cover{padding:0;}
+.ks.cover .ph{position:absolute; inset:0; border-radius:0;}
+.ks.cover .ph img{filter:brightness(.92);}
+.ks.cover .box{position:absolute; left:8px; right:8px; bottom:12px; background:rgba(255,252,246,.94); border-radius:8px; padding:8px; z-index:2;}
+.ks.cover .box .big{font-size:13px;}
+.ks.cover .sv{position:absolute; top:8px; right:8px; z-index:2; font-size:8.5px; font-weight:700; color:#fff; background:var(--coral-btn); border-radius:999px; padding:1px 7px;}
+.ks .circle{font-family:var(--font-hand); font-weight:600; font-size:22px; color:var(--coral-ink); line-height:1;}
+.ks.sum{background:var(--navy); color:#fff;}
+.ks.sum .big{color:#fff;}
+.ks.sum .body{color:#E9ECF3;}
+.ks.sum ol{margin:4px 0 0; padding-left:14px; font-size:9.5px;}
+.ks.save{align-items:center; justify-content:center; text-align:center; background:var(--coral-soft);}
+.ks.save .ico{width:30px; height:30px; color:var(--coral-ink); margin-bottom:4px;}
+.ks .empty{color:#B5AE9F;}
+
+/* B/A compare */
+.cmp{position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:2px; background:#fff;}
+.cmp .ph{border-radius:0; height:100%;}
+.cmp .tagba{position:absolute; top:6px; z-index:2; font-size:9px; font-weight:800; letter-spacing:.08em; color:#fff; border-radius:4px; padding:1px 6px;}
+.cmp .tagba.b{left:6px; background:rgba(31,47,77,.8);} .cmp .tagba.a{right:6px; background:var(--coral-btn);}
+.cmp .sample{top:auto; bottom:6px;}
+.cmp .ph + .ph .sample{display:none;}
+
+/* ---------- Preview ---------- */
+.pv{margin-top:14px; border:1px solid var(--rule); border-radius:14px; overflow:hidden; background:var(--surface);}
+.pv-top{display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--rule);}
+.pv-top .av{width:32px; height:32px; border-radius:50%; flex:none; padding:2px; background:conic-gradient(from 200deg, #F4A28C, var(--coral-btn), #F6C77A, #F4A28C);}
+.pv-top .av span{display:flex; width:100%; height:100%; border-radius:50%; background:var(--surface); align-items:center; justify-content:center;
+  font-family:var(--font-logo); font-weight:800; font-size:12px; border:2px solid var(--surface);}
+.pv-top .nm{font-weight:700; font-size:13.5px; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.pv-top .lb{margin-left:auto; font-size:10.5px; font-weight:700; color:var(--navy-soft); border:1px solid var(--rule); border-radius:999px; padding:1px 8px; flex:none;}
+.pv-body{padding:12px 14px 14px; font-size:14px; line-height:1.75; white-space:pre-wrap; word-break:break-word; min-height:120px;}
+.pv-body .first{font-weight:700; background:linear-gradient(transparent 62%, var(--coral-mark) 62%);}
+.pv-body .ph-empty{color:#B5AE9F;}
+.pv-body .auto{color:var(--navy-2);}
+.pv-body .tagline{color:#2B5FA8;}
+.pv-meter{display:flex; flex-wrap:wrap; gap:6px; padding:10px 12px; border-top:1px solid var(--rule); background:var(--kinari-2); font-size:12px; font-variant-numeric:tabular-nums;}
+.meter{display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; background:var(--surface); border:1px solid var(--rule); font-weight:700;}
+.meter.warn{background:var(--warn-soft); border-color:#EBC58C; color:var(--warn);}
+.meter.bad{background:var(--bad-soft); border-color:#EDA79F; color:var(--bad);}
+.meter.ok{color:var(--ok);}
+.pv-note{font-size:12px; color:var(--navy-soft); margin:8px 2px 0;}
+.copy-area{margin-top:14px;}
+.copy-sub{text-align:center; font-size:12px; color:var(--navy-soft); margin-top:8px;}
+
+/* ---------- Tab bar ---------- */
+.tabbar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,252,246,.97); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border-top:1px solid var(--rule); padding-bottom:var(--safe-b); box-shadow:0 -4px 16px rgba(31,47,77,.06);}
+.tabbar-in{max-width:560px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); height:var(--tabbar-h);}
+.tab{position:relative; appearance:none; border:0; background:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  font-size:11.5px; font-weight:700; color:var(--navy-soft); padding:6px 2px;}
+.tab svg{width:24px; height:24px;}
+.tab[aria-selected=true]{color:var(--coral-ink);}
+.tab[aria-selected=true]::before{content:""; position:absolute; top:0; left:22%; right:22%; height:3px; border-radius:0 0 3px 3px; background:var(--coral-btn);}
+.tab .chk{position:absolute; top:6px; right:calc(50% - 22px); width:16px; height:16px; border-radius:50%; background:var(--ok); color:#fff; font-size:10px;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--kinari-2);}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed; left:50%; bottom:calc(var(--tabbar-h) + var(--safe-b) + 14px); transform:translate(-50%, 20px); opacity:0; pointer-events:none;
+  width:min(528px, calc(100% - 32px)); background:var(--navy); color:#fff; border-radius:14px; padding:12px 14px; z-index:60;
+  box-shadow:0 10px 26px rgba(31,47,77,.3); transition:opacity .2s, transform .2s; font-size:14px;}
+.toast.show{opacity:1; transform:translate(-50%,0); pointer-events:auto;}
+.toast .tt{font-weight:700;}
+.toast .ts{font-size:12.5px; color:#D5DBE7; margin-top:2px;}
+.toast .acts{display:flex; gap:8px; margin-top:10px;}
+.toast .acts a, .toast .acts button{flex:1; min-height:40px; border-radius:999px; font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;}
+.toast .acts .p{background:var(--coral-btn); color:#fff; border:0;}
+.toast .acts .s{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.5);}
+
+/* ---------- Modal ---------- */
+.modal{position:fixed; inset:0; z-index:80; background:rgba(31,47,77,.45); display:flex; align-items:flex-end; justify-content:center;}
+.modal .sheet{background:var(--kinari); width:100%; max-width:560px; max-height:88vh; overflow:auto; border-radius:20px 20px 0 0; padding:20px 18px calc(20px + var(--safe-b));
+  -webkit-overflow-scrolling:touch;}
+.modal h2{font-family:var(--font-hand); font-weight:600; font-size:22px; margin:0 0 4px;}
+.modal ol{list-style:none; margin:14px 0 0; padding:0; display:grid; gap:10px; counter-reset:s;}
+.modal ol li{counter-increment:s; background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:10px 12px 10px 48px; position:relative; font-size:14px;}
+.modal ol li::before{content:counter(s); position:absolute; left:12px; top:10px; width:26px; height:26px; border-radius:50%; background:var(--coral-btn); color:#fff;
+  font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;}
+.modal ol li b{display:block;}
+.modal ol li span{font-size:12.5px; color:var(--navy-soft);}
+.modal .close{width:100%; margin-top:16px;}
+.modal .privacy{margin-top:12px; font-size:12px; color:var(--navy-soft); background:var(--kinari-2); border-radius:10px; padding:8px 10px;}
+
+.foot{text-align:center; font-size:11px; color:var(--navy-soft); margin-top:28px; line-height:1.9;}
+.foot .brand{font-family:var(--font-logo); font-weight:700; letter-spacing:.08em; font-size:13px; color:var(--navy);}
+
+@media (min-width:480px){
+  .ttl h1{font-size:28px;}
+  .slide{width:170px;}
+}
+@media (max-width:360px){
+  .cover-demo{grid-template-columns:1fr;}
+  .cover{max-width:200px; margin:0 auto;}
+  .step{font-size:11px;}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="hd">
+  <div class="hd-in">
+    <div class="logo">髪にドラマを。<small>インスタ投稿テンプレート</small></div>
+    <button class="howto" id="howtoBtn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .8c0 1.8-2.5 2.2-2.5 3.8"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>
+      使い方
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="ttl">
+    <h1>空欄をうめて、<span class="mk">コピーするだけ。</span></h1>
+    <p>画像の準備から投稿文まで、この順番で進めれば<br>そのままInstagramに投稿できます。</p>
+  </div>
+
+  <!-- ============ PROGRESS ============ -->
+  <section class="card" aria-labelledby="progTitle">
+    <div class="prog-top">
+      <span class="count hand" id="progTitle">3投稿セット <b id="progNum">0</b>/3</span>
+      <button class="reset" id="progReset" type="button">やり直す</button>
+    </div>
+    <ol class="steps" id="steps">
+      <li><button class="step" type="button" data-go="reel"><span class="dot">1</span>リール<span class="purpose">見てもらう</span></button></li>
+      <li class="arw" aria-hidden="true">→</li>
+      <li><button class="step" type="button" data-go="know"><span class="dot">2</span>知識投稿<span class="purpose">保存してもらう</span></button></li>
+      <li class="arw" aria-hidden="true">→</li>
+      <li><button class="step" type="button" data-go="ba"><span class="dot">3</span>Before/After<span class="purpose">予約につなげる</span></button></li>
+    </ol>
+    <p class="prog-msg" id="progMsg"></p>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <details class="card settings" id="settings">
+    <summary>
+      <h2>基本設定</h2>
+      <span class="state" id="setState">未入力</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <p class="note">ここに入れた内容は、3つのテンプレートすべての末尾に自動で入ります。最初に1回だけ入力してください。</p>
+
+    <div class="field">
+      <label for="s_shop">店名</label>
+      <input type="text" id="s_shop" data-set="shop" placeholder="例）hair salon HANA" autocomplete="organization">
+    </div>
+    <div class="field">
+      <label for="s_staff">担当者名</label>
+      <input type="text" id="s_staff" data-set="staff" placeholder="例）山田 はな" autocomplete="name">
+    </div>
+    <div class="field">
+      <span class="lbl" id="bookLbl">予約の受け付け方</span>
+      <div class="seg" role="radiogroup" aria-labelledby="bookLbl">
+        <label><input type="radio" name="book" value="link" checked><span>プロフィールの<br>リンク</span></label>
+        <label><input type="radio" name="book" value="hpb"><span>ホット<br>ペッパー</span></label>
+        <label><input type="radio" name="book" value="dm"><span>DM</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="s_tags">いつも付けるハッシュタグ</label>
+      <span class="hint">スペースか改行で区切ってください。「#」は自動で付きます。</span>
+      <textarea id="s_tags" data-set="tags" rows="3" placeholder="例）#髪質改善 #縮毛矯正 #梅田美容室"></textarea>
+      <div class="cnt" id="tagCnt"></div>
+    </div>
+    <div class="row-btns" style="margin-top:14px">
+      <button class="btn btn-soft" type="button" id="setExample">記入例を入れる</button>
+      <button class="btn btn-ghost" type="button" id="setDone">入力できた</button>
+    </div>
+  </details>
+
+  <!-- ============ PANELS ============ -->
+  <div id="panels"></div>
+
+  <footer class="foot">
+    <div class="brand">髪にドラマを。</div>
+    入力内容はこの端末（ブラウザ）の中だけに保存され、ほかの人には見えません。<br>
+    ※写真は見本です。
+  </footer>
+</main>
+
+<!-- ============ TAB BAR ============ -->
+<nav class="tabbar" aria-label="テンプレート切り替え">
+  <div class="tabbar-in" role="tablist" id="tabbar">
+    <button class="tab" role="tab" data-tab="reel" aria-selected="true" aria-controls="panel-reel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8 3l3 5.5M13.5 3l3 5.5"/><path d="m10.2 12 4.3 2.5-4.3 2.5z" fill="currentColor"/></svg>
+      リール
+    </button>
+    <button class="tab" role="tab" data-tab="know" aria-selected="false" aria-controls="panel-know">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+      知識投稿
+    </button>
+    <button class="tab" role="tab" data-tab="ba" aria-selected="false" aria-controls="panel-ba">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M12 4v16"/><path d="m6 14 2-2.5 2 2.5M14.5 14.5c1-2 3-2 4-3.5"/></svg>
+      Before/After
+    </button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============ HOW TO (modal) ============ -->
+<div class="modal" id="howto" role="dialog" aria-modal="true" aria-labelledby="howtoTitle" hidden>
+  <div class="sheet">
+    <h2 id="howtoTitle">使い方</h2>
+    <p class="muted small" style="margin:0">上から順に進めるだけで、3つの投稿がそろいます。</p>
+    <ol>
+      <li><b>基本設定を入れる</b><span>店名・担当者名・予約方法・ハッシュタグ。最初の1回だけでOK。</span></li>
+      <li><b>下のタブで「リール」から始める</b><span>おすすめの順番は リール → 知識投稿 → Before/After です。</span></li>
+      <li><b>①を見て、画像・動画を準備する</b><span>何枚目に何を入れるか、どう撮るかを見本で確認できます。</span></li>
+      <li><b>②の空欄をうめる</b><span>迷ったら「記入例を入れる」で見本を表示。下のプレビューに完成文が出ます。</span></li>
+      <li><b>「コピーする」を押して、Instagramに貼り付け</b><span>投稿画面のキャプション欄を長押し →「ペースト」。店名・ハッシュタグも入っています。</span></li>
+      <li><b>3つそろえば完了！</b><span>コピーした投稿には完了マークが付きます。</span></li>
+    </ol>
+    <p class="privacy">🔒 入力した内容は、このスマホ（ブラウザ）の中だけに保存されます。ほかの受講生や講師には見えません。</p>
+    <button class="btn btn-ghost close" type="button" id="howtoClose">とじる</button>
+  </div>
+</div>
+
+<!-- ============ PANEL TEMPLATES ============ -->
+<template id="tpl-reel-prep">
+  <p class="part-lead">まずは「最初の3秒で止まってもらう」ための素材を用意します。</p>
+
+  <h4 class="sub-h">カバー画像の作り方</h4>
+  <div class="cover-demo">
+    <div class="cover" aria-label="カバー画像の見本図">
+      <div class="ph" data-photo="reelCover"></div>
+      <div class="cut top">プロフィールでは<br>切れる</div>
+      <div class="safe"><div class="tx" data-bind="reel.hook" data-fallback="1行目の言葉を<br>ここに大きく"></div></div>
+      <span class="safe-lbl">表示される範囲</span>
+      <div class="cut bottom">プロフィールでは<br>切れる</div>
+    </div>
+    <ul class="legend">
+      <li><span class="sw safe"></span><span><b>点線の中に文字と顔を入れる</b>プロフィール一覧では縦長（3:4）に切り取られます。</span></li>
+      <li><span class="sw cut"></span><span><b>上下は切れる前提で</b>上下それぞれ約1/8は表示されません。文字を置かないようにしましょう。</span></li>
+      <li><span class="sw" style="background:var(--coral-soft)"></span><span><b>サイズ</b>縦 1080×1920px（9:16）</span></li>
+    </ul>
+  </div>
+  <ul class="tips">
+    <li>カバーの文字は<b>②の「1行目」と同じ言葉</b>にすると伝わりやすい（上の図にも自動で入ります）</li>
+    <li>文字は<b>2行・15文字以内</b>を目安に、太く大きく</li>
+  </ul>
+
+  <h4 class="sub-h">動画の流れ（15〜30秒）</h4>
+  <div class="timeline">
+    <div class="tl">
+      <div class="ph before" data-photo="reelBefore"><span class="lab">BEFORE</span></div>
+      <span class="sec">0〜3秒</span>
+      <span class="t">冒頭はBefore</span>
+      <span class="d">広がり・うねりが分かるように。最初に見せて「どうなるの？」と思わせる</span>
+    </div>
+    <div class="tl">
+      <div class="ph" data-photo="reelDuring"><span class="lab">施術中</span></div>
+      <span class="sec">3〜20秒</span>
+      <span class="t">施術中</span>
+      <span class="d">手元のアップを数カット。1カット2〜3秒でテンポよく</span>
+    </div>
+    <div class="tl">
+      <div class="ph" data-photo="reelAfter"><span class="lab">AFTER</span></div>
+      <span class="sec">ラスト5秒</span>
+      <span class="t">Afterで締め</span>
+      <span class="d">髪をなびかせる・振り向くなど、動きでツヤを見せる</span>
+    </div>
+  </div>
+  <ul class="tips">
+    <li>スマホは<b>縦向き</b>で撮影。窓際の明るい場所がおすすめ</li>
+    <li>Before と After は<b>同じ場所・同じ角度</b>で撮ると変化が伝わります</li>
+  </ul>
+</template>
+
+<template id="tpl-know-prep">
+  <p class="part-lead">スワイプで読める6枚のカルーセルを作ります。サイズは縦 1080×1350px（4:5）。</p>
+  <h4 class="sub-h">6枚の順番とデザイン見本</h4>
+  <div class="carousel" tabindex="0" aria-label="知識投稿のスライド見本">
+    <div class="slide">
+      <div class="frame"><div class="ks cover"><div class="ph" data-photo="knowCover"></div><span class="sv">保存推奨</span>
+        <div class="box"><div class="big"><span class="mk" data-bind="know.hook" data-fallback="結論をひと言で"></span></div></div></div></div>
+      <span class="no">1枚目</span><span class="nm">表紙</span><span class="ds">1行目の結論を大きく。写真の上に文字をのせる</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">1</span><span class="kk" style="margin-top:6px">理由</span>
+        <div class="big" data-bind="know.r1" data-fallback="理由1"></div><span class="pg">2/6</span></div></div>
+      <span class="no">2枚目</span><span class="nm">理由1</span><span class="ds">1枚に1つだけ。文字は大きく少なく</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">2</span><span class="kk" style="margin-top:6px">理由</span>
+        <div class="big" data-bind="know.r2" data-fallback="理由2"></div><span class="pg">3/6</span></div></div>
+      <span class="no">3枚目</span><span class="nm">理由2</span><span class="ds">同じデザインでそろえると読みやすい</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">3</span><span class="kk" style="margin-top:6px">理由</span>
+        <div class="big" data-bind="know.r3" data-fallback="理由3"></div><span class="pg">4/6</span></div></div>
+      <span class="no">4枚目</span><span class="nm">理由3</span><span class="ds">色は2〜3色までにしぼる</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ks sum"><span class="kk">まとめ</span><div class="big" data-bind="know.hook" data-fallback="結論をもう一度"></div>
+        <ol><li data-bind="know.r1" data-fallback="理由1"></li><li data-bind="know.r2" data-fallback="理由2"></li><li data-bind="know.r3" data-fallback="理由3"></li></ol><span class="pg" style="color:#B9C3D6">5/6</span></div></div>
+      <span class="no">5枚目</span><span class="nm">まとめ</span><span class="ds">結論と理由3つを1枚で見返せるように</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ks save">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+        <div class="big" style="font-size:12.5px">あとで見返せるように<br><span class="mk">保存</span>してね</div>
+        <div class="body" data-bind="set.shop" data-fallback="店名"></div><span class="pg">6/6</span></div></div>
+      <span class="no">6枚目</span><span class="nm">保存のお願い</span><span class="ds">右下の保存ボタンを押してもらう一言を</span>
+    </div>
+  </div>
+  <div class="swipe-hint">← 横にスワイプ →</div>
+  <ul class="tips">
+    <li>見本の文字は<b>②に入力した内容</b>が自動で入ります。スライド作りの下書きにどうぞ</li>
+    <li>表紙だけ写真、2〜6枚目は<b>生成り背景＋文字</b>にすると作るのがかんたん</li>
+  </ul>
+</template>
+
+<template id="tpl-ba-prep">
+  <p class="part-lead">仕上がりを一番よく見せる6枚のカルーセルを作ります。サイズは縦 1080×1350px（4:5）。</p>
+  <h4 class="sub-h">6枚の順番</h4>
+  <div class="carousel" tabindex="0" aria-label="Before/After投稿のスライド見本">
+    <div class="slide">
+      <div class="frame"><div class="cmp"><div class="ph before" data-photo="baBefore"></div><div class="ph" data-photo="baFront"></div>
+        <span class="tagba b">BEFORE</span><span class="tagba a">AFTER</span></div></div>
+      <span class="no">1枚目</span><span class="nm">比較写真</span><span class="ds">左にBefore・右にAfter。一目で変化が分かる</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ph" data-photo="baFront"><span class="lab">AFTER 正面</span></div></div>
+      <span class="no">2枚目</span><span class="nm">After 正面</span><span class="ds">顔まわりと全体のシルエット</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ph" data-photo="baSide"><span class="lab">AFTER 横</span></div></div>
+      <span class="no">3枚目</span><span class="nm">After 横</span><span class="ds">毛先のまとまり・丸み</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ph" data-photo="baBack"><span class="lab">AFTER 後ろ</span></div></div>
+      <span class="no">4枚目</span><span class="nm">After 後ろ</span><span class="ds">自分では見えない後ろ姿は反応が高い</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ph" data-photo="baShine"><span class="lab">ツヤのアップ</span></div></div>
+      <span class="no">5枚目</span><span class="nm">ツヤのアップ</span><span class="ds">髪の表面に光が入る角度でアップ</span>
+    </div>
+    <div class="slide">
+      <div class="frame"><div class="ph before" data-photo="baBefore"><span class="lab">BEFORE</span></div></div>
+      <span class="no">6枚目</span><span class="nm">Before</span><span class="ds">最後にもう一度。変化の大きさを印象づける</span>
+    </div>
+  </div>
+  <div class="swipe-hint">← 横にスワイプ →</div>
+
+  <h4 class="sub-h">撮影のコツ</h4>
+  <ul class="tips">
+    <li><b>同じ場所・同じ光・同じ距離</b>でBeforeとAfterを撮る（比べたときに差がはっきり出る）</li>
+    <li><b>窓際の自然光</b>が一番きれい。照明の真下は影が出やすいので避ける</li>
+    <li>背景は<b>白い壁や無地</b>に。物が写りこまないように</li>
+    <li>スマホは<b>肩の高さ</b>で、傾けずにまっすぐ構える</li>
+    <li>ツヤは、光が髪に<b>斜め上から</b>当たる位置で撮ると出やすい</li>
+    <li>お客様に<b>掲載の許可</b>をいただいてから撮影しましょう</li>
+  </ul>
+</template>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     見本写真の設定
+     正式版の写真に差し替えるときは src を変えるだけでOK。
+     （pos = 見せたい位置 / z = ズーム倍率）
+     --------------------------------------------------------------- */
+  var SAMPLE = "assets/sample-salon.jpg";
+  var PHOTOS = {
+    reelCover:  {src:SAMPLE, pos:"52% 32%", z:1.0},
+    reelBefore: {src:SAMPLE, pos:"50% 30%", z:1.1},
+    reelDuring: {src:SAMPLE, pos:"62% 44%", z:1.6},
+    reelAfter:  {src:SAMPLE, pos:"49% 32%", z:1.25},
+    knowCover:  {src:SAMPLE, pos:"52% 32%", z:1.05},
+    baBefore:   {src:SAMPLE, pos:"50% 32%", z:1.35},
+    baFront:    {src:SAMPLE, pos:"49% 32%", z:1.35},
+    baSide:     {src:SAMPLE, pos:"53% 34%", z:1.6},
+    baBack:     {src:SAMPLE, pos:"56% 38%", z:2.0},
+    baShine:    {src:SAMPLE, pos:"52% 26%", z:3.0}
+  };
+
+  var FIRST_LIMIT = 30, TOTAL_LIMIT = 2200, TAG_LIMIT = 30;
+  var STORE_KEY = "kamidora-insta-template-v1";
+
+  var BOOK = {
+    link: "ご予約・ご相談は、プロフィールのリンクから受け付けています🌿",
+    hpb:  function(shop){ return "ご予約はホットペッパービューティーから。「" + (shop || "店名") + "」で検索してください🔍"; },
+    dm:   "ご予約・ご相談は、DMからお気軽にどうぞ📩"
+  };
+
+  var TEMPLATES = [
+    { id:"reel", no:1, name:"リール", goal:"見てもらう・コメントをもらう",
+      prepTitle:"画像・動画を準備する", prepTpl:"tpl-reel-prep",
+      fields:[
+        {id:"hook", label:"1行目", hint:"思わず手が止まるひと言。カバー画像の文字と同じでOK", first:true, rows:2,
+          ph:"例）広がる髪が、30秒でツヤ髪に変わるまで",
+          ex:"広がる髪が、30秒でツヤ髪に変わるまで"},
+        {id:"point", label:"施術のポイント", hint:"どこをどう工夫したか。2〜3文で", rows:4,
+          ph:"例）毛先のダメージに合わせて薬剤を塗り分け…",
+          ex:"毛先のダメージに合わせて、薬剤を塗り分けています。\n根元はクセを伸ばしすぎず、自然な丸みが出るようにアイロンの角度を調整しました。"},
+        {id:"cta", label:"コメントを促す一文", hint:"質問形にすると返事がもらいやすい", rows:2,
+          ph:"例）あなたの髪のお悩みもコメントで教えてください",
+          ex:"あなたの髪のお悩みも、コメントで教えてください✨\n次の動画でお答えします！"}
+      ],
+      build:function(v){ return [v.hook, v.point, v.cta]; }
+    },
+    { id:"know", no:2, name:"知識投稿", goal:"保存・シェアしてもらう",
+      prepTitle:"画像を準備する", prepTpl:"tpl-know-prep",
+      fields:[
+        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2,
+          ph:"例）うねりは「乾かし方」を変えるだけで落ち着きます",
+          ex:"うねりは「乾かし方」を変えるだけで落ち着きます"},
+        {id:"r1", label:"理由1", rows:2, ph:"例）濡れたままだと湿気を吸いやすいから",
+          ex:"濡れたままにすると、髪が湿気を吸ってうねりやすくなるから"},
+        {id:"r2", label:"理由2", rows:2, ph:"例）根元から乾かすとクセが出にくいから",
+          ex:"根元から先に乾かすと、クセの元になる根元の形が整うから"},
+        {id:"r3", label:"理由3", rows:2, ph:"例）最後の冷風でツヤが長持ちするから",
+          ex:"最後に冷風を当てると、ツヤが出てまとまりが長持ちするから"},
+        {id:"cta", label:"保存を促す一文", hint:"「あとで見返せるように」がおすすめ", rows:2,
+          ph:"例）忘れないように保存して、今夜から試してみてください",
+          ex:"忘れないように【保存】して、今夜から試してみてください📌"}
+      ],
+      build:function(v){
+        var reasons = [];
+        if (v.r1) reasons.push("① " + v.r1);
+        if (v.r2) reasons.push("② " + v.r2);
+        if (v.r3) reasons.push("③ " + v.r3);
+        return [v.hook, reasons.join("\n"), v.cta];
+      }
+    },
+    { id:"ba", no:3, name:"Before/After", goal:"予約につなげる",
+      prepTitle:"画像を準備する", prepTpl:"tpl-ba-prep",
+      fields:[
+        {id:"hook", label:"1行目", hint:"変化が一番伝わるひと言を", first:true, rows:2,
+          ph:"例）毎朝のアイロンがいらなくなったBefore/After",
+          ex:"毎朝のアイロンがいらなくなったBefore/After"},
+        {id:"worry", label:"ご来店時のお悩み", rows:3, ph:"例）湿気で広がる・前髪がうねる",
+          ex:"湿気で広がる、前髪がうねる。\n毎朝30分アイロンをかけていたそうです。"},
+        {id:"menu", label:"施術内容", rows:3, ph:"例）髪質改善トリートメント＋毛先カット",
+          ex:"髪質改善トリートメント＋毛先カット。\nダメージに合わせて薬剤を塗り分けました。"},
+        {id:"finish", label:"仕上がり", rows:3, ph:"例）乾かすだけでまとまるツヤ髪に",
+          ex:"乾かすだけでまとまるツヤ髪に。\n手ぐしがスッと通るやわらかさです。"}
+      ],
+      bookLine:true,
+      build:function(v){
+        return [
+          v.hook,
+          v.worry  ? "【ご来店時のお悩み】\n" + v.worry  : "",
+          v.menu   ? "【施術内容】\n" + v.menu : "",
+          v.finish ? "【仕上がり】\n" + v.finish : ""
+        ];
+      }
+    }
+  ];
+  var ORDER = TEMPLATES.map(function(t){ return t.id; });
+
+  /* ---------------- State ---------------- */
+  var state = { set:{shop:"", staff:"", book:"link", tags:""}, v:{reel:{}, know:{}, ba:{}}, done:{}, tab:"reel" };
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved && typeof saved === "object") {
+      if (saved.set) Object.assign(state.set, saved.set);
+      if (saved.v) ORDER.forEach(function(k){ if (saved.v[k]) state.v[k] = saved.v[k]; });
+      if (saved.done) state.done = saved.done;
+      if (saved.tab && ORDER.indexOf(saved.tab) > -1) state.tab = saved.tab;
+    }
+  } catch(e) {}
+  var saveTimer;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {} }, 200);
+  }
+
+  /* ---------------- Helpers ---------------- */
+  function $(s, r){ return (r || document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function len(s){ return Array.from(s || "").length; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function trimAll(s){ return String(s || "").replace(/\r\n?/g, "\n").trim(); }
+  function fmt(n){ return n.toLocaleString("ja-JP"); }
+
+  function tagsList(){
+    var out = [], seen = {};
+    String(state.set.tags || "").split(/[\s,、，　]+/).forEach(function(t){
+      t = t.replace(/^[#＃]+/, "").trim();
+      if (!t) return;
+      var k = t.toLowerCase();
+      if (seen[k]) return; seen[k] = 1;
+      out.push("#" + t);
+    });
+    return out;
+  }
+  function bookLine(){
+    var b = BOOK[state.set.book] || BOOK.link;
+    return typeof b === "function" ? b(trimAll(state.set.shop)) : b;
+  }
+
+  /* Caption as segments: {text, cls} so preview can style parts while copy uses plain text */
+  function buildSegments(tpl){
+    var v = {};
+    tpl.fields.forEach(function(f){ v[f.id] = trimAll(state.v[tpl.id][f.id]); });
+    var body = tpl.build(v).filter(Boolean);
+    var segs = [];
+    body.forEach(function(p, i){
+      if (i === 0 && v.hook && p === v.hook) {
+        var lines = p.split("\n");
+        segs.push({text:lines[0], cls:"first"});
+        if (lines.length > 1) segs.push({text:"\n" + lines.slice(1).join("\n")});
+      } else {
+        segs.push({text:p});
+      }
+      segs.push({text:"\n\n"});
+    });
+    if (tpl.bookLine) { segs.push({text:bookLine(), cls:"auto"}); segs.push({text:"\n\n"}); }
+    var shop = trimAll(state.set.shop), staff = trimAll(state.set.staff);
+    var sig = [];
+    if (shop)  sig.push("📍" + shop);
+    if (staff) sig.push("✂️ 担当：" + staff);
+    if (sig.length) { segs.push({text:"――――――――\n" + sig.join("\n"), cls:"auto"}); segs.push({text:"\n\n"}); }
+    var tags = tagsList();
+    if (tags.length) segs.push({text:tags.join(" "), cls:"tagline"});
+    // trim trailing blank lines
+    while (segs.length && /^\n+$/.test(segs[segs.length-1].text)) segs.pop();
+    return segs;
+  }
+  function captionText(tpl){ return buildSegments(tpl).map(function(s){ return s.text; }).join(""); }
+
+  /* ---------------- Photos ---------------- */
+  function paintPhotos(root){
+    $$("[data-photo]", root).forEach(function(el){
+      var p = PHOTOS[el.getAttribute("data-photo")]; if (!p) return;
+      if (!el.querySelector("img")) {
+        var img = new Image(); img.src = p.src; img.alt = ""; img.loading = "lazy"; img.decoding = "async";
+        el.insertBefore(img, el.firstChild);
+        var s = document.createElement("span"); s.className = "sample"; s.textContent = "見本"; el.appendChild(s);
+      }
+      el.style.setProperty("--pos", p.pos); el.style.setProperty("--z", p.z);
+    });
+  }
+
+  /* ---------------- Build panels ---------------- */
+  var panels = $("#panels");
+  TEMPLATES.forEach(function(t){
+    var sec = document.createElement("section");
+    sec.id = "panel-" + t.id; sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-label", t.name);
+    var html = ''
+      + '<div class="panel-head"><span class="badge">' + t.no + '</span><div><h2>' + esc(t.name) + '</h2>'
+      + '<div class="goal">目的：<b>' + esc(t.goal) + '</b></div></div></div>'
+      + '<div class="card"><div class="part-h"><span class="no">①</span><h3>' + esc(t.prepTitle) + '</h3></div><div class="prep"></div></div>'
+      + '<div class="card"><div class="part-h"><span class="no">②</span><h3>キャプションを書く</h3></div>'
+      + '<p class="part-lead">空欄をうめると、下のプレビューに完成文ができあがります。</p>'
+      + '<div class="row-btns" style="margin-top:10px"><button class="btn btn-soft" type="button" data-ex="' + t.id + '">記入例を入れる</button>'
+      + '<button class="btn btn-ghost" type="button" data-clear="' + t.id + '">空にする</button></div>';
+    t.fields.forEach(function(f, i){
+      var fid = "f_" + t.id + "_" + f.id;
+      html += '<div class="field" data-field="' + f.id + '"><label for="' + fid + '"><span class="num">' + (i+1) + '</span>' + esc(f.label) + '</label>'
+        + (f.hint ? '<span class="hint">' + esc(f.hint) + '</span>' : '')
+        + '<textarea id="' + fid + '" rows="' + (f.rows || 2) + '" data-t="' + t.id + '" data-f="' + f.id + '" placeholder="' + esc(f.ph || "") + '"></textarea>'
+        + '<div class="cnt" data-cnt="' + f.id + '"></div></div>';
+    });
+    if (t.bookLine) {
+      html += '<div class="auto-line"><span class="tag">自動で入ります</span><div data-bookline></div>'
+        + '<div class="small muted">※基本設定の「予約の受け付け方」に合わせて切り替わります</div></div>';
+    }
+    html += '<h4 class="sub-h" style="margin-top:22px">完成プレビュー</h4>'
+      + '<div class="pv"><div class="pv-top"><span class="av"><span data-avatar></span></span><span class="nm" data-pvname></span><span class="lb">キャプション</span></div>'
+      + '<div class="pv-body" data-pv></div>'
+      + '<div class="pv-meter"><span class="meter" data-m="first"></span><span class="meter" data-m="total"></span><span class="meter" data-m="tags"></span></div></div>'
+      + '<p class="pv-note">色付きの1行目が、フィードで最初に目に入る部分です。店名・担当者名・ハッシュタグは基本設定から自動で入ります。</p>'
+      + '<div class="copy-area"><button class="btn btn-copy" type="button" data-copy="' + t.id + '">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>'
+      + '<span data-copylabel>コピーする</span></button>'
+      + '<div class="copy-sub">コピーしたら、Instagramのキャプション欄に貼り付けるだけ</div></div>'
+      + '</div>';
+    sec.innerHTML = html;
+    var tplEl = document.getElementById(t.prepTpl);
+    $(".prep", sec).appendChild(tplEl.content.cloneNode(true));
+    panels.appendChild(sec);
+    // restore values
+    t.fields.forEach(function(f){
+      var ta = $("#f_" + t.id + "_" + f.id);
+      ta.value = state.v[t.id][f.id] || "";
+    });
+  });
+  paintPhotos(document);
+
+  function autosize(ta){ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 3) + "px"; }
+  function autosizeAll(){ $$("textarea").forEach(function(ta){ if (ta.offsetParent) autosize(ta); }); }
+
+  /* ---------------- Render ---------------- */
+  function countClass(n, limit, warnAt){ return n > limit ? "bad" : (n >= warnAt ? "warn" : ""); }
+
+  function renderPanel(t){
+    var sec = $("#panel-" + t.id);
+    // field counters
+    t.fields.forEach(function(f){
+      var val = state.v[t.id][f.id] || "";
+      var box = $('[data-field="' + f.id + '"]', sec), cnt = $('[data-cnt="' + f.id + '"]', sec);
+      if (f.first) {
+        var firstLine = trimAll(val).split("\n")[0] || "";
+        var n = len(firstLine), cls = countClass(n, FIRST_LIMIT, FIRST_LIMIT - 3);
+        cnt.className = "cnt " + cls;
+        cnt.textContent = n > FIRST_LIMIT ? (n + " / " + FIRST_LIMIT + "字（目安をこえています。短くするともっと読まれます）") : (n + " / " + FIRST_LIMIT + "字（目安）");
+        box.classList.toggle("over", n > FIRST_LIMIT);
+      } else {
+        cnt.className = "cnt"; cnt.textContent = len(val) + "字";
+      }
+    });
+    // book line
+    var bl = $("[data-bookline]", sec); if (bl) bl.textContent = bookLine();
+    // preview
+    var segs = buildSegments(t);
+    var pv = $("[data-pv]", sec);
+    var hasBody = t.fields.some(function(f){ return trimAll(state.v[t.id][f.id]); });
+    var html = segs.map(function(s){ return s.cls ? '<span class="' + s.cls + '">' + esc(s.text) + '</span>' : esc(s.text); }).join("");
+    if (!hasBody) html = '<span class="ph-empty">ここに完成文が表示されます。\n上の空欄をうめるか「記入例を入れる」を押してみてください。</span>' + (html ? "\n\n" + html : "");
+    pv.innerHTML = html;
+    var shop = trimAll(state.set.shop);
+    $("[data-pvname]", sec).textContent = shop || "あなたのアカウント";
+    $("[data-avatar]", sec).textContent = shop ? Array.from(shop)[0].toUpperCase() : "髪";
+    // meters
+    var text = captionText(t);
+    var hook = trimAll(state.v[t.id].hook).split("\n")[0] || "";
+    var fl = len(hook), tl = len(text), tg = tagsList().length;
+    var mf = $('[data-m="first"]', sec), mt = $('[data-m="total"]', sec), mg = $('[data-m="tags"]', sec);
+    mf.className = "meter " + (countClass(fl, FIRST_LIMIT, FIRST_LIMIT - 3) || (fl ? "ok" : ""));
+    mf.textContent = "1行目 " + fl + " / " + FIRST_LIMIT + "字";
+    mt.className = "meter " + (countClass(tl, TOTAL_LIMIT, 2000) || "");
+    mt.textContent = "全体 " + fmt(tl) + " / " + fmt(TOTAL_LIMIT) + "字" + (tl > TOTAL_LIMIT ? "（上限オーバー）" : "");
+    mg.className = "meter " + (tg > TAG_LIMIT ? "bad" : "");
+    mg.textContent = "# " + tg + " / " + TAG_LIMIT + "個";
+    // copy button
+    var btn = $("[data-copy]", sec);
+    btn.classList.toggle("copied", !!state.done[t.id]);
+    $("[data-copylabel]", btn).textContent = state.done[t.id] ? "コピー済み ✓ もう一度コピー" : "コピーする";
+  }
+
+  function renderBinds(){
+    $$("[data-bind]").forEach(function(el){
+      var p = el.getAttribute("data-bind").split("."), val;
+      if (p[0] === "set") val = trimAll(state.set[p[1]]);
+      else val = trimAll((state.v[p[0]] || {})[p[1]]);
+      if (p[1] === "hook") val = val.split("\n")[0];
+      if (val) { el.textContent = val; el.classList.remove("empty"); }
+      else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
+    });
+    // リールのカバー文字にはマーカーを付ける
+    var tx = $(".cover .tx"); if (tx && !tx.classList.contains("empty")) { var t = tx.textContent; tx.innerHTML = '<span class="mk">' + esc(t) + '</span>'; }
+  }
+
+  function renderSettings(){
+    var ok = trimAll(state.set.shop) && trimAll(state.set.staff);
+    var st = $("#setState");
+    st.textContent = ok ? "入力済み ✓" : "未入力";
+    st.classList.toggle("ok", !!ok);
+    var n = tagsList().length, c = $("#tagCnt");
+    c.className = "cnt " + (n > TAG_LIMIT ? "bad" : "");
+    c.textContent = n ? ("ハッシュタグ " + n + "個" + (n > TAG_LIMIT ? "（Instagramは30個まで）" : "")) : "";
+  }
+
+  function renderProgress(){
+    var n = ORDER.filter(function(k){ return state.done[k]; }).length;
+    $("#progNum").textContent = n;
+    $$(".step").forEach(function(b){
+      var k = b.getAttribute("data-go"), i = ORDER.indexOf(k);
+      b.classList.toggle("done", !!state.done[k]);
+      b.classList.toggle("current", state.tab === k && !state.done[k]);
+      $(".dot", b).textContent = state.done[k] ? "✓" : String(i + 1);
+      b.setAttribute("aria-label", TEMPLATES[i].name + (state.done[k] ? "（完了）" : ""));
+    });
+    $$(".tab").forEach(function(b){
+      var k = b.getAttribute("data-tab"), c = $(".chk", b);
+      if (state.done[k] && !c) { c = document.createElement("span"); c.className = "chk"; c.textContent = "✓"; c.setAttribute("aria-hidden","true"); b.appendChild(c); }
+      if (!state.done[k] && c) c.remove();
+    });
+    var msg = $("#progMsg");
+    var next = ORDER.filter(function(k){ return !state.done[k]; })[0];
+    msg.classList.toggle("all", n === 3);
+    if (n === 3) msg.textContent = "🎉 3投稿セットがそろいました！ おつかれさまでした。";
+    else {
+      var t = TEMPLATES[ORDER.indexOf(next)];
+      var setOk = trimAll(state.set.shop) && trimAll(state.set.staff);
+      msg.innerHTML = (n === 0 ? (setOk ? "下のタブの " : "まずは基本設定を入れて、") : "次は ") + "<b>「" + esc(t.name) + "」</b>" + (n === 0 ? "から始めましょう。" : "です。");
+    }
+  }
+
+  function renderAll(){
+    renderSettings();
+    TEMPLATES.forEach(renderPanel);
+    renderBinds();
+    renderProgress();
+  }
+
+  /* ---------------- Tabs ---------------- */
+  function showTab(id, scroll){
+    state.tab = id; save();
+    ORDER.forEach(function(k){
+      $("#panel-" + k).hidden = k !== id;
+      $('.tab[data-tab="' + k + '"]').setAttribute("aria-selected", k === id ? "true" : "false");
+    });
+    renderProgress();
+    autosizeAll();
+    if (scroll) {
+      var y = $("#panel-" + id).getBoundingClientRect().top + window.pageYOffset - 70;
+      window.scrollTo({top:y, behavior:"smooth"});
+    }
+  }
+  $$(".tab").forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab"), true); }); });
+  $$(".step").forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-go"), true); }); });
+
+  /* ---------------- Inputs ---------------- */
+  panels.addEventListener("input", function(e){
+    var el = e.target; if (!el.matches("textarea[data-t]")) return;
+    var t = el.getAttribute("data-t");
+    state.v[t][el.getAttribute("data-f")] = el.value;
+    autosize(el);
+    save();
+    renderPanel(TEMPLATES[ORDER.indexOf(t)]);
+    renderBinds();
+  });
+  panels.addEventListener("click", function(e){
+    var ex = e.target.closest("[data-ex]"), cl = e.target.closest("[data-clear]"), cp = e.target.closest("[data-copy]");
+    if (ex) fillExample(ex.getAttribute("data-ex"));
+    if (cl) clearTpl(cl.getAttribute("data-clear"));
+    if (cp) doCopy(cp.getAttribute("data-copy"));
+  });
+
+  function fillExample(id){
+    var t = TEMPLATES[ORDER.indexOf(id)];
+    var filled = t.fields.some(function(f){ return trimAll(state.v[id][f.id]); });
+    if (filled && !confirm("入力した内容を記入例に置きかえます。よろしいですか？")) return;
+    t.fields.forEach(function(f){ state.v[id][f.id] = f.ex; $("#f_" + id + "_" + f.id).value = f.ex; });
+    save(); renderPanel(t); renderBinds(); autosizeAll();
+    toast("記入例を入れました", "自分の言葉に書きかえて使ってください。");
+  }
+  function clearTpl(id){
+    var t = TEMPLATES[ORDER.indexOf(id)];
+    if (!confirm("「" + t.name + "」の入力内容を空にします。よろしいですか？")) return;
+    t.fields.forEach(function(f){ state.v[id][f.id] = ""; $("#f_" + id + "_" + f.id).value = ""; });
+    save(); renderPanel(t); renderBinds(); autosizeAll();
+  }
+
+  /* ---------------- Settings ---------------- */
+  var settingsEl = $("#settings");
+  $$("[data-set]").forEach(function(el){
+    el.value = state.set[el.getAttribute("data-set")] || "";
+    el.addEventListener("input", function(){ state.set[el.getAttribute("data-set")] = el.value; save(); renderAll(); });
+  });
+  $$('input[name="book"]').forEach(function(r){
+    r.checked = r.value === state.set.book;
+    r.addEventListener("change", function(){ if (r.checked) { state.set.book = r.value; save(); renderAll(); } });
+  });
+  $("#setExample").addEventListener("click", function(){
+    var ex = {shop:"hair salon HANA", staff:"山田 はな", tags:"#髪質改善 #縮毛矯正 #髪質改善トリートメント #梅田美容室 #ツヤ髪"};
+    var filled = trimAll(state.set.shop) || trimAll(state.set.staff) || trimAll(state.set.tags);
+    if (filled && !confirm("入力した内容を記入例に置きかえます。よろしいですか？")) return;
+    Object.keys(ex).forEach(function(k){ state.set[k] = ex[k]; $('[data-set="' + k + '"]').value = ex[k]; });
+    save(); renderAll();
+  });
+  $("#setDone").addEventListener("click", function(){
+    settingsEl.open = false;
+    showTab(state.tab, true);
+  });
+  if (!trimAll(state.set.shop) || !trimAll(state.set.staff)) settingsEl.open = true;
+  settingsEl.addEventListener("toggle", autosizeAll);
+
+  /* ---------------- Copy ---------------- */
+  function copyText(text){
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).catch(function(){ return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  function legacyCopy(text){
+    return new Promise(function(resolve, reject){
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;font-size:16px;";
+      document.body.appendChild(ta);
+      ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+      var ok = false; try { ok = document.execCommand("copy"); } catch(e) {}
+      document.body.removeChild(ta);
+      ok ? resolve() : reject();
+    });
+  }
+  function doCopy(id){
+    var t = TEMPLATES[ORDER.indexOf(id)];
+    var empty = t.fields.filter(function(f){ return !trimAll(state.v[id][f.id]); });
+    if (empty.length === t.fields.length) { toast("まだ何も入力されていません", "空欄をうめるか「記入例を入れる」を押してください。"); return; }
+    if (empty.length && !confirm("「" + empty.map(function(f){ return f.label; }).join("」「") + "」が空欄です。このままコピーしますか？")) return;
+    var text = captionText(t);
+    if (len(text) > TOTAL_LIMIT && !confirm("全体が" + fmt(TOTAL_LIMIT) + "字をこえています。Instagramでは投稿できないため、短くするのがおすすめです。このままコピーしますか？")) return;
+    copyText(text).then(function(){
+      state.done[id] = true; save(); renderAll();
+      var next = ORDER.filter(function(k){ return !state.done[k]; })[0];
+      var nt = next ? TEMPLATES[ORDER.indexOf(next)] : null;
+      toast("コピーしました ✓", "Instagramのキャプション欄を長押し →「ペースト」で貼り付けてください。", [
+        {label:"Instagramを開く", href:"https://www.instagram.com/", primary:true},
+        nt ? {label:"次は「" + nt.name + "」へ", go:next} : {label:"とじる"}
+      ]);
+    }, function(){
+      toast("コピーできませんでした", "プレビューの文章を長押しして選択 →「コピー」してください。");
+    });
+  }
+
+  /* ---------------- Progress reset ---------------- */
+  $("#progReset").addEventListener("click", function(){
+    if (!confirm("完了マークをすべて外します。（入力した内容は残ります）")) return;
+    state.done = {}; save(); renderAll();
+  });
+
+  /* ---------------- Toast ---------------- */
+  var toastEl = $("#toast"), toastTimer;
+  function toast(title, sub, actions){
+    clearTimeout(toastTimer);
+    var html = '<div class="tt">' + esc(title) + '</div>' + (sub ? '<div class="ts">' + esc(sub) + '</div>' : '');
+    if (actions && actions.length) {
+      html += '<div class="acts">' + actions.map(function(a, i){
+        var c = a.primary ? "p" : "s";
+        return a.href ? '<a class="' + c + '" href="' + esc(a.href) + '" target="_blank" rel="noopener">' + esc(a.label) + '</a>'
+                      : '<button type="button" class="' + c + '" data-act="' + i + '">' + esc(a.label) + '</button>';
+      }).join("") + '</div>';
+    }
+    toastEl.innerHTML = html;
+    toastEl.classList.add("show");
+    $$("[data-act]", toastEl).forEach(function(b){
+      b.addEventListener("click", function(){
+        var a = actions[+b.getAttribute("data-act")];
+        hideToast();
+        if (a.go) showTab(a.go, true);
+      });
+    });
+    toastTimer = setTimeout(hideToast, actions ? 9000 : 3200);
+  }
+  function hideToast(){ toastEl.classList.remove("show"); }
+
+  /* ---------------- How-to modal ---------------- */
+  var modal = $("#howto");
+  function openHowto(){ modal.hidden = false; document.body.style.overflow = "hidden"; $("#howtoClose").focus(); }
+  function closeHowto(){ modal.hidden = true; document.body.style.overflow = ""; $("#howtoBtn").focus(); try { localStorage.setItem(STORE_KEY + "-howto", "1"); } catch(e) {} }
+  $("#howtoBtn").addEventListener("click", openHowto);
+  $("#howtoClose").addEventListener("click", closeHowto);
+  modal.addEventListener("click", function(e){ if (e.target === modal) closeHowto(); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !modal.hidden) closeHowto(); });
+
+  /* ---------------- Init ---------------- */
+  showTab(state.tab, false);
+  renderAll();
+  var seen = false; try { seen = !!localStorage.getItem(STORE_KEY + "-howto"); } catch(e) {}
+  if (!seen) setTimeout(openHowto, 300);
+})();
+</script>
+</body>
+</html>
