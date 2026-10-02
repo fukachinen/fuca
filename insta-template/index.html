@@ -256,6 +256,37 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .copy-area{margin-top:14px;}
 .copy-sub{text-align:center; font-size:12px; color:var(--navy-soft); margin-top:8px;}
 
+/* ---------- Post picker ---------- */
+.pick-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+.pick{appearance:none; position:relative; border:1.5px solid var(--rule); background:var(--kinari-2); border-radius:14px; padding:12px 4px 10px;
+  display:flex; flex-direction:column; align-items:center; gap:3px; font-size:13.5px; font-weight:700; line-height:1.3; min-height:96px; text-align:center;}
+.pick svg{width:26px; height:26px; color:var(--coral-ink);}
+.pick .purpose{font-size:10.5px; font-weight:500; color:var(--navy-soft);}
+.pick.current{border-color:var(--navy); background:var(--surface); box-shadow:0 0 0 2px var(--navy) inset;}
+.pick .st{position:absolute; top:-8px; right:-4px; font-size:10px; font-weight:700; color:#fff; background:var(--ok); border-radius:999px; padding:1px 7px; box-shadow:0 0 0 2px var(--kinari);}
+.pick-foot{display:flex; align-items:center; gap:8px; margin:10px 0 0; font-size:12px; color:var(--navy-soft);}
+.pick-foot .reset{margin-left:auto; background:none; border:0; font-size:12px; color:var(--navy-soft); text-decoration:underline; padding:4px;}
+
+/* ---------- Choices ---------- */
+.choose{margin-top:12px; background:var(--kinari-2); border:1.5px solid var(--rule); border-radius:14px; padding:12px;}
+.choose .lbl2{display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; margin-bottom:8px;}
+.choose .lbl2 .step-n{font-size:11px; color:#fff; background:var(--coral-btn); border-radius:999px; padding:1px 9px;}
+.chips{display:flex; flex-wrap:wrap; gap:6px;}
+.chip{appearance:none; border:1.5px solid var(--rule); background:var(--surface); color:var(--navy); border-radius:999px; padding:7px 13px; font-size:13px; font-weight:700; line-height:1.3; min-height:38px;}
+.chip[aria-pressed=true]{background:var(--navy); border-color:var(--navy); color:#fff;}
+.chip.tag{font-weight:500; padding:6px 11px; min-height:34px;}
+.chip.tag[aria-pressed=true]{background:var(--coral-btn); border-color:var(--coral-btn);}
+.chip.tag.need{border-style:dashed; color:var(--warn);}
+.opts{display:grid; gap:6px; margin:0 0 8px;}
+.opt{appearance:none; text-align:left; border:1.5px solid var(--rule); background:var(--surface); border-radius:12px; padding:8px 10px 8px 34px; font-size:13px; line-height:1.55; position:relative; color:var(--navy);}
+.opt::before{content:""; position:absolute; left:10px; top:10px; width:16px; height:16px; border-radius:50%; border:1.5px solid var(--navy-soft); background:var(--surface);}
+.opt[aria-pressed=true]{border-color:var(--navy); background:#EEF1F7;}
+.opt[aria-pressed=true]::before{border-color:var(--navy); background:var(--navy); box-shadow:inset 0 0 0 3px #fff;}
+.opt .o-lb{display:block; font-size:10.5px; font-weight:700; color:var(--coral-ink);}
+.opts-h{font-size:11.5px; font-weight:700; color:var(--navy-soft); margin:0 0 4px;}
+.free-note{font-size:12px; color:var(--navy-soft); margin:-2px 0 6px;}
+.warn-line{font-size:12px; color:var(--warn); margin-top:8px;}
+
 /* ---------- Tab bar ---------- */
 .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,252,246,.97); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   border-top:1px solid var(--rule); padding-bottom:var(--safe-b); box-shadow:0 -4px 16px rgba(31,47,77,.06);}
@@ -325,24 +356,25 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 <main class="wrap">
 
   <div class="ttl">
-    <h1>空欄をうめて、<span class="mk">コピーするだけ。</span></h1>
-    <p>画像の準備から投稿文まで、この順番で進めれば<br>そのままInstagramに投稿できます。</p>
+    <h1>選んで、<span class="mk">コピーするだけ。</span></h1>
+    <p>作りたい投稿を1つ選んで、お悩みをタップ。<br>そのままInstagramに投稿できる文章ができます。</p>
   </div>
 
-  <!-- ============ PROGRESS ============ -->
-  <section class="card" aria-labelledby="progTitle">
-    <div class="prog-top">
-      <span class="count hand" id="progTitle">3投稿セット <b id="progNum">0</b>/3</span>
-      <button class="reset" id="progReset" type="button">やり直す</button>
+  <!-- ============ PICKER ============ -->
+  <section class="card" aria-labelledby="pickTitle">
+    <div class="card-h"><h2 id="pickTitle">作る投稿をえらぶ</h2><span class="aside">1つずつでOK</span></div>
+    <div class="pick-grid">
+      <button class="pick" type="button" data-go="reel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8 3l3 5.5M13.5 3l3 5.5"/><path d="m10.2 12 4.3 2.5-4.3 2.5z" fill="currentColor"/></svg>
+        リール<span class="purpose">見てもらう</span></button>
+      <button class="pick" type="button" data-go="know">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+        知識投稿<span class="purpose">保存してもらう</span></button>
+      <button class="pick" type="button" data-go="ba">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M12 4v16"/><path d="m6 14 2-2.5 2 2.5M14.5 14.5c1-2 3-2 4-3.5"/></svg>
+        Before/After<span class="purpose">予約につなげる</span></button>
     </div>
-    <ol class="steps" id="steps">
-      <li><button class="step" type="button" data-go="reel"><span class="dot">1</span>リール<span class="purpose">見てもらう</span></button></li>
-      <li class="arw" aria-hidden="true">→</li>
-      <li><button class="step" type="button" data-go="know"><span class="dot">2</span>知識投稿<span class="purpose">保存してもらう</span></button></li>
-      <li class="arw" aria-hidden="true">→</li>
-      <li><button class="step" type="button" data-go="ba"><span class="dot">3</span>Before/After<span class="purpose">予約につなげる</span></button></li>
-    </ol>
-    <p class="prog-msg" id="progMsg"></p>
+    <div class="pick-foot"><span>どれからでも、1つだけでも作れます。</span><button class="reset" id="progReset" type="button" hidden>✓を消す</button></div>
   </section>
 
   <!-- ============ SETTINGS ============ -->
@@ -352,7 +384,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       <span class="state" id="setState">未入力</span>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     </summary>
-    <p class="note">ここに入れた内容は、3つのテンプレートすべての末尾に自動で入ります。最初に1回だけ入力してください。</p>
+    <p class="note">ここに入れた内容は、どの投稿にも末尾に自動で入ります。最初に1回だけ入力してください。</p>
 
     <div class="field">
       <label for="s_shop">店名</label>
@@ -371,9 +403,14 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       </div>
     </div>
     <div class="field">
-      <label for="s_tags">いつも付けるハッシュタグ</label>
-      <span class="hint">スペースか改行で区切ってください。「#」は自動で付きます。</span>
-      <textarea id="s_tags" data-set="tags" rows="3" placeholder="例）#髪質改善 #縮毛矯正 #梅田美容室"></textarea>
+      <label for="s_area">地域名</label>
+      <span class="hint">ハッシュタグの「○○縮毛矯正」の○○に入ります（例：梅田 → #梅田縮毛矯正）</span>
+      <input type="text" id="s_area" data-set="area" placeholder="例）梅田">
+    </div>
+    <div class="field">
+      <label for="s_tags">お店でいつも付けるハッシュタグ（任意）</label>
+      <span class="hint">店名タグなど。お悩みに合うタグは、投稿ごとに選べます。スペースか改行で区切り、「#」は自動で付きます。</span>
+      <textarea id="s_tags" data-set="tags" rows="3" placeholder="例）#hairsalonHANA"></textarea>
       <div class="cnt" id="tagCnt"></div>
     </div>
     <div class="row-btns" style="margin-top:14px">
@@ -416,14 +453,14 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 <div class="modal" id="howto" role="dialog" aria-modal="true" aria-labelledby="howtoTitle" hidden>
   <div class="sheet">
     <h2 id="howtoTitle">使い方</h2>
-    <p class="muted small" style="margin:0">上から順に進めるだけで、3つの投稿がそろいます。</p>
+    <p class="muted small" style="margin:0">作りたい投稿を1つ選ぶだけ。リールだけ、Before/Afterだけでも大丈夫です。</p>
     <ol>
-      <li><b>基本設定を入れる</b><span>店名・担当者名・予約方法・ハッシュタグ。最初の1回だけでOK。</span></li>
-      <li><b>下のタブで「リール」から始める</b><span>おすすめの順番は リール → 知識投稿 → Before/After です。</span></li>
+      <li><b>基本設定を入れる</b><span>店名・担当者名・予約方法・地域名。最初の1回だけでOK。</span></li>
+      <li><b>作りたい投稿を1つ選ぶ</b><span>リール・知識投稿・Before/Afterのどれからでも。下のタブでも切り替えられます。</span></li>
       <li><b>①を見て、画像・動画を準備する</b><span>何枚目に何を入れるか、どう撮るかを見本で確認できます。</span></li>
-      <li><b>②の空欄をうめる</b><span>迷ったら「記入例を入れる」で見本を表示。下のプレビューに完成文が出ます。</span></li>
+      <li><b>②でお悩みをタップする</b><span>文章とハッシュタグが自動で入ります。ほかの候補を選んだり、自分の言葉に書きかえたりもできます。</span></li>
       <li><b>「コピーする」を押して、Instagramに貼り付け</b><span>投稿画面のキャプション欄を長押し →「ペースト」。店名・ハッシュタグも入っています。</span></li>
-      <li><b>3つそろえば完了！</b><span>コピーした投稿には完了マークが付きます。</span></li>
+      <li><b>できあがり！</b><span>コピーした投稿には ✓ が付きます。次に作りたくなったら、また選ぶだけ。</span></li>
     </ol>
     <p class="privacy">🔒 入力した内容は、このスマホ（ブラウザ）の中だけに保存されます。ほかの受講生や講師には見えません。</p>
     <button class="btn btn-ghost close" type="button" id="howtoClose">とじる</button>
@@ -568,6 +605,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   </ul>
 </template>
 
+<script src="data.js"></script>
 <script>
 (function(){
   "use strict";
@@ -591,8 +629,9 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     baShine:    {src:SAMPLE, pos:"52% 26%", z:3.0}
   };
 
+  var CH = window.CHOICES || {nayami:[], common:{comment:[], save:[], tags:[]}};
   var FIRST_LIMIT = 30, TOTAL_LIMIT = 2200, TAG_LIMIT = 30;
-  var STORE_KEY = "kamidora-insta-template-v1";
+  var STORE_KEY = "kamidora-insta-template-v2";
 
   var BOOK = {
     link: "ご予約・ご相談は、プロフィールのリンクから受け付けています🌿",
@@ -604,13 +643,13 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     { id:"reel", no:1, name:"リール", goal:"見てもらう・コメントをもらう",
       prepTitle:"画像・動画を準備する", prepTpl:"tpl-reel-prep",
       fields:[
-        {id:"hook", label:"1行目", hint:"思わず手が止まるひと言。カバー画像の文字と同じでOK", first:true, rows:2,
+        {id:"hook", label:"1行目", hint:"思わず手が止まるひと言。カバー画像の文字と同じでOK", first:true, rows:2, opt:function(n){ return n.reel; },
           ph:"例）広がる髪が、30秒でツヤ髪に変わるまで",
           ex:"広がる髪が、30秒でツヤ髪に変わるまで"},
-        {id:"point", label:"施術のポイント", hint:"どこをどう工夫したか。2〜3文で", rows:4,
+        {id:"point", label:"施術のポイント", hint:"ここだけは自分の言葉で。どこをどう工夫したか、2〜3文で", rows:4, free:true,
           ph:"例）毛先のダメージに合わせて薬剤を塗り分け…",
           ex:"毛先のダメージに合わせて、薬剤を塗り分けています。\n根元はクセを伸ばしすぎず、自然な丸みが出るようにアイロンの角度を調整しました。"},
-        {id:"cta", label:"コメントを促す一文", hint:"質問形にすると返事がもらいやすい", rows:2,
+        {id:"cta", label:"コメントを促す一文", hint:"質問形にすると返事がもらいやすい", rows:2, common:"comment",
           ph:"例）あなたの髪のお悩みもコメントで教えてください",
           ex:"あなたの髪のお悩みも、コメントで教えてください✨\n次の動画でお答えします！"}
       ],
@@ -619,16 +658,16 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     { id:"know", no:2, name:"知識投稿", goal:"保存・シェアしてもらう",
       prepTitle:"画像を準備する", prepTpl:"tpl-know-prep",
       fields:[
-        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2,
+        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2, opt:function(n){ return [n.know.hook]; },
           ph:"例）うねりは「乾かし方」を変えるだけで落ち着きます",
           ex:"うねりは「乾かし方」を変えるだけで落ち着きます"},
-        {id:"r1", label:"理由1", rows:2, ph:"例）濡れたままだと湿気を吸いやすいから",
+        {id:"r1", label:"理由1", rows:2, opt:function(n){ return [n.know.r1]; }, ph:"例）濡れたままだと湿気を吸いやすいから",
           ex:"濡れたままにすると、髪が湿気を吸ってうねりやすくなるから"},
-        {id:"r2", label:"理由2", rows:2, ph:"例）根元から乾かすとクセが出にくいから",
+        {id:"r2", label:"理由2", rows:2, opt:function(n){ return [n.know.r2]; }, ph:"例）根元から乾かすとクセが出にくいから",
           ex:"根元から先に乾かすと、クセの元になる根元の形が整うから"},
-        {id:"r3", label:"理由3", rows:2, ph:"例）最後の冷風でツヤが長持ちするから",
+        {id:"r3", label:"理由3", rows:2, opt:function(n){ return [n.know.r3]; }, ph:"例）最後の冷風でツヤが長持ちするから",
           ex:"最後に冷風を当てると、ツヤが出てまとまりが長持ちするから"},
-        {id:"cta", label:"保存を促す一文", hint:"「あとで見返せるように」がおすすめ", rows:2,
+        {id:"cta", label:"保存を促す一文", hint:"「あとで見返せるように」がおすすめ", rows:2, common:"save",
           ph:"例）忘れないように保存して、今夜から試してみてください",
           ex:"忘れないように【保存】して、今夜から試してみてください📌"}
       ],
@@ -643,14 +682,14 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     { id:"ba", no:3, name:"Before/After", goal:"予約につなげる",
       prepTitle:"画像を準備する", prepTpl:"tpl-ba-prep",
       fields:[
-        {id:"hook", label:"1行目", hint:"変化が一番伝わるひと言を", first:true, rows:2,
+        {id:"hook", label:"1行目", hint:"変化が一番伝わるひと言を", first:true, rows:2, opt:function(n){ return n.ba.hook; },
           ph:"例）毎朝のアイロンがいらなくなったBefore/After",
           ex:"毎朝のアイロンがいらなくなったBefore/After"},
-        {id:"worry", label:"ご来店時のお悩み", rows:3, ph:"例）湿気で広がる・前髪がうねる",
+        {id:"worry", label:"ご来店時のお悩み", rows:3, opt:function(n){ return n.ba.worry; }, ph:"例）湿気で広がる・前髪がうねる",
           ex:"湿気で広がる、前髪がうねる。\n毎朝30分アイロンをかけていたそうです。"},
-        {id:"menu", label:"施術内容", rows:3, ph:"例）髪質改善トリートメント＋毛先カット",
+        {id:"menu", label:"施術内容", rows:3, opt:function(n){ return n.ba.menu; }, ph:"例）髪質改善トリートメント＋毛先カット",
           ex:"髪質改善トリートメント＋毛先カット。\nダメージに合わせて薬剤を塗り分けました。"},
-        {id:"finish", label:"仕上がり", rows:3, ph:"例）乾かすだけでまとまるツヤ髪に",
+        {id:"finish", label:"仕上がり", rows:3, opt:function(n){ return n.ba.finish; }, ph:"例）乾かすだけでまとまるツヤ髪に",
           ex:"乾かすだけでまとまるツヤ髪に。\n手ぐしがスッと通るやわらかさです。"}
       ],
       bookLine:true,
@@ -667,13 +706,15 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   var ORDER = TEMPLATES.map(function(t){ return t.id; });
 
   /* ---------------- State ---------------- */
-  var state = { set:{shop:"", staff:"", book:"link", tags:""}, v:{reel:{}, know:{}, ba:{}}, done:{}, tab:"reel" };
+  var state = { set:{shop:"", staff:"", book:"link", tags:"", area:""}, v:{reel:{}, know:{}, ba:{}}, pick:{}, ptags:{}, done:{}, tab:"reel" };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (saved && typeof saved === "object") {
       if (saved.set) Object.assign(state.set, saved.set);
       if (saved.v) ORDER.forEach(function(k){ if (saved.v[k]) state.v[k] = saved.v[k]; });
       if (saved.done) state.done = saved.done;
+      if (saved.pick) state.pick = saved.pick;
+      if (saved.ptags) state.ptags = saved.ptags;
       if (saved.tab && ORDER.indexOf(saved.tab) > -1) state.tab = saved.tab;
     }
   } catch(e) {}
@@ -691,16 +732,30 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   function trimAll(s){ return String(s || "").replace(/\r\n?/g, "\n").trim(); }
   function fmt(n){ return n.toLocaleString("ja-JP"); }
 
-  function tagsList(){
+  /* {area} を地域名に置きかえる。地域名が空なら null */
+  function areaTag(raw){
+    if (raw.indexOf("{area}") < 0) return raw;
+    var a = trimAll(state.set.area).replace(/[\s#＃]+/g, "");
+    return a ? raw.split("{area}").join(a) : null;
+  }
+  function tagsList(tid){
     var out = [], seen = {};
-    String(state.set.tags || "").split(/[\s,、，　]+/).forEach(function(t){
-      t = t.replace(/^[#＃]+/, "").trim();
+    function add(t){
+      t = String(t || "").replace(/^[#＃]+/, "").trim();
       if (!t) return;
       var k = t.toLowerCase();
       if (seen[k]) return; seen[k] = 1;
       out.push("#" + t);
-    });
+    }
+    String(state.set.tags || "").split(/[\s,、，　]+/).forEach(add);
+    if (tid) (state.ptags[tid] || []).forEach(function(raw){ var t = areaTag(raw); if (t) add(t); });
     return out;
+  }
+  function nayamiOf(tid){ var i = state.pick[tid]; return (i === null || i === undefined) ? null : CH.nayami[i] || null; }
+  function optsOf(f, n){
+    if (f.common) return CH.common[f.common] || [];
+    if (f.opt && n) return (f.opt(n) || []).filter(Boolean);
+    return [];
   }
   function bookLine(){
     var b = BOOK[state.set.book] || BOOK.link;
@@ -729,7 +784,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     if (shop)  sig.push("📍" + shop);
     if (staff) sig.push("✂️ 担当：" + staff);
     if (sig.length) { segs.push({text:"――――――――\n" + sig.join("\n"), cls:"auto"}); segs.push({text:"\n\n"}); }
-    var tags = tagsList();
+    var tags = tagsList(tpl.id);
     if (tags.length) segs.push({text:tags.join(" "), cls:"tagline"});
     // trim trailing blank lines
     while (segs.length && /^\n+$/.test(segs[segs.length-1].text)) segs.pop();
@@ -756,20 +811,24 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     var sec = document.createElement("section");
     sec.id = "panel-" + t.id; sec.setAttribute("role", "tabpanel"); sec.setAttribute("aria-label", t.name);
     var html = ''
-      + '<div class="panel-head"><span class="badge">' + t.no + '</span><div><h2>' + esc(t.name) + '</h2>'
+      + '<div class="panel-head"><div><h2>' + esc(t.name) + '</h2>'
       + '<div class="goal">目的：<b>' + esc(t.goal) + '</b></div></div></div>'
       + '<div class="card"><div class="part-h"><span class="no">①</span><h3>' + esc(t.prepTitle) + '</h3></div><div class="prep"></div></div>'
       + '<div class="card"><div class="part-h"><span class="no">②</span><h3>キャプションを書く</h3></div>'
-      + '<p class="part-lead">空欄をうめると、下のプレビューに完成文ができあがります。</p>'
-      + '<div class="row-btns" style="margin-top:10px"><button class="btn btn-soft" type="button" data-ex="' + t.id + '">記入例を入れる</button>'
-      + '<button class="btn btn-ghost" type="button" data-clear="' + t.id + '">空にする</button></div>';
+      + '<p class="part-lead">お悩みを選ぶと、文章とハッシュタグが自動で入ります。候補を選びなおしたり、自分の言葉に書きかえたりもできます。</p>'
+      + '<div class="choose"><div class="lbl2"><span class="step-n">STEP 1</span>お悩みを選ぶ</div><div class="chips" data-nay></div><div class="small muted" data-theme style="margin-top:8px"></div></div>'
+      + '<div class="lbl2" style="display:flex;align-items:center;gap:8px;font-weight:700;margin-top:18px"><span class="step-n" style="font-size:11px;color:#fff;background:var(--coral-btn);border-radius:999px;padding:1px 9px">STEP 2</span>文章を確認する</div>';
     t.fields.forEach(function(f, i){
       var fid = "f_" + t.id + "_" + f.id;
       html += '<div class="field" data-field="' + f.id + '"><label for="' + fid + '"><span class="num">' + (i+1) + '</span>' + esc(f.label) + '</label>'
         + (f.hint ? '<span class="hint">' + esc(f.hint) + '</span>' : '')
+        + '<div class="opts" data-opts="' + f.id + '"></div>'
         + '<textarea id="' + fid + '" rows="' + (f.rows || 2) + '" data-t="' + t.id + '" data-f="' + f.id + '" placeholder="' + esc(f.ph || "") + '"></textarea>'
         + '<div class="cnt" data-cnt="' + f.id + '"></div></div>';
     });
+    html += '<div class="choose" style="margin-top:18px"><div class="lbl2"><span class="step-n">STEP 3</span>ハッシュタグ（タップで付け外し）</div>'
+      + '<div class="chips" data-tags></div><div class="warn-line" data-areawarn></div></div>'
+      + '<div class="row-btns" style="margin-top:12px"><button class="btn btn-ghost" type="button" data-clear="' + t.id + '">この投稿を空にする</button></div>';
     if (t.bookLine) {
       html += '<div class="auto-line"><span class="tag">自動で入ります</span><div data-bookline></div>'
         + '<div class="small muted">※基本設定の「予約の受け付け方」に合わせて切り替わります</div></div>';
@@ -802,8 +861,37 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   /* ---------------- Render ---------------- */
   function countClass(n, limit, warnAt){ return n > limit ? "bad" : (n >= warnAt ? "warn" : ""); }
 
+  function renderChoices(t){
+    var sec = $("#panel-" + t.id), n = nayamiOf(t.id);
+    $("[data-nay]", sec).innerHTML = CH.nayami.map(function(x, i){
+      return '<button type="button" class="chip" data-nay-t="' + t.id + '" data-nay-i="' + i + '" aria-pressed="' + (state.pick[t.id] === i) + '">' + esc(x.name) + '</button>';
+    }).join("");
+    $("[data-theme]", sec).textContent = (t.id === "know" && n) ? "テーマ：" + n.know.theme : "";
+    t.fields.forEach(function(f){
+      var box = $('[data-opts="' + f.id + '"]', sec), o = optsOf(f, n), cur = trimAll(state.v[t.id][f.id]);
+      if (f.free) { box.innerHTML = ""; return; }
+      if (!o.length) { box.innerHTML = n ? "" : '<div class="free-note">STEP 1でお悩みを選ぶと、候補が出ます</div>'; return; }
+      box.innerHTML = (o.length > 1 ? '<div class="opts-h">候補をタップ（' + o.length + '個）</div>' : '')
+        + o.map(function(text, i){
+          return '<button type="button" class="opt" data-opt-t="' + t.id + '" data-opt-f="' + f.id + '" data-opt-i="' + i + '" aria-pressed="' + (cur === trimAll(text)) + '">'
+            + (o.length > 1 ? '<span class="o-lb">候補' + (i+1) + '</span>' : '<span class="o-lb">おすすめ</span>') + esc(text) + '</button>';
+        }).join("");
+    });
+    // hashtags
+    var pool = [];
+    (n ? n.tags : []).concat(CH.common.tags || []).concat(state.ptags[t.id] || []).forEach(function(r){ if (pool.indexOf(r) < 0) pool.push(r); });
+    var sel = state.ptags[t.id] || [], needArea = false;
+    $("[data-tags]", sec).innerHTML = pool.length ? pool.map(function(raw){
+      var tag = areaTag(raw), on = sel.indexOf(raw) > -1;
+      if (!tag) needArea = true;
+      return '<button type="button" class="chip tag' + (tag ? '' : ' need') + '" data-tag-t="' + t.id + '" data-tag-r="' + esc(raw) + '" aria-pressed="' + on + '">#' + esc(tag || raw.split("{area}").join("○○")) + '</button>';
+    }).join("") : '<span class="free-note">STEP 1でお悩みを選ぶと、候補が出ます</span>';
+    $("[data-areawarn]", sec).textContent = needArea ? "「#○○〜」のタグは、基本設定の「地域名」を入れると使えるようになります。" : "";
+  }
+
   function renderPanel(t){
     var sec = $("#panel-" + t.id);
+    renderChoices(t);
     // field counters
     t.fields.forEach(function(f){
       var val = state.v[t.id][f.id] || "";
@@ -825,7 +913,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     var pv = $("[data-pv]", sec);
     var hasBody = t.fields.some(function(f){ return trimAll(state.v[t.id][f.id]); });
     var html = segs.map(function(s){ return s.cls ? '<span class="' + s.cls + '">' + esc(s.text) + '</span>' : esc(s.text); }).join("");
-    if (!hasBody) html = '<span class="ph-empty">ここに完成文が表示されます。\n上の空欄をうめるか「記入例を入れる」を押してみてください。</span>' + (html ? "\n\n" + html : "");
+    if (!hasBody) html = '<span class="ph-empty">ここに完成文が表示されます。\nSTEP 1でお悩みを選んでみてください。</span>' + (html ? "\n\n" + html : "");
     pv.innerHTML = html;
     var shop = trimAll(state.set.shop);
     $("[data-pvname]", sec).textContent = shop || "あなたのアカウント";
@@ -833,7 +921,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     // meters
     var text = captionText(t);
     var hook = trimAll(state.v[t.id].hook).split("\n")[0] || "";
-    var fl = len(hook), tl = len(text), tg = tagsList().length;
+    var fl = len(hook), tl = len(text), tg = tagsList(t.id).length;
     var mf = $('[data-m="first"]', sec), mt = $('[data-m="total"]', sec), mg = $('[data-m="tags"]', sec);
     mf.className = "meter " + (countClass(fl, FIRST_LIMIT, FIRST_LIMIT - 3) || (fl ? "ok" : ""));
     mf.textContent = "1行目 " + fl + " / " + FIRST_LIMIT + "字";
@@ -861,7 +949,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   }
 
   function renderSettings(){
-    var ok = trimAll(state.set.shop) && trimAll(state.set.staff);
+    var ok = trimAll(state.set.shop) && trimAll(state.set.staff) && trimAll(state.set.area);
     var st = $("#setState");
     st.textContent = ok ? "入力済み ✓" : "未入力";
     st.classList.toggle("ok", !!ok);
@@ -871,29 +959,20 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   }
 
   function renderProgress(){
-    var n = ORDER.filter(function(k){ return state.done[k]; }).length;
-    $("#progNum").textContent = n;
-    $$(".step").forEach(function(b){
-      var k = b.getAttribute("data-go"), i = ORDER.indexOf(k);
-      b.classList.toggle("done", !!state.done[k]);
-      b.classList.toggle("current", state.tab === k && !state.done[k]);
-      $(".dot", b).textContent = state.done[k] ? "✓" : String(i + 1);
-      b.setAttribute("aria-label", TEMPLATES[i].name + (state.done[k] ? "（完了）" : ""));
+    var any = false;
+    $$(".pick").forEach(function(b){
+      var k = b.getAttribute("data-go"), st = $(".st", b);
+      b.classList.toggle("current", state.tab === k);
+      b.setAttribute("aria-pressed", state.tab === k ? "true" : "false");
+      if (state.done[k]) { any = true; if (!st) { st = document.createElement("span"); st.className = "st"; st.textContent = "✓ コピー済み"; b.appendChild(st); } }
+      else if (st) st.remove();
     });
+    $("#progReset").hidden = !any;
     $$(".tab").forEach(function(b){
       var k = b.getAttribute("data-tab"), c = $(".chk", b);
       if (state.done[k] && !c) { c = document.createElement("span"); c.className = "chk"; c.textContent = "✓"; c.setAttribute("aria-hidden","true"); b.appendChild(c); }
       if (!state.done[k] && c) c.remove();
     });
-    var msg = $("#progMsg");
-    var next = ORDER.filter(function(k){ return !state.done[k]; })[0];
-    msg.classList.toggle("all", n === 3);
-    if (n === 3) msg.textContent = "🎉 3投稿セットがそろいました！ おつかれさまでした。";
-    else {
-      var t = TEMPLATES[ORDER.indexOf(next)];
-      var setOk = trimAll(state.set.shop) && trimAll(state.set.staff);
-      msg.innerHTML = (n === 0 ? (setOk ? "下のタブの " : "まずは基本設定を入れて、") : "次は ") + "<b>「" + esc(t.name) + "」</b>" + (n === 0 ? "から始めましょう。" : "です。");
-    }
   }
 
   function renderAll(){
@@ -918,7 +997,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     }
   }
   $$(".tab").forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab"), true); }); });
-  $$(".step").forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-go"), true); }); });
+  $$(".pick").forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-go"), true); }); });
 
   /* ---------------- Inputs ---------------- */
   panels.addEventListener("input", function(e){
@@ -931,25 +1010,61 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     renderBinds();
   });
   panels.addEventListener("click", function(e){
-    var ex = e.target.closest("[data-ex]"), cl = e.target.closest("[data-clear]"), cp = e.target.closest("[data-copy]");
-    if (ex) fillExample(ex.getAttribute("data-ex"));
+    var cl = e.target.closest("[data-clear]"), cp = e.target.closest("[data-copy]");
+    var ny = e.target.closest("[data-nay-t]"), op = e.target.closest("[data-opt-t]"), tg = e.target.closest("[data-tag-t]");
+    if (ny) pickNayami(ny.getAttribute("data-nay-t"), +ny.getAttribute("data-nay-i"));
+    if (op) pickOpt(op.getAttribute("data-opt-t"), op.getAttribute("data-opt-f"), +op.getAttribute("data-opt-i"));
+    if (tg) toggleTag(tg.getAttribute("data-tag-t"), tg.getAttribute("data-tag-r"));
     if (cl) clearTpl(cl.getAttribute("data-clear"));
     if (cp) doCopy(cp.getAttribute("data-copy"));
   });
 
-  function fillExample(id){
-    var t = TEMPLATES[ORDER.indexOf(id)];
-    var filled = t.fields.some(function(f){ return trimAll(state.v[id][f.id]); });
-    if (filled && !confirm("入力した内容を記入例に置きかえます。よろしいですか？")) return;
-    t.fields.forEach(function(f){ state.v[id][f.id] = f.ex; $("#f_" + id + "_" + f.id).value = f.ex; });
-    save(); renderPanel(t); renderBinds(); autosizeAll();
-    toast("記入例を入れました", "自分の言葉に書きかえて使ってください。");
+  function tplOf(id){ return TEMPLATES[ORDER.indexOf(id)]; }
+  function setField(id, fid, val){ state.v[id][fid] = val; $("#f_" + id + "_" + fid).value = val; }
+  function afterChange(t){ save(); renderPanel(t); renderBinds(); autosizeAll(); }
+  /* 候補にない（自分で書いた）文章が入っているか */
+  function hasOwnText(t){
+    return t.fields.some(function(f){
+      if (f.free) return false;
+      var v = trimAll(state.v[t.id][f.id]); if (!v) return false;
+      var known = optsOf(f, nayamiOf(t.id)).map(trimAll);
+      return known.indexOf(v) < 0;
+    });
+  }
+  function pickNayami(id, i){
+    var t = tplOf(id), n = CH.nayami[i]; if (!n) return;
+    if (state.pick[id] === i) return;
+    if (hasOwnText(t) && !confirm("書きかえた文章を「" + n.name + "」の文章に置きかえます。よろしいですか？")) return;
+    state.pick[id] = i;
+    t.fields.forEach(function(f){
+      if (f.free) return;
+      var o = optsOf(f, n);
+      if (f.common) { if (!trimAll(state.v[id][f.id]) && o.length) setField(id, f.id, o[0]); return; }
+      setField(id, f.id, o.length ? o[0] : "");
+    });
+    var tags = [];
+    n.tags.concat(CH.common.tags || []).forEach(function(r){ if (tags.indexOf(r) < 0) tags.push(r); });
+    state.ptags[id] = tags;
+    afterChange(t);
+    if (t.fields.some(function(f){ return f.free && !trimAll(state.v[id][f.id]); }))
+      toast("「" + n.name + "」の文章を入れました", "「施術のポイント」だけは、自分の言葉で書いてください。");
+  }
+  function pickOpt(id, fid, i){
+    var t = tplOf(id), f = t.fields.filter(function(x){ return x.id === fid; })[0];
+    var o = optsOf(f, nayamiOf(id)); if (o[i] === undefined) return;
+    setField(id, fid, o[i]); afterChange(t);
+  }
+  function toggleTag(id, raw){
+    var list = (state.ptags[id] || []).slice(), k = list.indexOf(raw);
+    if (k > -1) list.splice(k, 1); else list.push(raw);
+    state.ptags[id] = list; afterChange(tplOf(id));
   }
   function clearTpl(id){
     var t = TEMPLATES[ORDER.indexOf(id)];
     if (!confirm("「" + t.name + "」の入力内容を空にします。よろしいですか？")) return;
-    t.fields.forEach(function(f){ state.v[id][f.id] = ""; $("#f_" + id + "_" + f.id).value = ""; });
-    save(); renderPanel(t); renderBinds(); autosizeAll();
+    t.fields.forEach(function(f){ setField(id, f.id, ""); });
+    state.pick[id] = null; state.ptags[id] = [];
+    afterChange(t);
   }
 
   /* ---------------- Settings ---------------- */
@@ -963,8 +1078,8 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     r.addEventListener("change", function(){ if (r.checked) { state.set.book = r.value; save(); renderAll(); } });
   });
   $("#setExample").addEventListener("click", function(){
-    var ex = {shop:"hair salon HANA", staff:"山田 はな", tags:"#髪質改善 #縮毛矯正 #髪質改善トリートメント #梅田美容室 #ツヤ髪"};
-    var filled = trimAll(state.set.shop) || trimAll(state.set.staff) || trimAll(state.set.tags);
+    var ex = {shop:"hair salon HANA", staff:"山田 はな", area:"梅田", tags:"#hairsalonHANA"};
+    var filled = trimAll(state.set.shop) || trimAll(state.set.staff) || trimAll(state.set.tags) || trimAll(state.set.area);
     if (filled && !confirm("入力した内容を記入例に置きかえます。よろしいですか？")) return;
     Object.keys(ex).forEach(function(k){ state.set[k] = ex[k]; $('[data-set="' + k + '"]').value = ex[k]; });
     save(); renderAll();
@@ -973,7 +1088,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     settingsEl.open = false;
     showTab(state.tab, true);
   });
-  if (!trimAll(state.set.shop) || !trimAll(state.set.staff)) settingsEl.open = true;
+  if (!trimAll(state.set.shop) || !trimAll(state.set.staff) || !trimAll(state.set.area)) settingsEl.open = true;
   settingsEl.addEventListener("toggle", autosizeAll);
 
   /* ---------------- Copy ---------------- */
@@ -998,17 +1113,15 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   function doCopy(id){
     var t = TEMPLATES[ORDER.indexOf(id)];
     var empty = t.fields.filter(function(f){ return !trimAll(state.v[id][f.id]); });
-    if (empty.length === t.fields.length) { toast("まだ何も入力されていません", "空欄をうめるか「記入例を入れる」を押してください。"); return; }
+    if (empty.length === t.fields.length) { toast("まだ何も入っていません", "STEP 1でお悩みを選んでください。"); return; }
     if (empty.length && !confirm("「" + empty.map(function(f){ return f.label; }).join("」「") + "」が空欄です。このままコピーしますか？")) return;
     var text = captionText(t);
     if (len(text) > TOTAL_LIMIT && !confirm("全体が" + fmt(TOTAL_LIMIT) + "字をこえています。Instagramでは投稿できないため、短くするのがおすすめです。このままコピーしますか？")) return;
     copyText(text).then(function(){
       state.done[id] = true; save(); renderAll();
-      var next = ORDER.filter(function(k){ return !state.done[k]; })[0];
-      var nt = next ? TEMPLATES[ORDER.indexOf(next)] : null;
       toast("コピーしました ✓", "Instagramのキャプション欄を長押し →「ペースト」で貼り付けてください。", [
         {label:"Instagramを開く", href:"https://www.instagram.com/", primary:true},
-        nt ? {label:"次は「" + nt.name + "」へ", go:next} : {label:"とじる"}
+        {label:"とじる"}
       ]);
     }, function(){
       toast("コピーできませんでした", "プレビューの文章を長押しして選択 →「コピー」してください。");
@@ -1017,7 +1130,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 
   /* ---------------- Progress reset ---------------- */
   $("#progReset").addEventListener("click", function(){
-    if (!confirm("完了マークをすべて外します。（入力した内容は残ります）")) return;
+    if (!confirm("コピー済みの ✓ をすべて外します。（入力した内容は残ります）")) return;
     state.done = {}; save(); renderAll();
   });
 
