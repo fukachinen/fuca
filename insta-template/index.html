@@ -211,11 +211,15 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .ks .big{font-family:var(--font-hand); font-weight:600; font-size:14px; line-height:1.4; word-break:break-word;}
 .ks .big .mk{background:linear-gradient(transparent 60%, var(--coral-mark) 60%);}
 .ks .body{font-size:9.5px; color:var(--navy); margin-top:6px; word-break:break-word;}
-.ks.cover{padding:0;}
+.ks.cover{padding:0; position:absolute; aspect-ratio:auto; border-radius:0; box-shadow:none;} /* .cover（リール図解）のスタイルを打ち消す */
 .ks.cover .ph{position:absolute; inset:0; border-radius:0;}
 .ks.cover .ph img{filter:brightness(.92);}
 .ks.cover .box{position:absolute; left:8px; right:8px; bottom:12px; background:rgba(255,252,246,.94); border-radius:8px; padding:8px; z-index:2;}
-.ks.cover .box .big{font-size:13px;}
+.ks.cover .box .big{font-size:11.5px; display:block !important;}
+.ks .body{display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; font-size:8.5px;}
+.ks.cover .box .body{-webkit-line-clamp:2; margin-top:3px;}
+.ks.sum .body{-webkit-line-clamp:2; margin-top:4px;}
+.ks .big{display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;}
 .ks.cover .sv{position:absolute; top:8px; right:8px; z-index:2; font-size:8.5px; font-weight:700; color:#fff; background:var(--coral-btn); border-radius:999px; padding:1px 7px;}
 .ks .circle{font-family:var(--font-hand); font-weight:600; font-size:22px; color:var(--coral-ink); line-height:1;}
 .ks.sum{background:var(--navy); color:#fff;}
@@ -286,6 +290,16 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .opts-h{font-size:11.5px; font-weight:700; color:var(--navy-soft); margin:0 0 4px;}
 .free-note{font-size:12px; color:var(--navy-soft); margin:-2px 0 6px;}
 .warn-line{font-size:12px; color:var(--warn); margin-top:8px;}
+
+.telop{display:block; font-size:11px; font-weight:700; color:var(--navy); background:var(--coral-soft); border-radius:6px; padding:3px 6px; line-height:1.45;}
+.cmp-tx{position:absolute; left:6px; right:6px; bottom:8px; z-index:3; text-align:center; font-family:var(--font-hand); font-weight:600; font-size:11px; color:var(--navy);
+  background:rgba(255,252,246,.94); border-radius:6px; padding:3px 4px;}
+.cmp-tx:empty{display:none;}
+.opt .o-lb.season{color:var(--ok);}
+.opt .o-lb.psy{color:var(--navy-2);}
+.psy-note{font-size:11.5px; color:var(--warn); margin:-2px 0 6px;}
+.book-opts{display:grid; gap:6px; margin:8px 0 4px;}
+input.one{font-size:16px;}
 
 /* ---------- Tab bar ---------- */
 .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,252,246,.97); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
@@ -476,7 +490,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     <div class="cover" aria-label="カバー画像の見本図">
       <div class="ph" data-photo="reelCover"></div>
       <div class="cut top">プロフィールでは<br>切れる</div>
-      <div class="safe"><div class="tx" data-bind="reel.hook" data-fallback="1行目の言葉を<br>ここに大きく"></div></div>
+      <div class="safe"><div class="tx" data-nbind="reel:cover" data-alt="reel.hook" data-fallback="1行目の言葉を<br>ここに大きく"></div></div>
       <span class="safe-lbl">表示される範囲</span>
       <div class="cut bottom">プロフィールでは<br>切れる</div>
     </div>
@@ -487,7 +501,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     </ul>
   </div>
   <ul class="tips">
-    <li>カバーの文字は<b>②の「1行目」と同じ言葉</b>にすると伝わりやすい（上の図にも自動で入ります）</li>
+    <li>②でお悩みを選ぶと、<b>おすすめのカバー文字</b>が上の図に入ります</li>
     <li>文字は<b>2行・15文字以内</b>を目安に、太く大きく</li>
   </ul>
 
@@ -498,18 +512,21 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       <span class="sec">0〜3秒</span>
       <span class="t">冒頭はBefore</span>
       <span class="d">広がり・うねりが分かるように。最初に見せて「どうなるの？」と思わせる</span>
+      <span class="telop" data-nbind="reel:telop.before" data-prefix="テロップ：" hidden></span>
     </div>
     <div class="tl">
       <div class="ph" data-photo="reelDuring"><span class="lab">施術中</span></div>
       <span class="sec">3〜20秒</span>
       <span class="t">施術中</span>
       <span class="d">手元のアップを数カット。1カット2〜3秒でテンポよく</span>
+      <span class="telop" data-nbind="reel:telop.during" data-prefix="テロップ：" hidden></span>
     </div>
     <div class="tl">
       <div class="ph" data-photo="reelAfter"><span class="lab">AFTER</span></div>
       <span class="sec">ラスト5秒</span>
       <span class="t">Afterで締め</span>
       <span class="d">髪をなびかせる・振り向くなど、動きでツヤを見せる</span>
+      <span class="telop" data-nbind="reel:telop.after" data-prefix="テロップ：" hidden></span>
     </div>
   </div>
   <ul class="tips">
@@ -524,27 +541,27 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   <div class="carousel" tabindex="0" aria-label="知識投稿のスライド見本">
     <div class="slide">
       <div class="frame"><div class="ks cover"><div class="ph" data-photo="knowCover"></div><span class="sv">保存推奨</span>
-        <div class="box"><div class="big"><span class="mk" data-bind="know.hook" data-fallback="結論をひと言で"></span></div></div></div></div>
+        <div class="box"><div class="big"><span class="mk" data-bind="know.hook" data-fallback="結論をひと言で"></span></div><div class="body" data-nbind="know:know.sub"></div></div></div></div>
       <span class="no">1枚目</span><span class="nm">表紙</span><span class="ds">1行目の結論を大きく。写真の上に文字をのせる</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">1</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-bind="know.r1" data-fallback="理由1"></div><span class="pg">2/6</span></div></div>
+        <div class="big" data-nbind="know:know.h1" data-alt="know.r1" data-fallback="理由1"></div><div class="body" data-bind="know.r1" data-showif="know:know.h1"></div><span class="pg">2/6</span></div></div>
       <span class="no">2枚目</span><span class="nm">理由1</span><span class="ds">1枚に1つだけ。文字は大きく少なく</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">2</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-bind="know.r2" data-fallback="理由2"></div><span class="pg">3/6</span></div></div>
+        <div class="big" data-nbind="know:know.h2" data-alt="know.r2" data-fallback="理由2"></div><div class="body" data-bind="know.r2" data-showif="know:know.h2"></div><span class="pg">3/6</span></div></div>
       <span class="no">3枚目</span><span class="nm">理由2</span><span class="ds">同じデザインでそろえると読みやすい</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">3</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-bind="know.r3" data-fallback="理由3"></div><span class="pg">4/6</span></div></div>
+        <div class="big" data-nbind="know:know.h3" data-alt="know.r3" data-fallback="理由3"></div><div class="body" data-bind="know.r3" data-showif="know:know.h3"></div><span class="pg">4/6</span></div></div>
       <span class="no">4枚目</span><span class="nm">理由3</span><span class="ds">色は2〜3色までにしぼる</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks sum"><span class="kk">まとめ</span><div class="big" data-bind="know.hook" data-fallback="結論をもう一度"></div>
-        <ol><li data-bind="know.r1" data-fallback="理由1"></li><li data-bind="know.r2" data-fallback="理由2"></li><li data-bind="know.r3" data-fallback="理由3"></li></ol><span class="pg" style="color:#B9C3D6">5/6</span></div></div>
+        <ol><li data-nbind="know:know.h1" data-alt="know.r1" data-fallback="理由1"></li><li data-nbind="know:know.h2" data-alt="know.r2" data-fallback="理由2"></li><li data-nbind="know:know.h3" data-alt="know.r3" data-fallback="理由3"></li></ol><div class="body" data-nbind="know:know.sum"></div><span class="pg" style="color:#B9C3D6">5/6</span></div></div>
       <span class="no">5枚目</span><span class="nm">まとめ</span><span class="ds">結論と理由3つを1枚で見返せるように</span>
     </div>
     <div class="slide">
@@ -568,8 +585,8 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   <div class="carousel" tabindex="0" aria-label="Before/After投稿のスライド見本">
     <div class="slide">
       <div class="frame"><div class="cmp"><div class="ph before" data-photo="baBefore"></div><div class="ph" data-photo="baFront"></div>
-        <span class="tagba b">BEFORE</span><span class="tagba a">AFTER</span></div></div>
-      <span class="no">1枚目</span><span class="nm">比較写真</span><span class="ds">左にBefore・右にAfter。一目で変化が分かる</span>
+        <span class="tagba b">BEFORE</span><span class="tagba a">AFTER</span><span class="cmp-tx" data-nbind="ba:ba.cmp"></span></div></div>
+      <span class="no">1枚目</span><span class="nm">比較写真</span><span class="ds">左にBefore・右にAfter。一目で変化が分かる一言を入れる（②でお悩みを選ぶと入ります）</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ph" data-photo="baFront"><span class="lab">AFTER 正面</span></div></div>
@@ -639,34 +656,44 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     dm:   "ご予約・ご相談は、DMからお気軽にどうぞ📩"
   };
 
+  var PUSH_FIELD = {id:"push", label:"ひと押しの一文（任意）", hint:"行動心理を使った一文。入れると予約・反応につながりやすくなります", rows:2, common:"psy", optional:true, noAuto:true};
+  function knowTh(n){ return (state.theme.know === 1 && n.know2) ? n.know2 : n.know; }
+  var SEASON_KEYS = {"春":[3,4,5], "梅雨":[6,7], "夏":[7,8], "秋":[9,10,11], "冬":[12,1,2]};
+  function isNowSeason(name){
+    var m = new Date().getMonth() + 1;
+    for (var k in SEASON_KEYS) if (name.indexOf(k) === 0) return SEASON_KEYS[k].indexOf(m) > -1;
+    return false;
+  }
   var TEMPLATES = [
     { id:"reel", no:1, name:"リール", goal:"見てもらう・コメントをもらう",
       prepTitle:"画像・動画を準備する", prepTpl:"tpl-reel-prep",
       fields:[
-        {id:"hook", label:"1行目", hint:"思わず手が止まるひと言。カバー画像の文字と同じでOK", first:true, rows:2, opt:function(n){ return n.reel; },
+        {id:"hook", label:"1行目", hint:"思わず手が止まるひと言。季節の1行目も選べます", first:true, rows:2, season:"reel", opt:function(n){ return n.reel; },
           ph:"例）広がる髪が、30秒でツヤ髪に変わるまで",
           ex:"広がる髪が、30秒でツヤ髪に変わるまで"},
-        {id:"point", label:"施術のポイント", hint:"ここだけは自分の言葉で。どこをどう工夫したか、2〜3文で", rows:4, free:true,
+        {id:"point", label:"施術のポイント", hint:(window.CHOICES && CHOICES.common.pointTip) || "どこをどう工夫したか、2〜3文で", rows:4, opt:function(n){ return n.point || []; },
           ph:"例）毛先のダメージに合わせて薬剤を塗り分け…",
           ex:"毛先のダメージに合わせて、薬剤を塗り分けています。\n根元はクセを伸ばしすぎず、自然な丸みが出るようにアイロンの角度を調整しました。"},
+        PUSH_FIELD,
         {id:"cta", label:"コメントを促す一文", hint:"質問形にすると返事がもらいやすい", rows:2, common:"comment",
           ph:"例）あなたの髪のお悩みもコメントで教えてください",
           ex:"あなたの髪のお悩みも、コメントで教えてください✨\n次の動画でお答えします！"}
       ],
-      build:function(v){ return [v.hook, v.point, v.cta]; }
+      build:function(v){ return [v.hook, v.point, v.push, v.cta]; }
     },
     { id:"know", no:2, name:"知識投稿", goal:"保存・シェアしてもらう",
       prepTitle:"画像を準備する", prepTpl:"tpl-know-prep",
       fields:[
-        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2, opt:function(n){ return [n.know.hook]; },
+        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2, opt:function(n){ return [knowTh(n).hook]; },
           ph:"例）うねりは「乾かし方」を変えるだけで落ち着きます",
           ex:"うねりは「乾かし方」を変えるだけで落ち着きます"},
-        {id:"r1", label:"理由1", rows:2, opt:function(n){ return [n.know.r1]; }, ph:"例）濡れたままだと湿気を吸いやすいから",
+        {id:"r1", label:"理由1", rows:2, opt:function(n){ return [knowTh(n).r1]; }, ph:"例）濡れたままだと湿気を吸いやすいから",
           ex:"濡れたままにすると、髪が湿気を吸ってうねりやすくなるから"},
-        {id:"r2", label:"理由2", rows:2, opt:function(n){ return [n.know.r2]; }, ph:"例）根元から乾かすとクセが出にくいから",
+        {id:"r2", label:"理由2", rows:2, opt:function(n){ return [knowTh(n).r2]; }, ph:"例）根元から乾かすとクセが出にくいから",
           ex:"根元から先に乾かすと、クセの元になる根元の形が整うから"},
-        {id:"r3", label:"理由3", rows:2, opt:function(n){ return [n.know.r3]; }, ph:"例）最後の冷風でツヤが長持ちするから",
+        {id:"r3", label:"理由3", rows:2, opt:function(n){ return [knowTh(n).r3]; }, ph:"例）最後の冷風でツヤが長持ちするから",
           ex:"最後に冷風を当てると、ツヤが出てまとまりが長持ちするから"},
+        PUSH_FIELD,
         {id:"cta", label:"保存を促す一文", hint:"「あとで見返せるように」がおすすめ", rows:2, common:"save",
           ph:"例）忘れないように保存して、今夜から試してみてください",
           ex:"忘れないように【保存】して、今夜から試してみてください📌"}
@@ -676,13 +703,13 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
         if (v.r1) reasons.push("① " + v.r1);
         if (v.r2) reasons.push("② " + v.r2);
         if (v.r3) reasons.push("③ " + v.r3);
-        return [v.hook, reasons.join("\n"), v.cta];
+        return [v.hook, reasons.join("\n"), v.push, v.cta];
       }
     },
     { id:"ba", no:3, name:"Before/After", goal:"予約につなげる",
       prepTitle:"画像を準備する", prepTpl:"tpl-ba-prep",
       fields:[
-        {id:"hook", label:"1行目", hint:"変化が一番伝わるひと言を", first:true, rows:2, opt:function(n){ return n.ba.hook; },
+        {id:"hook", label:"1行目", hint:"変化が一番伝わるひと言を。季節の1行目も選べます", first:true, rows:2, season:"ba", opt:function(n){ return n.ba.hook; },
           ph:"例）毎朝のアイロンがいらなくなったBefore/After",
           ex:"毎朝のアイロンがいらなくなったBefore/After"},
         {id:"worry", label:"ご来店時のお悩み", rows:3, opt:function(n){ return n.ba.worry; }, ph:"例）湿気で広がる・前髪がうねる",
@@ -690,7 +717,12 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
         {id:"menu", label:"施術内容", rows:3, opt:function(n){ return n.ba.menu; }, ph:"例）髪質改善トリートメント＋毛先カット",
           ex:"髪質改善トリートメント＋毛先カット。\nダメージに合わせて薬剤を塗り分けました。"},
         {id:"finish", label:"仕上がり", rows:3, opt:function(n){ return n.ba.finish; }, ph:"例）乾かすだけでまとまるツヤ髪に",
-          ex:"乾かすだけでまとまるツヤ髪に。\n手ぐしがスッと通るやわらかさです。"}
+          ex:"乾かすだけでまとまるツヤ髪に。\n手ぐしがスッと通るやわらかさです。"},
+        {id:"menuName", label:"メニュー名", hint:"おすすめのメニュー名が入ります。お店のメニュー名に書きかえてOK", rows:1, opt:function(n){ return n.ba.menuName || []; }, optional:true},
+        {id:"price", label:"料金（任意）", hint:"お店の料金を入れてください", rows:1, free:true, optional:true, ph:"例）16,500円（税込）"},
+        {id:"time", label:"施術時間（任意）", rows:1, free:true, optional:true, ph:"例）約3時間"},
+        {id:"cust", label:"お客様の年代・髪の長さ（任意）", rows:1, free:true, optional:true, ph:"例）30代・ミディアム"},
+        PUSH_FIELD
       ],
       bookLine:true,
       build:function(v){
@@ -698,7 +730,10 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
           v.hook,
           v.worry  ? "【ご来店時のお悩み】\n" + v.worry  : "",
           v.menu   ? "【施術内容】\n" + v.menu : "",
-          v.finish ? "【仕上がり】\n" + v.finish : ""
+          v.finish ? "【仕上がり】\n" + v.finish : "",
+          [v.menuName ? "【メニュー】" + v.menuName : "", v.price ? "【料金】" + v.price : "",
+           v.time ? "【施術時間】" + v.time : "", v.cust ? "【お客様】" + v.cust : ""].filter(Boolean).join("\n"),
+          v.push
         ];
       }
     }
@@ -706,7 +741,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   var ORDER = TEMPLATES.map(function(t){ return t.id; });
 
   /* ---------------- State ---------------- */
-  var state = { set:{shop:"", staff:"", book:"link", tags:"", area:""}, v:{reel:{}, know:{}, ba:{}}, pick:{}, ptags:{}, done:{}, tab:"reel" };
+  var state = { set:{shop:"", staff:"", book:"link", bookIdx:0, tags:"", area:""}, v:{reel:{}, know:{}, ba:{}}, pick:{}, ptags:{}, theme:{}, done:{}, tab:"reel" };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (saved && typeof saved === "object") {
@@ -715,6 +750,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       if (saved.done) state.done = saved.done;
       if (saved.pick) state.pick = saved.pick;
       if (saved.ptags) state.ptags = saved.ptags;
+      if (saved.theme) state.theme = saved.theme;
       if (saved.tab && ORDER.indexOf(saved.tab) > -1) state.tab = saved.tab;
     }
   } catch(e) {}
@@ -752,14 +788,28 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     return out;
   }
   function nayamiOf(tid){ var i = state.pick[tid]; return (i === null || i === undefined) ? null : CH.nayami[i] || null; }
+  /* 候補の一覧：[{t:文章, lb:ラベル, cls:色}] */
   function optsOf(f, n){
-    if (f.common) return CH.common[f.common] || [];
-    if (f.opt && n) return (f.opt(n) || []).filter(Boolean);
-    return [];
+    var out = [];
+    if (f.common === "psy") return (CH.common.psy || []).map(function(x){ return {t:x.t, lb:x.lb, cls:"psy"}; });
+    var list = f.common ? (CH.common[f.common] || []) : ((f.opt && n) ? (f.opt(n) || []) : []);
+    list = list.filter(Boolean);
+    list.forEach(function(t, i){ out.push({t:t, lb:list.length > 1 ? "候補" + (i+1) : "おすすめ"}); });
+    if (f.season) {
+      var ss = ((CH.common.season || {})[f.season] || []).filter(function(x){ return x.t; });
+      ss.sort(function(a, b){ return isNowSeason(b.name) - isNowSeason(a.name); });
+      ss.forEach(function(x){ out.push({t:x.t, lb:"季節：" + x.name + (isNowSeason(x.name) ? "（今の季節）" : ""), cls:"season", season:true}); });
+    }
+    return out;
+  }
+  function bookOpts(){
+    var list = ((CH.common.book || {})[state.set.book] || []).filter(Boolean);
+    var shop = trimAll(state.set.shop) || "店名";
+    if (!list.length) { var b = BOOK[state.set.book] || BOOK.link; list = [typeof b === "function" ? b(shop) : b]; }
+    return list.map(function(t){ return t.split("「店名」").join("「" + shop + "」"); });
   }
   function bookLine(){
-    var b = BOOK[state.set.book] || BOOK.link;
-    return typeof b === "function" ? b(trimAll(state.set.shop)) : b;
+    var o = bookOpts(); return o[state.set.bookIdx] || o[0];
   }
 
   /* Caption as segments: {text, cls} so preview can style parts while copy uses plain text */
@@ -830,7 +880,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       + '<div class="chips" data-tags></div><div class="warn-line" data-areawarn></div></div>'
       + '<div class="row-btns" style="margin-top:12px"><button class="btn btn-ghost" type="button" data-clear="' + t.id + '">この投稿を空にする</button></div>';
     if (t.bookLine) {
-      html += '<div class="auto-line"><span class="tag">自動で入ります</span><div data-bookline></div>'
+      html += '<div class="auto-line"><span class="tag">予約の一文（自動で入ります・タップで選べます）</span><div data-bookline></div>'
         + '<div class="small muted">※基本設定の「予約の受け付け方」に合わせて切り替わります</div></div>';
     }
     html += '<h4 class="sub-h" style="margin-top:22px">完成プレビュー</h4>'
@@ -866,15 +916,22 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     $("[data-nay]", sec).innerHTML = CH.nayami.map(function(x, i){
       return '<button type="button" class="chip" data-nay-t="' + t.id + '" data-nay-i="' + i + '" aria-pressed="' + (state.pick[t.id] === i) + '">' + esc(x.name) + '</button>';
     }).join("");
-    $("[data-theme]", sec).textContent = (t.id === "know" && n) ? "テーマ：" + n.know.theme : "";
+    var th = $("[data-theme]", sec);
+    if (t.id === "know" && n) {
+      var ths = [n.know].concat(n.know2 ? [n.know2] : []);
+      th.innerHTML = '<div class="opts-h" style="margin-top:4px">テーマを選ぶ</div><div class="chips">' + ths.map(function(x, i){
+        return '<button type="button" class="chip" data-theme-i="' + i + '" aria-pressed="' + ((state.theme.know || 0) === i) + '">' + esc(x.theme) + '</button>';
+      }).join("") + '</div>';
+    } else th.innerHTML = "";
     t.fields.forEach(function(f){
       var box = $('[data-opts="' + f.id + '"]', sec), o = optsOf(f, n), cur = trimAll(state.v[t.id][f.id]);
       if (f.free) { box.innerHTML = ""; return; }
       if (!o.length) { box.innerHTML = n ? "" : '<div class="free-note">STEP 1でお悩みを選ぶと、候補が出ます</div>'; return; }
-      box.innerHTML = (o.length > 1 ? '<div class="opts-h">候補をタップ（' + o.length + '個）</div>' : '')
-        + o.map(function(text, i){
-          return '<button type="button" class="opt" data-opt-t="' + t.id + '" data-opt-f="' + f.id + '" data-opt-i="' + i + '" aria-pressed="' + (cur === trimAll(text)) + '">'
-            + (o.length > 1 ? '<span class="o-lb">候補' + (i+1) + '</span>' : '<span class="o-lb">おすすめ</span>') + esc(text) + '</button>';
+      box.innerHTML = (f.common === "psy" ? '<div class="psy-note">※お店に本当にあてはまる文だけを選んでください（例：人数を限定していないなら「希少性」は使わない）</div>' : '')
+        + (o.length > 1 ? '<div class="opts-h">候補をタップ（' + o.length + '個）' + (f.optional ? '・もう一度タップで外す' : '') + '</div>' : '')
+        + o.map(function(x, i){
+          return '<button type="button" class="opt" data-opt-t="' + t.id + '" data-opt-f="' + f.id + '" data-opt-i="' + i + '" aria-pressed="' + (cur === trimAll(x.t)) + '">'
+            + '<span class="o-lb' + (x.cls ? " " + x.cls : "") + '">' + esc(x.lb) + '</span>' + esc(x.t) + '</button>';
         }).join("");
     });
     // hashtags
@@ -907,7 +964,13 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       }
     });
     // book line
-    var bl = $("[data-bookline]", sec); if (bl) bl.textContent = bookLine();
+    var bl = $("[data-bookline]", sec);
+    if (bl) {
+      var bo = bookOpts();
+      bl.innerHTML = '<div class="book-opts">' + bo.map(function(x, i){
+        return '<button type="button" class="opt" data-book-i="' + i + '" aria-pressed="' + ((state.set.bookIdx || 0) === i || (!bo[state.set.bookIdx] && i === 0)) + '"><span class="o-lb">候補' + (i+1) + '</span>' + esc(x) + '</button>';
+      }).join("") + '</div>';
+    }
     // preview
     var segs = buildSegments(t);
     var pv = $("[data-pv]", sec);
@@ -935,6 +998,13 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     $("[data-copylabel]", btn).textContent = state.done[t.id] ? "コピー済み ✓ もう一度コピー" : "コピーする";
   }
 
+  /* 選んだお悩みのデータを取り出す（知識投稿のテーマ②には見出し等がないので空） */
+  function nval(tid, path){
+    var n = nayamiOf(tid); if (!n) return "";
+    if (tid === "know" && state.theme.know === 1 && /^know\.(sub|h1|h2|h3|sum)$/.test(path)) return "";
+    var v = path.split(".").reduce(function(o, k){ return o ? o[k] : undefined; }, n);
+    return trimAll(typeof v === "string" ? v : "");
+  }
   function renderBinds(){
     $$("[data-bind]").forEach(function(el){
       var p = el.getAttribute("data-bind").split("."), val;
@@ -943,6 +1013,18 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
       if (p[1] === "hook") val = val.split("\n")[0];
       if (val) { el.textContent = val; el.classList.remove("empty"); }
       else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
+    });
+    $$("[data-nbind]").forEach(function(el){
+      var spec = el.getAttribute("data-nbind").split(":"), val = nval(spec[0], spec[1]);
+      var alt = el.getAttribute("data-alt");
+      if (!val && alt) { var q = alt.split("."); val = trimAll((state.v[q[0]] || {})[q[1]]); if (q[1] === "hook") val = val.split("\n")[0]; }
+      var pre = el.getAttribute("data-prefix") || "";
+      if (el.hasAttribute("data-prefix")) el.hidden = !val;
+      if (val) { el.textContent = pre + val; el.classList.remove("empty"); }
+      else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
+    });
+    $$("[data-showif]").forEach(function(el){
+      var spec = el.getAttribute("data-showif").split(":"); el.hidden = !nval(spec[0], spec[1]);
     });
     // リールのカバー文字にはマーカーを付ける
     var tx = $(".cover .tx"); if (tx && !tx.classList.contains("empty")) { var t = tx.textContent; tx.innerHTML = '<span class="mk">' + esc(t) + '</span>'; }
@@ -1015,6 +1097,9 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     if (ny) pickNayami(ny.getAttribute("data-nay-t"), +ny.getAttribute("data-nay-i"));
     if (op) pickOpt(op.getAttribute("data-opt-t"), op.getAttribute("data-opt-f"), +op.getAttribute("data-opt-i"));
     if (tg) toggleTag(tg.getAttribute("data-tag-t"), tg.getAttribute("data-tag-r"));
+    var thb = e.target.closest("[data-theme-i]"), bk = e.target.closest("[data-book-i]");
+    if (thb) pickTheme(+thb.getAttribute("data-theme-i"));
+    if (bk) { state.set.bookIdx = +bk.getAttribute("data-book-i"); save(); renderAll(); }
     if (cl) clearTpl(cl.getAttribute("data-clear"));
     if (cp) doCopy(cp.getAttribute("data-copy"));
   });
@@ -1027,7 +1112,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     return t.fields.some(function(f){
       if (f.free) return false;
       var v = trimAll(state.v[t.id][f.id]); if (!v) return false;
-      var known = optsOf(f, nayamiOf(t.id)).map(trimAll);
+      var known = optsOf(f, nayamiOf(t.id)).map(function(x){ return trimAll(x.t); });
       return known.indexOf(v) < 0;
     });
   }
@@ -1036,23 +1121,35 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     if (state.pick[id] === i) return;
     if (hasOwnText(t) && !confirm("書きかえた文章を「" + n.name + "」の文章に置きかえます。よろしいですか？")) return;
     state.pick[id] = i;
-    t.fields.forEach(function(f){
-      if (f.free) return;
-      var o = optsOf(f, n);
-      if (f.common) { if (!trimAll(state.v[id][f.id]) && o.length) setField(id, f.id, o[0]); return; }
-      setField(id, f.id, o.length ? o[0] : "");
-    });
+    if (id === "know") state.theme.know = 0;
+    fillFrom(t, n);
     var tags = [];
     n.tags.concat(CH.common.tags || []).forEach(function(r){ if (tags.indexOf(r) < 0) tags.push(r); });
     state.ptags[id] = tags;
     afterChange(t);
-    if (t.fields.some(function(f){ return f.free && !trimAll(state.v[id][f.id]); }))
-      toast("「" + n.name + "」の文章を入れました", "「施術のポイント」だけは、自分の言葉で書いてください。");
+  }
+  function fillFrom(t, n){
+    var id = t.id;
+    t.fields.forEach(function(f){
+      if (f.free || f.noAuto) return;
+      var o = optsOf(f, n).filter(function(x){ return !x.season; });
+      if (f.common) { if (!trimAll(state.v[id][f.id]) && o.length) setField(id, f.id, o[0].t); return; }
+      setField(id, f.id, o.length ? o[0].t : "");
+    });
+  }
+  function pickTheme(i){
+    var t = tplOf("know"), n = nayamiOf("know"); if (!n || (state.theme.know || 0) === i) return;
+    if (hasOwnText(t) && !confirm("書きかえた文章を、選んだテーマの文章に置きかえます。よろしいですか？")) return;
+    state.theme.know = i;
+    ["hook","r1","r2","r3"].forEach(function(k){ setField("know", k, knowTh(n)[k] || ""); });
+    afterChange(t);
   }
   function pickOpt(id, fid, i){
     var t = tplOf(id), f = t.fields.filter(function(x){ return x.id === fid; })[0];
     var o = optsOf(f, nayamiOf(id)); if (o[i] === undefined) return;
-    setField(id, fid, o[i]); afterChange(t);
+    if (f.optional && trimAll(state.v[id][fid]) === trimAll(o[i].t)) setField(id, fid, "");
+    else setField(id, fid, o[i].t);
+    afterChange(t);
   }
   function toggleTag(id, raw){
     var list = (state.ptags[id] || []).slice(), k = list.indexOf(raw);
@@ -1063,7 +1160,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
     var t = TEMPLATES[ORDER.indexOf(id)];
     if (!confirm("「" + t.name + "」の入力内容を空にします。よろしいですか？")) return;
     t.fields.forEach(function(f){ setField(id, f.id, ""); });
-    state.pick[id] = null; state.ptags[id] = [];
+    state.pick[id] = null; state.ptags[id] = []; if (id === "know") state.theme.know = 0;
     afterChange(t);
   }
 
@@ -1075,7 +1172,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   });
   $$('input[name="book"]').forEach(function(r){
     r.checked = r.value === state.set.book;
-    r.addEventListener("change", function(){ if (r.checked) { state.set.book = r.value; save(); renderAll(); } });
+    r.addEventListener("change", function(){ if (r.checked) { state.set.book = r.value; state.set.bookIdx = 0; save(); renderAll(); } });
   });
   $("#setExample").addEventListener("click", function(){
     var ex = {shop:"hair salon HANA", staff:"山田 はな", area:"梅田", tags:"#hairsalonHANA"};
@@ -1112,7 +1209,7 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
   }
   function doCopy(id){
     var t = TEMPLATES[ORDER.indexOf(id)];
-    var empty = t.fields.filter(function(f){ return !trimAll(state.v[id][f.id]); });
+    var empty = t.fields.filter(function(f){ return !f.optional && !trimAll(state.v[id][f.id]); });
     if (empty.length === t.fields.length) { toast("まだ何も入っていません", "STEP 1でお悩みを選んでください。"); return; }
     if (empty.length && !confirm("「" + empty.map(function(f){ return f.label; }).join("」「") + "」が空欄です。このままコピーしますか？")) return;
     var text = captionText(t);
