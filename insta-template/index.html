@@ -301,6 +301,21 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .book-opts{display:grid; gap:6px; margin:8px 0 4px;}
 input.one{font-size:16px;}
 
+/* ---------- Image maker ---------- */
+.gen{margin-top:8px; border:1.5px solid var(--coral); background:var(--coral-soft); border-radius:14px; padding:12px;}
+.gen-lead{font-size:12.5px; margin:0 0 10px;}
+.gen-photos{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin-bottom:10px;}
+.gen-pick{position:relative; display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px dashed var(--coral-btn); border-radius:12px; padding:8px; font-size:12.5px; font-weight:700; min-height:56px; cursor:pointer;}
+.gen-pick input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+.gen-pick .th{width:40px; height:40px; flex:none; border-radius:8px; background:var(--kinari) center/cover no-repeat; border:1px solid var(--rule);}
+.gen-pick small{display:block; font-weight:500; color:var(--navy-soft); font-size:11px;}
+.gen-out{display:flex; gap:8px; overflow-x:auto; margin:10px -12px 0; padding:2px 12px 6px; -webkit-overflow-scrolling:touch;}
+.gen-item{flex:none; width:118px; display:flex; flex-direction:column; gap:5px;}
+.gen-item img{width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(31,47,77,.18); display:block; background:#eee;}
+.gen-item .btn{min-height:34px; padding:4px 8px; font-size:12px;}
+.gen-item .cap{font-size:11px; font-weight:700; color:var(--coral-ink);}
+.gen-note{font-size:11.5px; color:var(--navy-soft); margin:8px 0 0;}
+
 /* ---------- Tab bar ---------- */
 .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,252,246,.97); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   border-top:1px solid var(--rule); padding-bottom:var(--safe-b); box-shadow:0 -4px 16px rgba(31,47,77,.06);}
@@ -529,6 +544,9 @@ input.one{font-size:16px;}
       <span class="telop" data-nbind="reel:telop.after" data-prefix="テロップ：" hidden></span>
     </div>
   </div>
+  <h4 class="sub-h">カバー画像をつくって保存する</h4>
+  <div class="gen" data-gen="reel"></div>
+
   <ul class="tips">
     <li>スマホは<b>縦向き</b>で撮影。窓際の明るい場所がおすすめ</li>
     <li>Before と After は<b>同じ場所・同じ角度</b>で撮ると変化が伝わります</li>
@@ -577,6 +595,8 @@ input.one{font-size:16px;}
     <li>見本の文字は<b>②に入力した内容</b>が自動で入ります。スライド作りの下書きにどうぞ</li>
     <li>表紙だけ写真、2〜6枚目は<b>生成り背景＋文字</b>にすると作るのがかんたん</li>
   </ul>
+  <h4 class="sub-h">6枚の画像をつくって保存する</h4>
+  <div class="gen" data-gen="know"></div>
 </template>
 
 <template id="tpl-ba-prep">
@@ -610,6 +630,9 @@ input.one{font-size:16px;}
     </div>
   </div>
   <div class="swipe-hint">← 横にスワイプ →</div>
+
+  <h4 class="sub-h">1枚目の比較画像をつくって保存する</h4>
+  <div class="gen" data-gen="ba"></div>
 
   <h4 class="sub-h">撮影のコツ</h4>
   <ul class="tips">
@@ -1264,6 +1287,214 @@ input.one{font-size:16px;}
   $("#howtoClose").addEventListener("click", closeHowto);
   modal.addEventListener("click", function(e){ if (e.target === modal) closeHowto(); });
   document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !modal.hidden) closeHowto(); });
+
+
+  /* ================================================================
+     画像をつくる（canvas）
+     写真は端末の中だけで使い、どこにも送信しません。
+     ================================================================ */
+  var GEN = {
+    reel: {lead:"写真を選ぶと、②で選んだカバー文字を入れた画像（1080×1920）ができます。", photos:[{key:"cover", label:"カバーの写真", sub:"After の写真がおすすめ"}]},
+    know: {lead:"表紙の写真を選ぶと、②の文章を入れた6枚（1080×1350）ができます。", photos:[{key:"cover", label:"表紙の写真", sub:"施術中・After など"}]},
+    ba:   {lead:"Before と After の写真を選ぶと、比較画像（1080×1350）ができます。2枚目以降は撮った写真をそのまま使います。", photos:[{key:"before", label:"Before の写真"}, {key:"after", label:"After の写真"}]}
+  };
+  var genPhotos = {reel:{}, know:{}, ba:{}};   // key -> HTMLImageElement
+  var genOut = {reel:[], know:[], ba:[]};      // [{name, url}]
+  var C_ = {kinari:"#F7F2E8", kinari2:"#FFFCF6", coral:"#EE8E7C", coralBtn:"#D35C47", coralInk:"#BF4E3A", coralSoft:"#FCE6DF",
+            mark:"rgba(238,142,124,.38)", navy:"#1F2F4D", navySoft:"#5B6780", white:"#FFFFFF"};
+  var F_HAND = '"Klee One", "Zen Kaku Gothic New", sans-serif', F_BODY = '"Zen Kaku Gothic New", "Hiragino Sans", sans-serif', F_LOGO = '"Shippori Mincho", serif';
+
+  function loadImg(src){ return new Promise(function(ok, ng){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = ng; i.src = src; }); }
+  function fontsReady(){
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    return Promise.all(['600 60px "Klee One"', '700 40px "Zen Kaku Gothic New"', '500 40px "Zen Kaku Gothic New"', '800 40px "Shippori Mincho"']
+      .map(function(f){ return document.fonts.load(f, "あ").catch(function(){}); }));
+  }
+  function drawCoverImg(ctx, img, x, y, w, h, px, py){
+    var r = Math.max(w / img.naturalWidth, h / img.naturalHeight), iw = img.naturalWidth * r, ih = img.naturalHeight * r;
+    var ox = x + (w - iw) * (px == null ? .5 : px), oy = y + (h - ih) * (py == null ? .4 : py);
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); ctx.drawImage(img, ox, oy, iw, ih); ctx.restore();
+  }
+  function rr(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); }
+  /* 日本語の折り返し（行頭に句読点が来ないようにする） */
+  var NO_HEAD = "、。，．・：；？！?!」』）)]｝〉》ーぁぃぅぇぉっゃゅょァィゥェォッャュョ…";
+  function wrap(ctx, text, maxW, maxLines){
+    var out = [];
+    String(text || "").replace(/\r/g, "").split(/\n|／/).forEach(function(para){
+      var line = "";
+      Array.from(para).forEach(function(ch){
+        if (line && ctx.measureText(line + ch).width > maxW && NO_HEAD.indexOf(ch) < 0) { out.push(line); line = ch; }
+        else line += ch;
+      });
+      out.push(line);
+    });
+    if (maxLines && out.length > maxLines) { out = out.slice(0, maxLines); out[maxLines-1] = out[maxLines-1].replace(/.$/, "…"); }
+    return out;
+  }
+  function drawLines(ctx, lines, x, y, lh, opt){
+    opt = opt || {};
+    lines.forEach(function(l, i){
+      var ly = y + i * lh;
+      if (opt.marker) { var w = ctx.measureText(l).width, ax = opt.align === "center" ? x - w/2 : x; ctx.save(); ctx.fillStyle = C_.mark; ctx.fillRect(ax - 4, ly + lh * .38, w + 8, lh * .3); ctx.restore(); }
+      ctx.fillText(l, x, ly);
+    });
+    return y + lines.length * lh;
+  }
+  function pill(ctx, text, x, y, size, bg, fg){
+    ctx.font = "700 " + size + "px " + F_BODY; var w = ctx.measureText(text).width + size * 1.4, h = size * 1.7;
+    ctx.fillStyle = bg; rr(ctx, x, y, w, h, h/2); ctx.fill();
+    ctx.fillStyle = fg; ctx.textBaseline = "middle"; ctx.fillText(text, x + size * .7, y + h/2 + 1); ctx.textBaseline = "top";
+    return w;
+  }
+  function mk(w, h){ var c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.textBaseline = "top"; return [c, x]; }
+  function brand(ctx, x, y, size, color){ ctx.font = "800 " + size + "px " + F_LOGO; ctx.fillStyle = color || C_.navySoft; var shop = trimAll(state.set.shop); ctx.fillText(shop || "髪にドラマを。", x, y); }
+  function sampleImg(){ return loadImg(SAMPLE); }
+
+  function txt(tid, nPath, vKey){ var v = nPath ? nval(tid, nPath) : ""; if (!v && vKey) v = trimAll(state.v[tid][vKey]).split("\n")[0]; return v; }
+
+  /* --- リールのカバー 1080×1920 --- */
+  function makeReel(img){
+    var a = mk(1080, 1920), c = a[0], ctx = a[1];
+    drawCoverImg(ctx, img, 0, 0, 1080, 1920, .5, .35);
+    var t = txt("reel", "cover", "hook") || "カバーの文字";
+    ctx.font = "600 92px " + F_HAND; var lines = wrap(ctx, t, 820, 4), lh = 128;
+    var bh = lines.length * lh + 90, by = 960 - bh / 2;
+    ctx.fillStyle = "rgba(255,252,246,.94)"; rr(ctx, 90, by, 900, bh, 36); ctx.fill();
+    ctx.fillStyle = C_.navy; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by + 45, lh, {marker:true, align:"center"}); ctx.textAlign = "left";
+    return [{name:"reel-cover", cap:"カバー", c:c}];
+  }
+  /* --- 知識投稿 6枚 1080×1350 --- */
+  function makeKnow(img){
+    var out = [], v = state.v.know, hook = trimAll(v.hook) || "結論をひと言で";
+    var reasons = [1,2,3].map(function(i){ return {h: nval("know", "know.h" + i), b: trimAll(v["r" + i])}; });
+    // 1 表紙
+    var a = mk(1080, 1350), c = a[0], ctx = a[1];
+    drawCoverImg(ctx, img, 0, 0, 1080, 1350, .5, .35);
+    pill(ctx, "保存推奨", 760, 60, 40, C_.coralBtn, C_.white);
+    ctx.font = "600 76px " + F_HAND; var hl = wrap(ctx, hook, 840, 4);
+    var sub = nval("know", "know.sub"); ctx.font = "500 40px " + F_BODY; var sl = sub ? wrap(ctx, sub, 840, 2) : [];
+    var bh = hl.length * 104 + (sl.length ? sl.length * 58 + 24 : 0) + 96, by = 1350 - 70 - bh;
+    ctx.fillStyle = "rgba(255,252,246,.95)"; rr(ctx, 60, by, 960, bh, 32); ctx.fill();
+    ctx.fillStyle = C_.navy; ctx.font = "600 76px " + F_HAND; var y = drawLines(ctx, hl, 120, by + 48, 104, {marker:true});
+    if (sl.length) { ctx.font = "500 40px " + F_BODY; ctx.fillStyle = C_.navySoft; drawLines(ctx, sl, 120, y + 24, 58); }
+    out.push({name:"know-1", cap:"1枚目 表紙", c:c});
+    // 2-4 理由
+    reasons.forEach(function(r, i){
+      var a = mk(1080, 1350), c = a[0], ctx = a[1];
+      ctx.fillStyle = C_.kinari2; ctx.fillRect(0, 0, 1080, 1350);
+      brand(ctx, 90, 80, 34);
+      ctx.font = "600 200px " + F_HAND; ctx.fillStyle = C_.coralInk; ctx.fillText(String(i + 1), 90, 170);
+      pill(ctx, "理由", 90, 420, 40, C_.coral, C_.white);
+      var head = r.h || r.b || ("理由" + (i + 1));
+      ctx.font = "600 84px " + F_HAND; ctx.fillStyle = C_.navy; var y = drawLines(ctx, wrap(ctx, head, 900, 4), 90, 530, 116, {marker:true});
+      if (r.h && r.b) { ctx.font = "500 44px " + F_BODY; ctx.fillStyle = C_.navy; drawLines(ctx, wrap(ctx, r.b, 900, 7), 90, y + 50, 72); }
+      ctx.font = "500 32px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.textAlign = "right"; ctx.fillText((i + 2) + "/6", 990, 1260); ctx.textAlign = "left";
+      out.push({name:"know-" + (i + 2), cap:(i + 2) + "枚目 理由" + (i + 1), c:c});
+    });
+    // 5 まとめ
+    a = mk(1080, 1350); c = a[0]; ctx = a[1];
+    ctx.fillStyle = C_.navy; ctx.fillRect(0, 0, 1080, 1350);
+    pill(ctx, "まとめ", 90, 90, 40, C_.coral, C_.white);
+    ctx.font = "600 76px " + F_HAND; ctx.fillStyle = C_.white; y = drawLines(ctx, wrap(ctx, hook, 900, 4), 90, 200, 104);
+    ctx.font = "700 46px " + F_BODY; y += 40;
+    reasons.forEach(function(r, i){ var lines = wrap(ctx, (i + 1) + ". " + (r.h || r.b || ""), 900, 2); ctx.fillStyle = "#E9ECF3"; y = drawLines(ctx, lines, 90, y, 68) + 16; });
+    var sum = nval("know", "know.sum");
+    if (sum) { ctx.font = "500 42px " + F_BODY; ctx.fillStyle = "#C9D1E2"; drawLines(ctx, wrap(ctx, sum, 900, 3), 90, y + 30, 64); }
+    ctx.font = "500 32px " + F_BODY; ctx.fillStyle = "#B9C3D6"; ctx.textAlign = "right"; ctx.fillText("5/6", 990, 1260); ctx.textAlign = "left";
+    out.push({name:"know-5", cap:"5枚目 まとめ", c:c});
+    // 6 保存のお願い
+    a = mk(1080, 1350); c = a[0]; ctx = a[1];
+    ctx.fillStyle = C_.coralSoft; ctx.fillRect(0, 0, 1080, 1350);
+    ctx.save(); ctx.translate(540, 430); ctx.strokeStyle = C_.coralInk; ctx.lineWidth = 16; ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(-80, -110); ctx.lineTo(80, -110); ctx.lineTo(80, 120); ctx.lineTo(0, 60); ctx.lineTo(-80, 120); ctx.closePath(); ctx.stroke(); ctx.restore();
+    ctx.textAlign = "center"; ctx.fillStyle = C_.navy; ctx.font = "600 80px " + F_HAND;
+    drawLines(ctx, ["あとで見返せるように", "保存してね"], 540, 640, 116, {marker:true, align:"center"});
+    ctx.font = "500 40px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.fillText("投稿の右下にある保存マークをタップ", 540, 920);
+    ctx.font = "800 44px " + F_LOGO; ctx.fillStyle = C_.navy; ctx.fillText(trimAll(state.set.shop) || "髪にドラマを。", 540, 1120);
+    ctx.textAlign = "left";
+    out.push({name:"know-6", cap:"6枚目 保存", c:c});
+    return out;
+  }
+  /* --- Before/After 比較 1080×1350 --- */
+  function makeBA(before, after){
+    var a = mk(1080, 1350), c = a[0], ctx = a[1];
+    ctx.fillStyle = C_.white; ctx.fillRect(0, 0, 1080, 1350);
+    drawCoverImg(ctx, before, 0, 0, 536, 1350, .5, .35);
+    drawCoverImg(ctx, after, 544, 0, 536, 1350, .5, .35);
+    pill(ctx, "BEFORE", 36, 40, 38, "rgba(31,47,77,.85)", C_.white);
+    ctx.font = "700 38px " + F_BODY; var aw = ctx.measureText("AFTER").width + 38 * 1.4;
+    pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, C_.coralBtn, C_.white);
+    var t = nval("ba", "ba.cmp");
+    if (t) {
+      ctx.font = "600 72px " + F_HAND; var lines = wrap(ctx, t, 860, 2), bh = lines.length * 100 + 70, by = 1350 - 60 - bh;
+      ctx.fillStyle = "rgba(255,252,246,.95)"; rr(ctx, 80, by, 920, bh, 30); ctx.fill();
+      ctx.fillStyle = C_.navy; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by + 35, 100, {marker:true, align:"center"}); ctx.textAlign = "left";
+    }
+    return [{name:"ba-compare", cap:"1枚目 比較", c:c}];
+  }
+
+  function buildGenUI(tid){
+    var box = $('.gen[data-gen="' + tid + '"]'); if (!box) return;
+    var g = GEN[tid];
+    box.innerHTML = '<p class="gen-lead">' + esc(g.lead) + '</p><div class="gen-photos">'
+      + g.photos.map(function(ph){
+          return '<label class="gen-pick"><span class="th" data-th="' + ph.key + '"></span><span>' + esc(ph.label) + '<small>' + esc(ph.sub || "タップして選ぶ") + '</small></span>'
+            + '<input type="file" accept="image/*" data-gen-file="' + tid + '" data-key="' + ph.key + '"></label>';
+        }).join("") + '</div>'
+      + '<button type="button" class="btn btn-copy" style="min-height:48px;font-size:15px" data-gen-make="' + tid + '">画像をつくる</button>'
+      + '<div class="gen-out" data-gen-out="' + tid + '" hidden></div>'
+      + '<div class="row-btns" data-gen-all="' + tid + '" hidden style="margin-top:8px"><button type="button" class="btn btn-ghost" data-gen-saveall="' + tid + '" style="width:100%">まとめて保存する</button></div>'
+      + '<p class="gen-note">写真を選ばないときは見本写真で作ります。選んだ写真はこのスマホの中だけで使い、どこにも送信しません。文字を変えたら、もう一度「画像をつくる」を押してください。</p>';
+  }
+  function makeImages(tid){
+    var ph = genPhotos[tid], btn = $('[data-gen-make="' + tid + '"]');
+    btn.disabled = true; btn.textContent = "つくっています…";
+    var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : sampleImg(); });
+    fontsReady().then(function(){ return Promise.all(need); }).then(function(imgs){
+      var list = tid === "reel" ? makeReel(imgs[0]) : tid === "know" ? makeKnow(imgs[0]) : makeBA(imgs[0], imgs[1]);
+      genOut[tid] = list.map(function(x){ return {name:x.name, cap:x.cap, url:x.c.toDataURL("image/jpeg", .92)}; });
+      var out = $('[data-gen-out="' + tid + '"]');
+      out.innerHTML = genOut[tid].map(function(x, i){
+        return '<div class="gen-item"><span class="cap">' + esc(x.cap) + '</span><img src="' + x.url + '" alt="' + esc(x.cap) + '">'
+          + '<button type="button" class="btn btn-soft" data-gen-save="' + tid + '" data-i="' + i + '">保存</button></div>';
+      }).join("");
+      out.hidden = false; $('[data-gen-all="' + tid + '"]').hidden = genOut[tid].length < 2;
+      toast("画像ができました", "「保存」→「画像を保存」で写真アプリに入ります。うまくいかないときは画像を長押ししてください。");
+    }).catch(function(){
+      toast("画像をつくれませんでした", "写真を選びなおして、もう一度お試しください。");
+    }).then(function(){ btn.disabled = false; btn.textContent = "画像をつくりなおす"; });
+  }
+  function dataUrlToFile(url, name){
+    var b = atob(url.split(",")[1]), u = new Uint8Array(b.length);
+    for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+    return new File([u], name + ".jpg", {type:"image/jpeg"});
+  }
+  function saveImages(items){
+    var files = items.map(function(x){ return dataUrlToFile(x.url, x.name); });
+    if (navigator.canShare && navigator.canShare({files:files})) {
+      navigator.share({files:files}).catch(function(){});
+      return;
+    }
+    items.forEach(function(x, i){
+      setTimeout(function(){ var a = document.createElement("a"); a.href = x.url; a.download = x.name + ".jpg"; document.body.appendChild(a); a.click(); a.remove(); }, i * 300);
+    });
+  }
+  ORDER.forEach(buildGenUI);
+  panels.addEventListener("change", function(e){
+    var el = e.target; if (!el.matches("[data-gen-file]")) return;
+    var f = el.files && el.files[0]; if (!f) return;
+    var tid = el.getAttribute("data-gen-file"), key = el.getAttribute("data-key"), url = URL.createObjectURL(f);
+    loadImg(url).then(function(img){
+      genPhotos[tid][key] = img;
+      var th = $('[data-gen="' + tid + '"] [data-th="' + key + '"]'); if (th) th.style.backgroundImage = 'url("' + url + '")';
+    }).catch(function(){ toast("写真を読み込めませんでした", "別の写真を選んでください。"); });
+  });
+  panels.addEventListener("click", function(e){
+    var mkb = e.target.closest("[data-gen-make]"), sv = e.target.closest("[data-gen-save]"), sa = e.target.closest("[data-gen-saveall]");
+    if (mkb) makeImages(mkb.getAttribute("data-gen-make"));
+    if (sv) saveImages([genOut[sv.getAttribute("data-gen-save")][+sv.getAttribute("data-i")]]);
+    if (sa) saveImages(genOut[sa.getAttribute("data-gen-saveall")]);
+  });
 
   /* ---------------- Init ---------------- */
   showTab(state.tab, false);
