@@ -307,6 +307,14 @@ input.one{font-size:16px;}
 [data-bind], [data-nbind], .cover .safe .tx, .ks .big, .ks .body, .cmp-tx, .telop{word-break:keep-all; overflow-wrap:anywhere; line-break:strict;}
 
 /* ---------- Image maker ---------- */
+.slots{display:grid; gap:10px; margin-bottom:12px;}
+.slot{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:8px 10px;}
+.slot-h{display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:5px;}
+.slot-mode{margin-left:auto; font-size:10.5px; font-weight:700; color:var(--ok); background:var(--ok-soft); border-radius:999px; padding:1px 8px;}
+.slot-mode.own{color:var(--coral-ink); background:var(--coral-soft);}
+.slot textarea{min-height:44px; font-size:16px; padding:8px 10px;}
+.slot .chips{margin-top:6px;}
+.slot .chip{min-height:30px; padding:4px 10px; font-size:12px;}
 .gen{margin-top:8px; border:1.5px solid var(--coral); background:var(--coral-soft); border-radius:14px; padding:12px;}
 .gen-lead{font-size:12.5px; margin:0 0 10px;}
 .gen-photos{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin-bottom:10px;}
@@ -510,7 +518,7 @@ input.one{font-size:16px;}
     <div class="cover" aria-label="カバー画像の見本図">
       <div class="ph" data-photo="reelCover"></div>
       <div class="cut top">プロフィールでは<br>切れる</div>
-      <div class="safe"><div class="tx" data-nbind="reel:cover" data-alt="reel.hook" data-fallback="1行目の言葉を<br>ここに大きく"></div></div>
+      <div class="safe"><div class="tx" data-ibind="reel:cover" data-fallback="1行目の言葉を<br>ここに大きく"></div></div>
       <span class="safe-lbl">表示される範囲</span>
       <div class="cut bottom">プロフィールでは<br>切れる</div>
     </div>
@@ -521,7 +529,7 @@ input.one{font-size:16px;}
     </ul>
   </div>
   <ul class="tips">
-    <li>②でお悩みを選ぶと、<b>おすすめのカバー文字</b>が上の図に入ります</li>
+    <li>カバーの文字は、②で選んだ<b>投稿の1行目</b>が上の図に入ります（STEP 4で書きかえもできます）</li>
     <li>文字は<b>2行・15文字以内</b>を目安に、太く大きく</li>
   </ul>
 
@@ -549,8 +557,7 @@ input.one{font-size:16px;}
       <span class="telop" data-nbind="reel:telop.after" data-prefix="テロップ：" hidden></span>
     </div>
   </div>
-  <h4 class="sub-h">カバー画像をつくって保存する</h4>
-  <div class="gen" data-gen="reel"></div>
+<p class="gen-note" style="margin:6px 0 0">画像は、②で文章を選んだあとに<b>「STEP 4 画像をつくる」</b>で作れます。文字は投稿文に合わせて自動で入ります。</p>
 
   <ul class="tips">
     <li>スマホは<b>縦向き</b>で撮影。窓際の明るい場所がおすすめ</li>
@@ -564,27 +571,27 @@ input.one{font-size:16px;}
   <div class="carousel" tabindex="0" aria-label="知識投稿のスライド見本">
     <div class="slide">
       <div class="frame"><div class="ks cover"><div class="ph" data-photo="knowCover"></div><span class="sv">保存推奨</span>
-        <div class="box"><div class="big"><span class="mk" data-bind="know.hook" data-fallback="結論をひと言で"></span></div><div class="body" data-nbind="know:know.sub"></div></div></div></div>
+        <div class="box"><div class="big"><span class="mk" data-ibind="know:cover" data-fallback="結論をひと言で"></span></div><div class="body" data-ibind="know:sub"></div></div></div></div>
       <span class="no">1枚目</span><span class="nm">表紙</span><span class="ds">1行目の結論を大きく。写真の上に文字をのせる</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">1</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-nbind="know:know.h1" data-alt="know.r1" data-fallback="理由1"></div><div class="body" data-bind="know.r1" data-showif="know:know.h1"></div><span class="pg">2/6</span></div></div>
+        <div class="big" data-ibind="know:h1" data-fallback="理由1"></div><div class="body" data-bind="know.r1" data-showif-i="know:h1:r1"></div><span class="pg">2/6</span></div></div>
       <span class="no">2枚目</span><span class="nm">理由1</span><span class="ds">1枚に1つだけ。文字は大きく少なく</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">2</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-nbind="know:know.h2" data-alt="know.r2" data-fallback="理由2"></div><div class="body" data-bind="know.r2" data-showif="know:know.h2"></div><span class="pg">3/6</span></div></div>
+        <div class="big" data-ibind="know:h2" data-fallback="理由2"></div><div class="body" data-bind="know.r2" data-showif-i="know:h2:r2"></div><span class="pg">3/6</span></div></div>
       <span class="no">3枚目</span><span class="nm">理由2</span><span class="ds">同じデザインでそろえると読みやすい</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks"><span class="brand">髪にドラマを。</span><span class="circle" style="margin-top:6px">3</span><span class="kk" style="margin-top:6px">理由</span>
-        <div class="big" data-nbind="know:know.h3" data-alt="know.r3" data-fallback="理由3"></div><div class="body" data-bind="know.r3" data-showif="know:know.h3"></div><span class="pg">4/6</span></div></div>
+        <div class="big" data-ibind="know:h3" data-fallback="理由3"></div><div class="body" data-bind="know.r3" data-showif-i="know:h3:r3"></div><span class="pg">4/6</span></div></div>
       <span class="no">4枚目</span><span class="nm">理由3</span><span class="ds">色は2〜3色までにしぼる</span>
     </div>
     <div class="slide">
       <div class="frame"><div class="ks sum"><span class="kk">まとめ</span><div class="big" data-bind="know.hook" data-fallback="結論をもう一度"></div>
-        <ol><li data-nbind="know:know.h1" data-alt="know.r1" data-fallback="理由1"></li><li data-nbind="know:know.h2" data-alt="know.r2" data-fallback="理由2"></li><li data-nbind="know:know.h3" data-alt="know.r3" data-fallback="理由3"></li></ol><div class="body" data-nbind="know:know.sum"></div><span class="pg" style="color:#B9C3D6">5/6</span></div></div>
+        <ol><li data-ibind="know:h1" data-fallback="理由1"></li><li data-ibind="know:h2" data-fallback="理由2"></li><li data-ibind="know:h3" data-fallback="理由3"></li></ol><div class="body" data-ibind="know:sum"></div><span class="pg" style="color:#B9C3D6">5/6</span></div></div>
       <span class="no">5枚目</span><span class="nm">まとめ</span><span class="ds">結論と理由3つを1枚で見返せるように</span>
     </div>
     <div class="slide">
@@ -600,8 +607,7 @@ input.one{font-size:16px;}
     <li>見本の文字は<b>②に入力した内容</b>が自動で入ります。スライド作りの下書きにどうぞ</li>
     <li>表紙だけ写真、2〜6枚目は<b>生成り背景＋文字</b>にすると作るのがかんたん</li>
   </ul>
-  <h4 class="sub-h">6枚の画像をつくって保存する</h4>
-  <div class="gen" data-gen="know"></div>
+<p class="gen-note" style="margin:6px 0 0">画像は、②で文章を選んだあとに<b>「STEP 4 画像をつくる」</b>で作れます。文字は投稿文に合わせて自動で入ります。</p>
 </template>
 
 <template id="tpl-ba-prep">
@@ -610,7 +616,7 @@ input.one{font-size:16px;}
   <div class="carousel" tabindex="0" aria-label="Before/After投稿のスライド見本">
     <div class="slide">
       <div class="frame"><div class="cmp"><div class="ph before" data-photo="baBefore"></div><div class="ph" data-photo="baFront"></div>
-        <span class="tagba b">BEFORE</span><span class="tagba a">AFTER</span><span class="cmp-tx" data-nbind="ba:ba.cmp"></span></div></div>
+        <span class="tagba b">BEFORE</span><span class="tagba a">AFTER</span><span class="cmp-tx" data-ibind="ba:cmp"></span></div></div>
       <span class="no">1枚目</span><span class="nm">比較写真</span><span class="ds">左にBefore・右にAfter。一目で変化が分かる一言を入れる（②でお悩みを選ぶと入ります）</span>
     </div>
     <div class="slide">
@@ -636,8 +642,7 @@ input.one{font-size:16px;}
   </div>
   <div class="swipe-hint">← 横にスワイプ →</div>
 
-  <h4 class="sub-h">1枚目の比較画像をつくって保存する</h4>
-  <div class="gen" data-gen="ba"></div>
+<p class="gen-note" style="margin:6px 0 0">画像は、②で文章を選んだあとに<b>「STEP 4 画像をつくる」</b>で作れます。文字は投稿文に合わせて自動で入ります。</p>
 
   <h4 class="sub-h">撮影のコツ</h4>
   <ul class="tips">
@@ -769,7 +774,7 @@ input.one{font-size:16px;}
   var ORDER = TEMPLATES.map(function(t){ return t.id; });
 
   /* ---------------- State ---------------- */
-  var state = { set:{shop:"", staff:"", book:"link", bookIdx:0, tags:"", area:""}, v:{reel:{}, know:{}, ba:{}}, pick:{}, ptags:{}, theme:{}, done:{}, tab:"reel" };
+  var state = { set:{shop:"", staff:"", book:"link", bookIdx:0, tags:"", area:""}, v:{reel:{}, know:{}, ba:{}}, pick:{}, ptags:{}, theme:{}, img:{}, done:{}, tab:"reel" };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
     if (saved && typeof saved === "object") {
@@ -779,6 +784,7 @@ input.one{font-size:16px;}
       if (saved.pick) state.pick = saved.pick;
       if (saved.ptags) state.ptags = saved.ptags;
       if (saved.theme) state.theme = saved.theme;
+      if (saved.img) state.img = saved.img;
       if (saved.tab && ORDER.indexOf(saved.tab) > -1) state.tab = saved.tab;
     }
   } catch(e) {}
@@ -923,7 +929,7 @@ input.one{font-size:16px;}
   }
   /* 画面用：文節の切れ目に <wbr> を入れた HTML（CSS で word-break:keep-all と組み合わせる） */
   function phraseHTML(text){
-    return String(text || "").split("\n").map(function(line){ return phraseChunks(line).map(esc).join("<wbr>"); }).join("<br>");
+    return String(text || "").split(/\n|／/).map(function(line){ return phraseChunks(line).map(esc).join("<wbr>"); }).join("<br>");
   }
 
   function bookOpts(){
@@ -1007,6 +1013,7 @@ input.one{font-size:16px;}
       html += '<div class="auto-line"><span class="tag">予約の一文（自動で入ります・タップで選べます）</span><div data-bookline></div>'
         + '<div class="small muted">※基本設定の「予約の受け付け方」に合わせて切り替わります</div></div>';
     }
+    html += '<div class="choose" style="margin-top:18px"><div class="lbl2"><span class="step-n">STEP 4</span>画像をつくる</div><div class="gen" data-gen="' + t.id + '"></div></div>';
     html += '<h4 class="sub-h" style="margin-top:22px">完成プレビュー</h4>'
       + '<div class="pv"><div class="pv-top"><span class="av"><span data-avatar></span></span><span class="nm" data-pvname></span><span class="lb">キャプション</span></div>'
       + '<div class="pv-body" data-pv></div>'
@@ -1147,6 +1154,15 @@ input.one{font-size:16px;}
       if (val) { el.innerHTML = esc(pre) + phraseHTML(val); el.classList.remove("empty"); }
       else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
     });
+    $$("[data-ibind]").forEach(function(el){
+      var sp = el.getAttribute("data-ibind").split(":"), val = imgText(sp[0], sp[1]);
+      if (val) { el.innerHTML = phraseHTML(val); el.classList.remove("empty"); }
+      else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
+    });
+    $$("[data-showif-i]").forEach(function(el){
+      var sp = el.getAttribute("data-showif-i").split(":"), h = imgText(sp[0], sp[1]), b = trimAll((state.v[sp[0]] || {})[sp[2]]);
+      el.hidden = !h || h === b;
+    });
     $$("[data-showif]").forEach(function(el){
       var spec = el.getAttribute("data-showif").split(":"); el.hidden = !nval(spec[0], spec[1]);
     });
@@ -1213,7 +1229,7 @@ input.one{font-size:16px;}
     autosize(el);
     save();
     renderPanel(TEMPLATES[ORDER.indexOf(t)]);
-    renderBinds();
+    renderBinds(); renderImgSlots(t);
   });
   panels.addEventListener("click", function(e){
     var cl = e.target.closest("[data-clear]"), cp = e.target.closest("[data-copy]");
@@ -1230,7 +1246,7 @@ input.one{font-size:16px;}
 
   function tplOf(id){ return TEMPLATES[ORDER.indexOf(id)]; }
   function setField(id, fid, val){ state.v[id][fid] = val; $("#f_" + id + "_" + fid).value = val; }
-  function afterChange(t){ save(); renderPanel(t); renderBinds(); autosizeAll(); }
+  function afterChange(t){ save(); renderPanel(t); renderBinds(); if (typeof renderImgSlots === "function") renderImgSlots(t.id); autosizeAll(); }
   /* 候補にない（自分で書いた）文章が入っているか */
   function hasOwnText(t){
     return t.fields.some(function(f){
@@ -1284,7 +1300,7 @@ input.one{font-size:16px;}
     var t = TEMPLATES[ORDER.indexOf(id)];
     if (!confirm("「" + t.name + "」の入力内容を空にします。よろしいですか？")) return;
     t.fields.forEach(function(f){ setField(id, f.id, ""); });
-    state.pick[id] = null; state.ptags[id] = []; if (id === "know") state.theme.know = 0;
+    state.pick[id] = null; state.ptags[id] = []; if (id === "know") state.theme.know = 0; state.img[id] = {};
     afterChange(t);
   }
 
@@ -1391,12 +1407,66 @@ input.one{font-size:16px;}
 
 
   /* ================================================================
+     画像に入れる文字
+     自動：②で選んだ投稿文に合わせて入る（文章を変えると自動で変わる）
+     自分で入力：入力した文字を使う（「投稿文に合わせる」で自動に戻せる）
+     ================================================================ */
+  var IMG_SLOTS = {
+    reel: [{key:"cover", label:"カバーの文字", max:"15字くらい。「／」を入れるとそこで改行"}],
+    know: [{key:"cover", label:"表紙の大きい文字"}, {key:"sub", label:"表紙の小さい文字"},
+           {key:"h1", label:"2枚目の見出し"}, {key:"h2", label:"3枚目の見出し"}, {key:"h3", label:"4枚目の見出し"}, {key:"sum", label:"5枚目のまとめの一文"}],
+    ba:   [{key:"cmp", label:"比較画像に入れる一言", max:"10字くらい"}]
+  };
+  function firstLine(t){ return trimAll(t).split("\n")[0] || ""; }
+  /* 自動の文字と、ほかの候補 */
+  function imgAuto(tid, key){
+    var v = state.v[tid] || {}, alts = [], auto = "";
+    if (tid === "reel" && key === "cover") { auto = firstLine(v.hook); alts = [nval("reel", "cover")]; }
+    if (tid === "know") {
+      if (key === "cover") auto = firstLine(v.hook);
+      if (key === "sub") auto = nval("know", "know.sub");
+      if (/^h[123]$/.test(key)) { var i = key.slice(1), h = nval("know", "know.h" + i), r = trimAll(v["r" + i]);
+        // 見出しは、投稿文の理由と同じ内容のときだけおすすめを使う（理由を選びなおしたら理由の文に合わせる）
+        var th = knowTh(nayamiOf("know") || {know:{}});
+        auto = (h && th && trimAll(th["r" + i]) === r) ? h : r; alts = [h]; }
+      if (key === "sum") auto = nval("know", "know.sum");
+    }
+    if (tid === "ba" && key === "cmp") { auto = nval("ba", "ba.cmp"); alts = [firstLine(v.hook)]; }
+    alts = alts.filter(function(a){ return a && a !== auto; });
+    return {auto:auto, alts:alts};
+  }
+  function imgText(tid, key){
+    var c = ((state.img || {})[tid] || {})[key];
+    if (c && c.custom) return trimAll(c.text);
+    return imgAuto(tid, key).auto;
+  }
+  function setImgText(tid, key, text, custom){
+    state.img = state.img || {}; state.img[tid] = state.img[tid] || {};
+    state.img[tid][key] = {custom:!!custom, text:text};
+    save(); renderBinds(); renderImgSlots(tid, custom ? key : null);
+  }
+  function renderImgSlots(tid, skipKey){
+    var box = $('[data-slots="' + tid + '"]'); if (!box) return;
+    IMG_SLOTS[tid].forEach(function(sl){
+      var row = $('[data-slot="' + sl.key + '"]', box); if (!row) return;
+      var c = ((state.img || {})[tid] || {})[sl.key], custom = !!(c && c.custom), a = imgAuto(tid, sl.key);
+      var inp = $("textarea", row);
+      if (sl.key !== skipKey && document.activeElement !== inp) { inp.value = custom ? c.text : a.auto; autosize(inp); }
+      $(".slot-mode", row).textContent = custom ? "自分で入力" : "投稿文に合わせて自動";
+      $(".slot-mode", row).classList.toggle("own", custom);
+      var ex = $(".slot-extra", row);
+      ex.innerHTML = (custom ? '<button type="button" class="chip" data-slot-reset="' + tid + '" data-k="' + sl.key + '">投稿文に合わせる</button>' : '')
+        + a.alts.map(function(t, i){ return '<button type="button" class="chip tag" data-slot-alt="' + tid + '" data-k="' + sl.key + '" data-i="' + i + '">候補：' + esc(t) + '</button>'; }).join("");
+    });
+  }
+
+  /* ================================================================
      画像をつくる（canvas）
      写真は端末の中だけで使い、どこにも送信しません。
      ================================================================ */
   var GEN = {
-    reel: {lead:"写真を選ぶと、②で選んだカバー文字を入れた画像（1080×1920）ができます。", photos:[{key:"cover", label:"カバーの写真", sub:"After の写真がおすすめ"}]},
-    know: {lead:"表紙の写真を選ぶと、②の文章を入れた6枚（1080×1350）ができます。", photos:[{key:"cover", label:"表紙の写真", sub:"施術中・After など"}]},
+    reel: {lead:"写真を選ぶと、カバー画像（1080×1920）ができます。", photos:[{key:"cover", label:"カバーの写真", sub:"After の写真がおすすめ"}]},
+    know: {lead:"表紙の写真を選ぶと、6枚（1080×1350）ができます。", photos:[{key:"cover", label:"表紙の写真", sub:"施術中・After など"}]},
     ba:   {lead:"Before と After の写真を選ぶと、比較画像（1080×1350）ができます。2枚目以降は撮った写真をそのまま使います。", photos:[{key:"before", label:"Before の写真"}, {key:"after", label:"After の写真"}]}
   };
   var genPhotos = {reel:{}, know:{}, ba:{}};   // key -> HTMLImageElement
@@ -1464,7 +1534,7 @@ input.one{font-size:16px;}
   function makeReel(img){
     var a = mk(1080, 1920), c = a[0], ctx = a[1];
     drawCoverImg(ctx, img, 0, 0, 1080, 1920, .5, .35);
-    var t = txt("reel", "cover", "hook") || "カバーの文字";
+    var t = imgText("reel", "cover") || "カバーの文字";
     ctx.font = "800 92px " + F_HAND; var lines = wrap(ctx, t, 820, 4), lh = 128;
     var by = 960 - (lines.length * lh) / 2;
     ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, lh, {shadow:22}); ctx.textAlign = "left";
@@ -1472,14 +1542,14 @@ input.one{font-size:16px;}
   }
   /* --- 知識投稿 6枚 1080×1350 --- */
   function makeKnow(img){
-    var out = [], v = state.v.know, hook = trimAll(v.hook) || "結論をひと言で";
-    var reasons = [1,2,3].map(function(i){ return {h: nval("know", "know.h" + i), b: trimAll(v["r" + i])}; });
+    var out = [], v = state.v.know, hook = imgText("know", "cover") || "結論をひと言で";
+    var reasons = [1,2,3].map(function(i){ var b = trimAll(v["r" + i]), h = imgText("know", "h" + i); return {h: h === b ? "" : h, b: b}; });
     // 1 表紙
     var a = mk(1080, 1350), c = a[0], ctx = a[1];
     drawCoverImg(ctx, img, 0, 0, 1080, 1350, .5, .35);
     pill(ctx, "保存推奨", 760, 60, 40, C_.coralBtn, C_.white);
     ctx.font = "800 76px " + F_HAND; var hl = wrap(ctx, hook, 840, 4);
-    var sub = nval("know", "know.sub"); ctx.font = "500 40px " + F_BODY; var sl = sub ? wrap(ctx, sub, 840, 2) : [];
+    var sub = imgText("know", "sub"); ctx.font = "500 40px " + F_BODY; var sl = sub ? wrap(ctx, sub, 840, 2) : [];
     var bh = hl.length * 104 + (sl.length ? sl.length * 58 + 24 : 0), by = 1350 - 110 - bh;
     ctx.fillStyle = C_.white; ctx.font = "800 76px " + F_HAND; var y = drawLines(ctx, hl, 90, by, 104, {shadow:20});
     if (sl.length) { ctx.font = "700 40px " + F_BODY; drawLines(ctx, sl, 90, y + 24, 58, {shadow:14}); }
@@ -1504,7 +1574,7 @@ input.one{font-size:16px;}
     ctx.font = "800 76px " + F_HAND; ctx.fillStyle = C_.white; y = drawLines(ctx, wrap(ctx, hook, 900, 4), 90, 200, 104);
     ctx.font = "700 46px " + F_BODY; y += 40;
     reasons.forEach(function(r, i){ var lines = wrap(ctx, (i + 1) + ". " + (r.h || r.b || ""), 900, 2); ctx.fillStyle = "#E9ECF3"; y = drawLines(ctx, lines, 90, y, 68) + 16; });
-    var sum = nval("know", "know.sum");
+    var sum = imgText("know", "sum");
     if (sum) { ctx.font = "500 42px " + F_BODY; ctx.fillStyle = "#C9D1E2"; drawLines(ctx, wrap(ctx, sum, 900, 3), 90, y + 30, 64); }
     ctx.font = "500 32px " + F_BODY; ctx.fillStyle = "#B9C3D6"; ctx.textAlign = "right"; ctx.fillText("5/6", 990, 1260); ctx.textAlign = "left";
     out.push({name:"know-5", cap:"5枚目 まとめ", c:c});
@@ -1530,7 +1600,7 @@ input.one{font-size:16px;}
     pill(ctx, "BEFORE", 36, 40, 38, "rgba(31,47,77,.85)", C_.white);
     ctx.font = "700 38px " + F_BODY; var aw = ctx.measureText("AFTER").width + 38 * 1.4;
     pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, C_.coralBtn, C_.white);
-    var t = nval("ba", "ba.cmp");
+    var t = imgText("ba", "cmp");
     if (t) {
       ctx.font = "800 80px " + F_HAND; var lines = wrap(ctx, t, 900, 2), by = 1350 - 110 - lines.length * 108;
       ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, 108, {shadow:22}); ctx.textAlign = "left";
@@ -1541,15 +1611,20 @@ input.one{font-size:16px;}
   function buildGenUI(tid){
     var box = $('.gen[data-gen="' + tid + '"]'); if (!box) return;
     var g = GEN[tid];
-    box.innerHTML = '<p class="gen-lead">' + esc(g.lead) + '</p><div class="gen-photos">'
+    box.innerHTML = '<p class="gen-lead">' + esc(g.lead) + ' 文字は投稿文に合わせて自動で入ります。書きかえたいときは、そのまま入力してください。</p><div class="gen-photos">'
       + g.photos.map(function(ph){
           return '<label class="gen-pick"><span class="th" data-th="' + ph.key + '"></span><span>' + esc(ph.label) + '<small>' + esc(ph.sub || "タップして選ぶ") + '</small></span>'
             + '<input type="file" accept="image/*" data-gen-file="' + tid + '" data-key="' + ph.key + '"></label>';
         }).join("") + '</div>'
+      + '<div class="slots" data-slots="' + tid + '">' + IMG_SLOTS[tid].map(function(sl){
+          return '<div class="slot" data-slot="' + sl.key + '"><div class="slot-h"><b>' + esc(sl.label) + '</b><span class="slot-mode"></span></div>'
+            + '<textarea rows="1" data-slot-in="' + tid + '" data-k="' + sl.key + '" placeholder="' + esc(sl.max || "") + '"></textarea>'
+            + '<div class="chips slot-extra"></div></div>';
+        }).join("") + '</div>'
       + '<button type="button" class="btn btn-copy" style="min-height:48px;font-size:15px" data-gen-make="' + tid + '">画像をつくる</button>'
       + '<div class="gen-out" data-gen-out="' + tid + '" hidden></div>'
       + '<div class="row-btns" data-gen-all="' + tid + '" hidden style="margin-top:8px"><button type="button" class="btn btn-ghost" data-gen-saveall="' + tid + '" style="width:100%">まとめて保存する</button></div>'
-      + '<p class="gen-note">写真を選ばないときは見本写真で作ります。選んだ写真はこのスマホの中だけで使い、どこにも送信しません。文字を変えたら、もう一度「画像をつくる」を押してください。</p>';
+      + '<p class="gen-note">写真を選ばないときは見本写真で作ります。選んだ写真はこのスマホの中だけで使い、どこにも送信しません。文字や投稿文を変えたら、もう一度「画像をつくる」を押してください。</p>';
   }
   function makeImages(tid){
     var ph = genPhotos[tid], btn = $('[data-gen-make="' + tid + '"]');
@@ -1584,7 +1659,17 @@ input.one{font-size:16px;}
       setTimeout(function(){ var a = document.createElement("a"); a.href = x.url; a.download = x.name + ".jpg"; document.body.appendChild(a); a.click(); a.remove(); }, i * 300);
     });
   }
-  ORDER.forEach(buildGenUI);
+  ORDER.forEach(function(t){ buildGenUI(t); renderImgSlots(t); });
+  panels.addEventListener("input", function(e){
+    var el = e.target; if (!el.matches("[data-slot-in]")) return;
+    autosize(el); setImgText(el.getAttribute("data-slot-in"), el.getAttribute("data-k"), el.value, true);
+  });
+  panels.addEventListener("click", function(e){
+    var rs = e.target.closest("[data-slot-reset]"), al = e.target.closest("[data-slot-alt]");
+    if (rs) setImgText(rs.getAttribute("data-slot-reset"), rs.getAttribute("data-k"), "", false);
+    if (al) { var tid = al.getAttribute("data-slot-alt"), k = al.getAttribute("data-k");
+      setImgText(tid, k, imgAuto(tid, k).alts[+al.getAttribute("data-i")] || "", true); }
+  });
   panels.addEventListener("change", function(e){
     var el = e.target; if (!el.matches("[data-gen-file]")) return;
     var f = el.files && el.files[0]; if (!f) return;
