@@ -307,6 +307,7 @@ input.one{font-size:16px;}
 [data-bind], [data-nbind], .cover .safe .tx, .ks .big, .ks .body, .cmp-tx, .telop{word-break:keep-all; overflow-wrap:anywhere; line-break:strict;}
 
 /* ---------- Image maker ---------- */
+.style-pick{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; font-size:13px;}
 .accent-pick{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; font-size:13px;}
 .swatches{display:flex; gap:8px; flex-wrap:wrap;}
 .sw{position:relative; width:34px; height:34px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--rule); padding:0; cursor:pointer;}
@@ -875,7 +876,7 @@ input.one{font-size:16px;}
       if (c === "content") {
         // 前が「ひらがな」か句読点なら、新しい文節のはじまり
         // 「流れ出る」「吸い込み」「乾かし方」のような送りがな（2文字以内・助詞で終わらない）は切らない
-        var okuri = prevCls === "hira" && hiraRun <= 2 && lastKanji && JP_PARTICLE.indexOf(cur.slice(-1)) < 0 && !/(から|まで|より|など)$/.test(cur);
+        var okuri = prevCls === "hira" && hiraRun <= 2 && lastKanji && JP_PARTICLE.indexOf(cur.slice(-1)) < 0 && !/(から|まで|より|など|て)$/.test(cur);
         if (cur && (prevCls === "hira" || endsPunct) && !okuri && !(prevCls === "hira" && /^[おご]$/.test(cur.slice(-1)) && cur.length === 1)) flush();
         lastKanji = /[\u4E00-\u9FFF々]/.test(ch); hiraRun = 0;
         cur += ch; curHasContent = true; prevCls = c; return;
@@ -1497,7 +1498,8 @@ input.one{font-size:16px;}
     var n = nayamiOf(tid);
     var text = JSON.stringify(state.v[tid] || {}) + JSON.stringify(n || {}) + (state.set.shop || "")
       + "髪にドラマを。保存推奨理由まとめあとで見返せるように保存してね投稿の右下にある保存マークをタップBEFOREAFTER0123456789/";
-    return Promise.all(['500 40px "Shippori Mincho"', '700 40px "Shippori Mincho"', '800 40px "Shippori Mincho"']
+    return Promise.all(['500 40px "Shippori Mincho"', '700 40px "Shippori Mincho"', '800 40px "Shippori Mincho"',
+      '500 40px "Zen Kaku Gothic New"', '700 40px "Zen Kaku Gothic New"']
       .map(function(f){ return document.fonts.load(f, text).catch(function(){}); }));
   }
   function drawCoverImg(ctx, img, x, y, w, h, px, py){
@@ -1741,6 +1743,130 @@ input.one{font-size:16px;}
     out.push({name:"know-6", cap:"6枚目 保存・予約", c:c});
     return out;
   }
+
+  /* --- 知識投稿「シンプル」6枚：明るいグレー×ゴシック×図解（写真なし） --- */
+  var F_GO = '"Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif';
+  function blob(ctx, cx, cy, r, fill, line){
+    function path(k){
+      ctx.beginPath();
+      ctx.moveTo(cx - r * k, cy);
+      ctx.bezierCurveTo(cx - r * k, cy - r * .9 * k, cx - r * .2 * k, cy - r * 1.1 * k, cx + r * .35 * k, cy - r * .85 * k);
+      ctx.bezierCurveTo(cx + r * 1.05 * k, cy - r * .55 * k, cx + r * .95 * k, cy + r * .2 * k, cx + r * .55 * k, cy + r * .6 * k);
+      ctx.bezierCurveTo(cx + r * .1 * k, cy + r * 1.05 * k, cx - r * .9 * k, cy + r * .8 * k, cx - r * k, cy);
+      ctx.closePath();
+    }
+    ctx.save(); path(1); ctx.fillStyle = fill; ctx.fill();
+    path(1.18); ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+  }
+  function ticks(ctx, x, y, color){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.beginPath();
+    ctx.moveTo(x, y + 22); ctx.lineTo(x - 18, y + 30); ctx.moveTo(x + 12, y + 6); ctx.lineTo(x + 2, y - 10); ctx.moveTo(x + 34, y); ctx.lineTo(x + 34, y - 18);
+    ctx.stroke(); ctx.restore();
+  }
+  function circleCheck(ctx, cx, cy, r, color){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 3; ctx.beginPath();
+    ctx.moveTo(cx - r * .42, cy); ctx.lineTo(cx - r * .1, cy + r * .32); ctx.lineTo(cx + r * .45, cy - r * .32); ctx.stroke(); ctx.restore();
+  }
+  function dotted(ctx, x1, x2, y, color){ ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke(); ctx.restore(); }
+  function makeKnowSimple(){
+    var A = accent(), INK2 = "#3A3D42", SOFT = mix(A, "#FFFFFF", .55), PALE = mix(A, "#FFFFFF", .86), BG = "#F3F3F2", out = [];
+    var v = state.v.know, hook = imgText("know", "cover") || "結論をひと言で";
+    var reasons = [1,2,3].map(function(i){ var b = trimAll(v["r" + i]), h = imgText("know", "h" + i); return {h: h || b, b: b, same: h === b}; });
+    var sub = imgText("know", "sub"), sum = imgText("know", "sum"), shop = trimAll(state.set.shop);
+    function base(n, blobs){
+      var a = mk(1080, 1350), ctx = a[1];
+      ctx.fillStyle = BG; ctx.fillRect(0, 0, 1080, 1350);
+      if (blobs) { blob(ctx, 1020, 120, 190, PALE, SOFT); blob(ctx, 60, 1300, 230, PALE, SOFT); }
+      else blob(ctx, 1050, 1290, 200, PALE, SOFT);
+      // 縦書き「HAIR CARE」と線
+      ctx.save(); ctx.translate(58, 250); ctx.rotate(Math.PI / 2); ctx.font = "500 22px " + F_GO; ctx.fillStyle = "#7A7D82"; fillSp(ctx, "HAIR CARE", 0, 0, 6, "left"); ctx.restore();
+      ctx.strokeStyle = "#8A8D92"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(48, 500); ctx.lineTo(48, 760); ctx.stroke();
+      if (!blobs) { ctx.font = "500 24px " + F_GO; ctx.fillStyle = "#55585D"; fillSp(ctx, n + " / 6", 40, 60, 2, "left");
+        ctx.beginPath(); ctx.moveTo(130, 72); ctx.lineTo(300, 72); ctx.stroke(); }
+      return a;
+    }
+    function title(ctx, text, y, size){
+      ctx.font = "700 " + size + "px " + F_GO; var sp = size * .14, lines = wrapSp(ctx, text, 820, sp, 3), lh = size * 1.45;
+      ticks(ctx, 540 - Math.min(410, spW(ctx, lines[0], sp) / 2) - 40, y - 4, "#6E7177");
+      ctx.fillStyle = INK2; lines.forEach(function(l, i){ fillSp(ctx, l, 540, y + i * lh, sp, "center"); });
+      var w = Math.max.apply(null, lines.map(function(l){ return spW(ctx, l, sp); }));
+      swash(ctx, 540 - w / 2 - 10, 540 + w / 2 + 10, y + lines.length * lh + 6, SOFT, 4);
+      return y + lines.length * lh + 50;
+    }
+    function bodyCenter(ctx, text, y, size, maxW, color){
+      ctx.font = "500 " + size + "px " + F_GO; var sp = size * .12, lines = wrapSp(ctx, text, maxW, sp, 7), lh = size * 1.75;
+      ctx.fillStyle = color || INK2; lines.forEach(function(l, i){ fillSp(ctx, l, 540, y + i * lh, sp, "center"); });
+      return y + lines.length * lh;
+    }
+    function outlined(ctx, x, y, w, h){ ctx.save(); ctx.strokeStyle = "#8A8D92"; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h); ctx.restore(); }
+    // 1 表紙
+    var a = base(1, true), c = a[0], ctx = a[1];
+    ctx.font = "500 34px " + F_GO; ctx.fillStyle = INK2; fillSp(ctx, "お客様向け", 540, 330, 10, "center");
+    ctx.strokeStyle = "#55585D"; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(330, 312); ctx.lineTo(355, 360); ctx.moveTo(750, 312); ctx.lineTo(725, 360);
+    ctx.moveTo(470, 392); ctx.lineTo(610, 392); ctx.stroke();
+    var f = fitText(ctx, hook, {weight:"700", font:F_GO, max:92, min:52, lh:1.45, spacing:.12, maxW:880, maxLines:4, maxH:520});
+    var ty = 480 + (520 - f.lines.length * f.lh) / 2 - 40;
+    ctx.fillStyle = INK2; f.lines.forEach(function(l, i){ fillSp(ctx, l, 540, ty + i * f.lh, f.sp, "center"); });
+    var lw = spW(ctx, f.lines[f.lines.length - 1], f.sp);
+    swash(ctx, 540 - lw / 2 + 40, 540 + lw / 2 + 20, ty + f.lines.length * f.lh + 4, SOFT, 6);
+    var y = ty + f.lines.length * f.lh + 70;
+    if (sub) { ctx.font = "500 30px " + F_GO; var sl = wrapSp(ctx, sub, 640, 6, 2), bw = Math.max.apply(null, sl.map(function(l){ return spW(ctx, l, 6); })) + 80, bh = sl.length * 50 + 40;
+      outlined(ctx, 540 - bw / 2, y, bw, bh); ctx.fillStyle = INK2; sl.forEach(function(l, i){ fillSp(ctx, l, 540, y + 22 + i * 50, 6, "center"); }); }
+    ctx.font = "500 24px " + F_GO; ctx.fillStyle = "#55585D"; fillSp(ctx, "1 / 6", 1010, 1260, 2, "right");
+    out.push({name:"know-1", cap:"1枚目 表紙", c:c});
+    // 2-4 理由
+    reasons.forEach(function(r, i){
+      var a = base(i + 2, false), c = a[0], ctx = a[1];
+      ctx.font = "700 62px " + F_GO; var tl = wrapSp(ctx, r.h, 820, 62 * .14, 3).length;
+      ctx.font = "500 36px " + F_GO; var bn = (r.b && !r.same) ? wrapSp(ctx, r.b, 760, 36 * .12, 7).length : 0;
+      var total = 70 + tl * 90 + 50 + (bn ? 50 + bn * 63 + 30 : 0), top = Math.max(150, (1350 - total) / 2 - 20);
+      ctx.font = "500 30px " + F_GO; ctx.fillStyle = A; fillSp(ctx, "理由 " + (i + 1), 540, top, 10, "center");
+      var y = title(ctx, r.h, top + 70, 62);
+      if (r.b && !r.same) {
+        dotted(ctx, 240, 840, y, SOFT); y += 50;
+        y = bodyCenter(ctx, r.b, y, 36, 760);
+        dotted(ctx, 240, 840, y + 30, SOFT);
+      }
+      if (shop) { ctx.font = "500 26px " + F_GO; ctx.fillStyle = "#7A7D82"; fillSp(ctx, shop, 540, 1240, 6, "center"); }
+      out.push({name:"know-" + (i + 2), cap:(i + 2) + "枚目 理由" + (i + 1), c:c});
+    });
+    // 5 まとめ（チェックリスト）
+    a = base(5, false); c = a[0]; ctx = a[1];
+    y = title(ctx, hook, 170, 52);
+    ctx.font = "500 36px " + F_GO;
+    var rows = reasons.map(function(r){ return wrapSp(ctx, r.h, 600, 5, 2); }), rh = rows.map(function(l){ return Math.max(110, l.length * 56 + 54); });
+    var cardH = rh.reduce(function(t, h){ return t + h; }, 0) + 30;
+    ctx.fillStyle = "rgba(255,255,255,.75)"; rr(ctx, 170, y, 740, cardH, 14); ctx.fill();
+    var ry = y + 15;
+    rows.forEach(function(lines, i){
+      circleCheck(ctx, 240, ry + rh[i] / 2, 22, "#55585D");
+      var ly = ry + (rh[i] - lines.length * 56) / 2 + 4;
+      lines.forEach(function(l, k){ ctx.fillStyle = k === lines.length - 1 && lines.length > 1 ? A : INK2; fillSp(ctx, l, 290, ly + k * 56, 5, "left"); });
+      if (i < rows.length - 1) dotted(ctx, 220, 860, ry + rh[i], SOFT);
+      ry += rh[i];
+    });
+    y += cardH + 50;
+    if (sum) { ctx.font = "500 32px " + F_GO; var ml = wrapSp(ctx, sum, 640, 5, 3), mh = ml.length * 54 + 60;
+      outlined(ctx, 170, y, 740, mh); ctx.fillStyle = INK2; ml.forEach(function(l, k){ fillSp(ctx, l, 540, y + 30 + k * 54, 5, "center"); }); }
+    out.push({name:"know-5", cap:"5枚目 まとめ", c:c});
+    // 6 保存・予約
+    a = base(6, false); c = a[0]; ctx = a[1];
+    ctx.font = "500 34px " + F_GO; ctx.fillStyle = INK2; fillSp(ctx, "あとで見返せるように", 540, 230, 8, "center");
+    y = title(ctx, "保存がおすすめ", 300, 72);
+    var cta = trimAll(v.cta);
+    if (cta) y = bodyCenter(ctx, cta, y + 10, 34, 760) + 40;
+    var book = {link:"ご予約・ご相談は プロフィールのリンクから", hpb:"ご予約は ホットペッパービューティーから", dm:"ご予約・ご相談は DMから"}[state.set.book] || "ご予約・ご相談はお気軽に";
+    var bl = ["気になることがあれば、", "お気軽にご相談ください。"];
+    outlined(ctx, 150, y, 780, 300);
+    ctx.font = "500 34px " + F_GO; ctx.fillStyle = INK2; bl.forEach(function(l, k){ fillSp(ctx, l, 540, y + 50 + k * 58, 6, "center"); });
+    ctx.strokeStyle = "#B5B7BB"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(200, y + 190); ctx.lineTo(880, y + 190); ctx.stroke();
+    ctx.font = "500 28px " + F_GO; ctx.fillStyle = A; fillSp(ctx, state.set.book === "hpb" && shop ? "ホットペッパーで「" + shop + "」と検索" : book, 540, y + 225, 4, "center");
+    var who = [trimAll(state.set.staff), shop].filter(Boolean).join(" ／ ");
+    if (who) { ctx.font = "700 32px " + F_GO; ctx.fillStyle = INK2; fillSp(ctx, who, 540, 1200, 6, "center"); }
+    out.push({name:"know-6", cap:"6枚目 保存・予約", c:c});
+    return out;
+  }
   /* --- Before/After 比較 1080×1350 --- */
   function makeBA(before, after){
     var a = mk(1080, 1350), c = a[0], ctx = a[1];
@@ -1767,6 +1893,9 @@ input.one{font-size:16px;}
           return '<label class="gen-pick"><span class="th" data-th="' + ph.key + '"></span><span>' + esc(ph.label) + '<small>' + esc(ph.sub || "タップして選ぶ") + '</small></span>'
             + '<input type="file" accept="image/*" data-gen-file="' + tid + '" data-key="' + ph.key + '"></label>';
         }).join("") + '</div>'
+      + (tid === "know" ? '<div class="style-pick"><b>デザイン</b><div class="chips">'
+          + '<button type="button" class="chip" data-kstyle="photo">写真あり（明朝）</button>'
+          + '<button type="button" class="chip" data-kstyle="simple">シンプル（ゴシック・写真なし）</button></div></div>' : '')
       + '<div class="accent-pick"><b>アクセントカラー</b><div class="swatches">' + ACCENTS.map(function(a){
           return '<button type="button" class="sw" data-accent="' + a.c + '" title="' + a.n + '" style="background:' + a.c + '" aria-label="' + a.n + '"></button>';
         }).join("") + '<label class="sw sw-custom" title="自分で選ぶ"><input type="color" data-accent-in value="' + accent() + '">＋</label></div></div>'
@@ -1785,7 +1914,9 @@ input.one{font-size:16px;}
     btn.disabled = true; btn.textContent = "つくっています…";
     var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : (p.optional ? Promise.resolve(null) : sampleImg()); });
     fontsReady(tid).then(function(){ return Promise.all(need); }).then(function(imgs){
-      var list = tid === "reel" ? makeReel(imgs[0]) : tid === "know" ? makeKnow(imgs[0], imgs[1] || imgs[0], imgs[2]) : makeBA(imgs[0], imgs[1]);
+      var list = tid === "reel" ? makeReel(imgs[0])
+        : tid === "know" ? (knowStyle() === "simple" ? makeKnowSimple() : makeKnow(imgs[0], imgs[1] || imgs[0], imgs[2]))
+        : makeBA(imgs[0], imgs[1]);
       genOut[tid] = list.map(function(x){ return {name:x.name, cap:x.cap, url:x.c.toDataURL("image/jpeg", .92)}; });
       var out = $('[data-gen-out="' + tid + '"]');
       out.innerHTML = genOut[tid].map(function(x, i){
@@ -1819,6 +1950,16 @@ input.one{font-size:16px;}
     $$("[data-accent-in]").forEach(function(i){ i.value = accent(); });
   }
   renderAccent();
+  function knowStyle(){ return state.set.knowStyle === "simple" ? "simple" : "photo"; }
+  function renderKStyle(){
+    $$("[data-kstyle]").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-kstyle") === knowStyle()); });
+    var ph = $('.gen[data-gen="know"] .gen-photos'); if (ph) ph.hidden = knowStyle() === "simple";
+  }
+  renderKStyle();
+  panels.addEventListener("click", function(e){
+    var k = e.target.closest("[data-kstyle]"); if (!k) return;
+    state.set.knowStyle = k.getAttribute("data-kstyle"); save(); renderKStyle();
+  });
   panels.addEventListener("click", function(e){
     var a = e.target.closest("[data-accent]"); if (!a) return;
     state.set.accent = a.getAttribute("data-accent"); save(); renderAccent();
