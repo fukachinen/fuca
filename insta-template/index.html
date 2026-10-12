@@ -307,6 +307,12 @@ input.one{font-size:16px;}
 [data-bind], [data-nbind], .cover .safe .tx, .ks .big, .ks .body, .cmp-tx, .telop{word-break:keep-all; overflow-wrap:anywhere; line-break:strict;}
 
 /* ---------- Image maker ---------- */
+.accent-pick{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; font-size:13px;}
+.swatches{display:flex; gap:8px; flex-wrap:wrap;}
+.sw{position:relative; width:34px; height:34px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--rule); padding:0; cursor:pointer;}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--navy);}
+.sw-custom{display:flex; align-items:center; justify-content:center; background:conic-gradient(#e88,#ec8,#8c8,#8ce,#a8e,#e88); color:#fff; font-weight:700; text-shadow:0 1px 2px rgba(0,0,0,.5);}
+.sw-custom input{position:absolute; inset:0; opacity:0; cursor:pointer;}
 .slots{display:grid; gap:10px; margin-bottom:12px;}
 .slot{background:var(--surface); border:1px solid var(--rule); border-radius:12px; padding:8px 10px;}
 .slot-h{display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:5px;}
@@ -1466,7 +1472,10 @@ input.one{font-size:16px;}
      ================================================================ */
   var GEN = {
     reel: {lead:"写真を選ぶと、カバー画像（1080×1920）ができます。", photos:[{key:"cover", label:"カバーの写真", sub:"After の写真がおすすめ"}]},
-    know: {lead:"表紙の写真を選ぶと、6枚（1080×1350）ができます。", photos:[{key:"cover", label:"表紙の写真", sub:"施術中・After など"}]},
+    know: {lead:"写真を選ぶと、6枚（1080×1350）ができます。", photos:[
+      {key:"cover", label:"表紙の写真", sub:"お客様の Before など"},
+      {key:"cta", label:"最後の1枚の写真", sub:"仕上がりの後ろ姿など（なくてもOK）", optional:true},
+      {key:"staff", label:"担当者の写真", sub:"顔写真（なくてもOK）", optional:true}]},
     ba:   {lead:"Before と After の写真を選ぶと、比較画像（1080×1350）ができます。2枚目以降は撮った写真をそのまま使います。", photos:[{key:"before", label:"Before の写真"}, {key:"after", label:"After の写真"}]}
   };
   var genPhotos = {reel:{}, know:{}, ba:{}};   // key -> HTMLImageElement
@@ -1540,55 +1549,177 @@ input.one{font-size:16px;}
     ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, lh, {shadow:22}); ctx.textAlign = "left";
     return [{name:"reel-cover", cap:"カバー", c:c}];
   }
-  /* --- 知識投稿 6枚 1080×1350 --- */
-  function makeKnow(img){
-    var out = [], v = state.v.know, hook = imgText("know", "cover") || "結論をひと言で";
-    var reasons = [1,2,3].map(function(i){ var b = trimAll(v["r" + i]), h = imgText("know", "h" + i); return {h: h === b ? "" : h, b: b}; });
+  /* --- 知識投稿 6枚 1080×1350（参考デザイン：生成り×明朝×アクセントカラー） --- */
+  var ACCENTS = [{n:"モーヴ", c:"#A8787A"}, {n:"コーラル", c:"#C9735F"}, {n:"ネイビー", c:"#3E5375"}, {n:"セージ", c:"#6B8770"}, {n:"ブラウン", c:"#977658"}];
+  function accent(){ return state.set.accent || ACCENTS[0].c; }
+  function rgb(h){ h = h.replace("#", ""); return [0,2,4].map(function(i){ return parseInt(h.substr(i, 2), 16); }); }
+  function mix(h1, h2, t){ var a = rgb(h1), b = rgb(h2); return "rgb(" + a.map(function(v, i){ return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
+  var INK = "#3B3532";
+  function spW(ctx, t, sp){ return ctx.measureText(t).width + sp * Math.max(0, Array.from(t).length - 1); }
+  function fillSp(ctx, t, x, y, sp, align){
+    var w = spW(ctx, t, sp), cx = align === "center" ? x - w / 2 : align === "right" ? x - w : x;
+    var keep = ctx.textAlign; ctx.textAlign = "left";
+    Array.from(t).forEach(function(ch){ ctx.fillText(ch, cx, y); cx += ctx.measureText(ch).width + sp; });
+    ctx.textAlign = keep; return w;
+  }
+  function wrapSp(ctx, text, maxW, sp, maxLines){
+    var out = [], m = function(t){ return spW(ctx, t, sp); };
+    String(text || "").replace(/\r/g, "").split(/\n|／/).forEach(function(p){ out = out.concat(phraseWrap(p, maxW, m)); });
+    if (maxLines && out.length > maxLines) { out = out.slice(0, maxLines); out[maxLines-1] = out[maxLines-1].replace(/.$/, "…"); }
+    return out;
+  }
+  function swash(ctx, x1, x2, y, color, w){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w || 6; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x1, y + 4); ctx.quadraticCurveTo((x1 + x2) / 2, y - 6, x2, y); ctx.stroke(); ctx.restore();
+  }
+  function sparkle(ctx, cx, cy, r, color){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.beginPath();
+    ctx.moveTo(cx, cy - r); ctx.quadraticCurveTo(cx, cy, cx + r, cy); ctx.quadraticCurveTo(cx, cy, cx, cy + r);
+    ctx.quadraticCurveTo(cx, cy, cx - r, cy); ctx.quadraticCurveTo(cx, cy, cx, cy - r); ctx.stroke(); ctx.restore();
+  }
+  function checkCircle(ctx, cx, cy, r, color){
+    ctx.save(); ctx.fillStyle = color; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = r * .22; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(cx - r * .45, cy); ctx.lineTo(cx - r * .1, cy + r * .35); ctx.lineTo(cx + r * .5, cy - r * .35); ctx.stroke(); ctx.restore();
+  }
+  function checkBox(ctx, x, y, s, color){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.strokeRect(x, y + s * .12, s * .88, s * .88);
+    ctx.beginPath(); ctx.moveTo(x + s * .18, y + s * .55); ctx.lineTo(x + s * .42, y + s * .8); ctx.lineTo(x + s * .98, y); ctx.stroke(); ctx.restore();
+  }
+  function numCircle(ctx, cx, cy, r, n, color){
+    ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = color; ctx.font = "700 " + Math.round(r * 1.1) + "px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(n), cx, cy + 2); ctx.restore();
+  }
+  function card(ctx, x, y, w, h){ ctx.save(); ctx.fillStyle = "rgba(255,255,255,.62)"; rr(ctx, x, y, w, h, 18); ctx.fill(); ctx.restore(); }
+  function labelBox(ctx, text, x, y, size, color, align, maxW){
+    ctx.font = "500 " + size + "px " + F_MIN; var sp = size * .08, lines = wrapSp(ctx, text, maxW || 900, sp, 2);
+    var w = Math.max.apply(null, lines.map(function(l){ return spW(ctx, l, sp); })) + size * 1.4, h = lines.length * size * 1.5 + size * .8;
+    var bx = align === "center" ? x - w / 2 : x;
+    ctx.fillStyle = color; rr(ctx, bx, y, w, h, 6); ctx.fill();
+    ctx.fillStyle = "#fff"; lines.forEach(function(l, i){ fillSp(ctx, l, bx + w / 2, y + size * .4 + i * size * 1.5, sp, "center"); });
+    return y + h;
+  }
+  /* 強調する行（いちばん長い行）をアクセント色＋下線にして描く */
+  function drawHead(ctx, lines, x, y, lh, sp, align, A, Alight){
+    // 日本語は結論が文の終わりに来るので、最後の行を強調する（短すぎる行なら1つ前）
+    var em = lines.length - 1;
+    if (em > 0 && Array.from(lines[em]).length <= 3) em--;
+    lines.forEach(function(l, i){
+      ctx.fillStyle = i === em ? A : INK; var w = fillSp(ctx, l, x, y + i * lh, sp, align);
+      if (i === em) { var x1 = align === "center" ? x - w / 2 : x; swash(ctx, x1 - 6, x1 + w + 10, y + i * lh + lh * .9, Alight, 7); }
+    });
+    return y + lines.length * lh;
+  }
+  /* 2行に分け、1行目は濃い色・2行目はアクセント色 */
+  function twoTone(ctx, text, x, y, maxW, size, sp, A, align){
+    ctx.font = "700 " + size + "px " + F_MIN; var lines = wrapSp(ctx, text, maxW, sp, 3), lh = size * 1.55;
+    lines.forEach(function(l, i){ ctx.fillStyle = i === 0 && lines.length > 1 ? INK : A; fillSp(ctx, l, x, y + i * lh, sp, align); });
+    return y + lines.length * lh;
+  }
+  function makeKnow(img, ctaImg, staffImg){
+    var A = accent(), Al = mix(A, "#FFFFFF", .55), BG = mix("#F5F0EC", A, .06), out = [];
+    var v = state.v.know, hook = imgText("know", "cover") || "結論をひと言で";
+    var reasons = [1,2,3].map(function(i){ var b = trimAll(v["r" + i]), h = imgText("know", "h" + i); return {h: h || b, b: b, same: h === b}; });
+    var sub = imgText("know", "sub"), sum = imgText("know", "sum");
+    function base(){ var a = mk(1080, 1350); a[1].fillStyle = BG; a[1].fillRect(0, 0, 1080, 1350); return a; }
+    function photoRight(ctx, im, x0, y0, h){
+      drawCoverImg(ctx, im, x0, y0, 1080 - x0, h, .5, .3);
+      var g = ctx.createLinearGradient(x0, 0, x0 + 170, 0); g.addColorStop(0, BG); g.addColorStop(1, "rgba(245,240,236,0)");
+      ctx.fillStyle = g; ctx.fillRect(x0, y0, 170, h);
+    }
     // 1 表紙
-    var a = mk(1080, 1350), c = a[0], ctx = a[1];
-    drawCoverImg(ctx, img, 0, 0, 1080, 1350, .5, .35);
-    pill(ctx, "保存推奨", 760, 60, 40, C_.coralBtn, C_.white);
-    ctx.font = "800 76px " + F_HAND; var hl = wrap(ctx, hook, 840, 4);
-    var sub = imgText("know", "sub"); ctx.font = "500 40px " + F_BODY; var sl = sub ? wrap(ctx, sub, 840, 2) : [];
-    var bh = hl.length * 104 + (sl.length ? sl.length * 58 + 24 : 0), by = 1350 - 110 - bh;
-    ctx.fillStyle = C_.white; ctx.font = "800 76px " + F_HAND; var y = drawLines(ctx, hl, 90, by, 104, {shadow:20});
-    if (sl.length) { ctx.font = "700 40px " + F_BODY; drawLines(ctx, sl, 90, y + 24, 58, {shadow:14}); }
+    var a = base(), c = a[0], ctx = a[1];
+    photoRight(ctx, img, 520, 0, 1350);
+    // 長い文は、5行に収まるまで文字を小さくする（「…」で切らない）
+    var fs = 74, hl;
+    for (; fs >= 48; fs -= 4) { ctx.font = "800 " + fs + "px " + F_MIN; hl = wrapSp(ctx, hook, 440, fs * .08); if (hl.length <= 5) break; }
+    var y = drawHead(ctx, hl, 70, 100, Math.round(fs * 1.5), fs * .08, "left", A, Al) + 30;
+    ctx.strokeStyle = mix(A, "#FFFFFF", .5); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(500, y); ctx.stroke(); y += 40;
+    reasons.forEach(function(r){
+      checkCircle(ctx, 92, y + 22, 20, A);
+      y = twoTone(ctx, r.h, 130, y, 380, 33, 3, A, "left") + 22;
+    });
+    ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(500, y); ctx.stroke(); y += 36;
+    if (sub) y = labelBox(ctx, sub, 70, y, 32, A, "left", 400) + 30;
+    if (sum && y < 1180) { ctx.font = "500 29px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, sum, 430, 2, 4).forEach(function(l, i){ fillSp(ctx, l, 70, y + i * 50, 2, "left"); }); }
     out.push({name:"know-1", cap:"1枚目 表紙", c:c});
     // 2-4 理由
     reasons.forEach(function(r, i){
-      var a = mk(1080, 1350), c = a[0], ctx = a[1];
-      ctx.fillStyle = C_.kinari2; ctx.fillRect(0, 0, 1080, 1350);
-      brand(ctx, 90, 80, 34);
-      ctx.font = "800 200px " + F_HAND; ctx.fillStyle = C_.coralInk; ctx.fillText(String(i + 1), 90, 170);
-      pill(ctx, "理由", 90, 420, 40, C_.coral, C_.white);
-      var head = r.h || r.b || ("理由" + (i + 1));
-      ctx.font = "800 84px " + F_HAND; ctx.fillStyle = C_.navy; var y = drawLines(ctx, wrap(ctx, head, 900, 4), 90, 530, 116, {marker:true});
-      if (r.h && r.b) { ctx.font = "500 44px " + F_BODY; ctx.fillStyle = C_.navy; drawLines(ctx, wrap(ctx, r.b, 900, 7), 90, y + 50, 72); }
-      ctx.font = "500 32px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.textAlign = "right"; ctx.fillText((i + 2) + "/6", 990, 1260); ctx.textAlign = "left";
+      var a = base(), c = a[0], ctx = a[1];
+      ctx.font = "800 70px " + F_MIN; var hl = wrapSp(ctx, r.h, 860, 6, 4);
+      ctx.font = "500 40px " + F_MIN; var bl = (r.b && !r.same) ? wrapSp(ctx, r.b, 780, 3, 8) : [], ch = bl.length ? bl.length * 72 + 100 : 0;
+      var total = 100 + hl.length * 108 + (ch ? 60 + ch : 0), top = Math.max(90, (1350 - total) / 2 - 30);
+      ctx.font = "700 34px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "理由 " + (i + 1), 540, top, 10, "center");
+      ctx.strokeStyle = Al; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(330, top + 20); ctx.lineTo(450, top + 20); ctx.moveTo(630, top + 20); ctx.lineTo(750, top + 20); ctx.stroke();
+      ctx.font = "800 70px " + F_MIN;
+      var y = drawHead(ctx, hl, 540, top + 100, 108, 6, "center", A, Al) + 60;
+      if (ch) {
+        ctx.font = "500 40px " + F_MIN;
+        card(ctx, 90, y, 900, ch); checkBox(ctx, 130, y + 52, 46, A);
+        ctx.fillStyle = INK; bl.forEach(function(l, k){ fillSp(ctx, l, 200, y + 50 + k * 72, 3, "left"); });
+        y += ch;
+      }
+      ctx.font = "700 30px " + F_MIN; ctx.fillStyle = mix(A, "#FFFFFF", .3); fillSp(ctx, trimAll(state.set.shop) || "", 540, 1250, 6, "center");
       out.push({name:"know-" + (i + 2), cap:(i + 2) + "枚目 理由" + (i + 1), c:c});
     });
     // 5 まとめ
-    a = mk(1080, 1350); c = a[0]; ctx = a[1];
-    ctx.fillStyle = C_.navy; ctx.fillRect(0, 0, 1080, 1350);
-    pill(ctx, "まとめ", 90, 90, 40, C_.coral, C_.white);
-    ctx.font = "800 76px " + F_HAND; ctx.fillStyle = C_.white; y = drawLines(ctx, wrap(ctx, hook, 900, 4), 90, 200, 104);
-    ctx.font = "700 46px " + F_BODY; y += 40;
-    reasons.forEach(function(r, i){ var lines = wrap(ctx, (i + 1) + ". " + (r.h || r.b || ""), 900, 2); ctx.fillStyle = "#E9ECF3"; y = drawLines(ctx, lines, 90, y, 68) + 16; });
-    var sum = imgText("know", "sum");
-    if (sum) { ctx.font = "500 42px " + F_BODY; ctx.fillStyle = "#C9D1E2"; drawLines(ctx, wrap(ctx, sum, 900, 3), 90, y + 30, 64); }
-    ctx.font = "500 32px " + F_BODY; ctx.fillStyle = "#B9C3D6"; ctx.textAlign = "right"; ctx.fillText("5/6", 990, 1260); ctx.textAlign = "left";
+    a = base(); c = a[0]; ctx = a[1];
+    ctx.font = "800 62px " + F_MIN; hl = wrapSp(ctx, hook, 880, 5, 3);
+    ctx.font = "700 36px " + F_MIN;
+    var cardsH = reasons.reduce(function(t, r){ return t + Math.max(150, wrapSp(ctx, r.h, 640, 3, 3).length * 56 + 70) + 22; }, 0);
+    var sumH = sum ? wrapSp(ctx, sum, 820, 4, 3).length * 56 + 20 : 0;
+    var top5 = Math.max(70, (1350 - (70 + hl.length * 96 + 50 + cardsH + sumH)) / 2);
+    ctx.font = "700 32px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "まとめ", 540, top5, 12, "center");
+    ctx.font = "800 62px " + F_MIN;
+    y = drawHead(ctx, hl, 540, top5 + 70, 96, 5, "center", A, Al) + 50;
+    reasons.forEach(function(r, i){
+      ctx.font = "700 36px " + F_MIN; var lines = wrapSp(ctx, r.h, 640, 3, 3), ch = Math.max(150, lines.length * 56 + 70);
+      card(ctx, 120, y, 840, ch); numCircle(ctx, 210, y + ch / 2, 40, i + 1, A);
+      var ty = y + (ch - lines.length * 56) / 2 + 2;
+      lines.forEach(function(l, k){ ctx.fillStyle = k === 0 && lines.length > 1 ? INK : A; fillSp(ctx, l, 290, ty + k * 56, 3, "left"); });
+      y += ch + 22;
+    });
+    if (sum && y < 1200) { y += 20; twoTone(ctx, sum, 540, y, 820, 36, 4, A, "center"); }
     out.push({name:"know-5", cap:"5枚目 まとめ", c:c});
-    // 6 保存のお願い
-    a = mk(1080, 1350); c = a[0]; ctx = a[1];
-    ctx.fillStyle = C_.coralSoft; ctx.fillRect(0, 0, 1080, 1350);
-    ctx.save(); ctx.translate(540, 430); ctx.strokeStyle = C_.coralInk; ctx.lineWidth = 16; ctx.lineJoin = "round";
-    ctx.beginPath(); ctx.moveTo(-80, -110); ctx.lineTo(80, -110); ctx.lineTo(80, 120); ctx.lineTo(0, 60); ctx.lineTo(-80, 120); ctx.closePath(); ctx.stroke(); ctx.restore();
-    ctx.textAlign = "center"; ctx.fillStyle = C_.navy; ctx.font = "800 80px " + F_HAND;
-    drawLines(ctx, ["あとで見返せるように", "保存してね"], 540, 640, 116, {marker:true, align:"center"});
-    ctx.font = "500 40px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.fillText("投稿の右下にある保存マークをタップ", 540, 920);
-    ctx.font = "800 44px " + F_LOGO; ctx.fillStyle = C_.navy; ctx.fillText(trimAll(state.set.shop) || "髪にドラマを。", 540, 1120);
-    ctx.textAlign = "left";
-    out.push({name:"know-6", cap:"6枚目 保存", c:c});
+    // 6 保存・予約
+    a = base(); c = a[0]; ctx = a[1];
+    photoRight(ctx, ctaImg, 560, 0, 900);
+    ctx.font = "500 40px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "あとで見返せるように", 70, 110, 4, "left");
+    ctx.font = "800 76px " + F_MIN; var sw = spW(ctx, "保存してね。", 6); drawHead(ctx, ["保存してね。"], 70, 180, 110, 6, "left", A, Al);
+    sparkle(ctx, 70 + sw + 4, 170, 18, Al); sparkle(ctx, 70 + sw + 34, 214, 11, Al);
+    y = labelBox(ctx, "気になる方は\nお気軽にご相談ください。", 70, 360, 32, A, "left", 420) + 40;
+    var cta = trimAll(v.cta);
+    if (cta) { ctx.font = "500 32px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, cta, 440, 2, 4).forEach(function(l, k){ fillSp(ctx, l, 70, y + k * 54, 2, "left"); }); }
+    // 予約パネル
+    var shop = trimAll(state.set.shop) || "店名", py = 930;
+    ctx.fillStyle = "rgba(255,255,255,.72)"; rr(ctx, 50, py, 980, 200, 18); ctx.fill();
+    ctx.strokeStyle = mix(A, "#FFFFFF", .6); ctx.lineWidth = 2; rr(ctx, 50, py, 980, 200, 18); ctx.stroke();
+    var head = {link:"ご予約・ご相談はプロフィールのリンクから", hpb:"ご予約・ご相談はホットペッパーから", dm:"ご予約・ご相談はDMから"}[state.set.book] || "ご予約・ご相談はこちらから";
+    ctx.font = "700 32px " + F_MIN; var hw = spW(ctx, head, 4) + 90;
+    ctx.fillStyle = A; ctx.beginPath(); ctx.moveTo(540 - hw / 2, py - 30); ctx.lineTo(540 + hw / 2, py - 30); ctx.lineTo(540 + hw / 2 - 18, py); ctx.lineTo(540 + hw / 2, py + 30); ctx.lineTo(540 - hw / 2, py + 30); ctx.lineTo(540 - hw / 2 + 18, py); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.textBaseline = "middle"; fillSp(ctx, head, 540, py + 2, 4, "center"); ctx.textBaseline = "top";
+    if (state.set.book === "hpb") {
+      ctx.font = "500 28px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "ホットペッパービューティーで", 540, py + 46, 2, "center");
+      ctx.fillStyle = "#fff"; rr(ctx, 230, py + 86, 620, 60, 10); ctx.fill(); ctx.strokeStyle = A; ctx.lineWidth = 3; rr(ctx, 230, py + 86, 620, 60, 10); ctx.stroke();
+      ctx.font = "700 32px " + F_MIN; ctx.fillStyle = INK; var sl2 = wrapSp(ctx, shop, 520, 2, 1)[0]; fillSp(ctx, sl2, 260, py + 99, 2, "left");
+      ctx.strokeStyle = A; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(806, py + 112, 12, 0, Math.PI * 2); ctx.moveTo(815, py + 121); ctx.lineTo(826, py + 132); ctx.stroke();
+      ctx.font = "500 26px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "と検索してご予約ください。", 540, py + 158, 2, "center");
+    } else {
+      var msg = state.set.book === "dm" ? ["このアカウントへの DM で、", "お気軽にご相談ください。"] : ["プロフィールのリンクから", "ご予約いただけます。"];
+      ctx.font = "500 34px " + F_MIN; ctx.fillStyle = INK; msg.forEach(function(l, k){ fillSp(ctx, l, 540, py + 66 + k * 54, 3, "center"); });
+    }
+    // 担当者の帯
+    var by = 1170; ctx.fillStyle = mix(A, "#FFFFFF", .12); ctx.fillRect(0, by, 1080, 180);
+    ctx.save(); ctx.beginPath(); ctx.arc(150, by + 90, 70, 0, Math.PI * 2); ctx.clip();
+    if (staffImg) drawCoverImg(ctx, staffImg, 80, by + 20, 140, 140, .5, .3);
+    else { ctx.fillStyle = mix(A, "#FFFFFF", .7); ctx.fillRect(80, by + 20, 140, 140); ctx.fillStyle = A; ctx.font = "800 60px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(Array.from(trimAll(state.set.staff) || shop)[0], 150, by + 92); ctx.textAlign = "left"; ctx.textBaseline = "top"; }
+    ctx.restore(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(150, by + 90, 70, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.font = "800 44px " + F_MIN; fillSp(ctx, trimAll(state.set.staff) || "担当者名", 260, by + 38, 4, "left");
+    var meta = [shop, trimAll(state.set.area)].filter(Boolean).join(" / ");
+    ctx.font = "500 28px " + F_MIN; fillSp(ctx, meta, 260, by + 104, 2, "left");
+    out.push({name:"know-6", cap:"6枚目 保存・予約", c:c});
     return out;
   }
   /* --- Before/After 比較 1080×1350 --- */
@@ -1616,6 +1747,9 @@ input.one{font-size:16px;}
           return '<label class="gen-pick"><span class="th" data-th="' + ph.key + '"></span><span>' + esc(ph.label) + '<small>' + esc(ph.sub || "タップして選ぶ") + '</small></span>'
             + '<input type="file" accept="image/*" data-gen-file="' + tid + '" data-key="' + ph.key + '"></label>';
         }).join("") + '</div>'
+      + '<div class="accent-pick"><b>アクセントカラー</b><div class="swatches">' + ACCENTS.map(function(a){
+          return '<button type="button" class="sw" data-accent="' + a.c + '" title="' + a.n + '" style="background:' + a.c + '" aria-label="' + a.n + '"></button>';
+        }).join("") + '<label class="sw sw-custom" title="自分で選ぶ"><input type="color" data-accent-in value="' + accent() + '">＋</label></div></div>'
       + '<div class="slots" data-slots="' + tid + '">' + IMG_SLOTS[tid].map(function(sl){
           return '<div class="slot" data-slot="' + sl.key + '"><div class="slot-h"><b>' + esc(sl.label) + '</b><span class="slot-mode"></span></div>'
             + '<textarea rows="1" data-slot-in="' + tid + '" data-k="' + sl.key + '" placeholder="' + esc(sl.max || "") + '"></textarea>'
@@ -1629,9 +1763,9 @@ input.one{font-size:16px;}
   function makeImages(tid){
     var ph = genPhotos[tid], btn = $('[data-gen-make="' + tid + '"]');
     btn.disabled = true; btn.textContent = "つくっています…";
-    var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : sampleImg(); });
+    var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : (p.optional ? Promise.resolve(null) : sampleImg()); });
     fontsReady(tid).then(function(){ return Promise.all(need); }).then(function(imgs){
-      var list = tid === "reel" ? makeReel(imgs[0]) : tid === "know" ? makeKnow(imgs[0]) : makeBA(imgs[0], imgs[1]);
+      var list = tid === "reel" ? makeReel(imgs[0]) : tid === "know" ? makeKnow(imgs[0], imgs[1] || imgs[0], imgs[2]) : makeBA(imgs[0], imgs[1]);
       genOut[tid] = list.map(function(x){ return {name:x.name, cap:x.cap, url:x.c.toDataURL("image/jpeg", .92)}; });
       var out = $('[data-gen-out="' + tid + '"]');
       out.innerHTML = genOut[tid].map(function(x, i){
@@ -1660,6 +1794,19 @@ input.one{font-size:16px;}
     });
   }
   ORDER.forEach(function(t){ buildGenUI(t); renderImgSlots(t); });
+  function renderAccent(){
+    $$("[data-accent]").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-accent").toLowerCase() === accent().toLowerCase()); });
+    $$("[data-accent-in]").forEach(function(i){ i.value = accent(); });
+  }
+  renderAccent();
+  panels.addEventListener("click", function(e){
+    var a = e.target.closest("[data-accent]"); if (!a) return;
+    state.set.accent = a.getAttribute("data-accent"); save(); renderAccent();
+  });
+  panels.addEventListener("input", function(e){
+    if (!e.target.matches("[data-accent-in]")) return;
+    state.set.accent = e.target.value; save(); renderAccent();
+  });
   panels.addEventListener("input", function(e){
     var el = e.target; if (!el.matches("[data-slot-in]")) return;
     autosize(el); setImgText(el.getAttribute("data-slot-in"), el.getAttribute("data-k"), el.value, true);
