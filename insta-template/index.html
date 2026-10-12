@@ -496,7 +496,7 @@ input.one{font-size:16px;}
       <li><b>「コピーする」を押して、Instagramに貼り付け</b><span>投稿画面のキャプション欄を長押し →「ペースト」。店名・ハッシュタグも入っています。</span></li>
       <li><b>できあがり！</b><span>コピーした投稿には ✓ が付きます。次に作りたくなったら、また選ぶだけ。</span></li>
     </ol>
-    <p class="privacy">🔒 入力した内容は、このスマホ（ブラウザ）の中だけに保存されます。ほかの受講生や講師には見えません。</p>
+    <p class="privacy">入力した内容は、このスマホ（ブラウザ）の中だけに保存されます。ほかの受講生や講師には見えません。</p>
     <button class="btn btn-ghost close" type="button" id="howtoClose">とじる</button>
   </div>
 </div>
@@ -679,9 +679,9 @@ input.one{font-size:16px;}
   var STORE_KEY = "kamidora-insta-template-v2";
 
   var BOOK = {
-    link: "ご予約・ご相談は、プロフィールのリンクから受け付けています🌿",
-    hpb:  function(shop){ return "ご予約はホットペッパービューティーから。「" + (shop || "店名") + "」で検索してください🔍"; },
-    dm:   "ご予約・ご相談は、DMからお気軽にどうぞ📩"
+    link: "ご予約・ご相談は、プロフィールのリンクからどうぞ。",
+    hpb:  function(shop){ return "ご予約はホットペッパービューティーから。「" + (shop || "店名") + "」で検索してください。"; },
+    dm:   "ご予約・ご相談は、DMでお気軽にどうぞ。"
   };
 
   var PUSH_FIELD = {id:"push", label:"ひと押しの一文（任意）", hint:"行動心理を使った一文。入れると予約・反応につながりやすくなります", rows:2, common:"psy", optional:true, noAuto:true};
@@ -705,7 +705,7 @@ input.one{font-size:16px;}
         PUSH_FIELD,
         {id:"cta", label:"コメントを促す一文", hint:"質問形にすると返事がもらいやすい", rows:2, common:"comment",
           ph:"例）あなたの髪のお悩みもコメントで教えてください",
-          ex:"あなたの髪のお悩みも、コメントで教えてください✨\n次の動画でお答えします！"}
+          ex:"あなたの髪のお悩みも、コメントで教えてください。次の動画でお答えします。"}
       ],
       build:function(v){ return [v.hook, v.point, v.push, v.cta]; }
     },
@@ -724,7 +724,7 @@ input.one{font-size:16px;}
         PUSH_FIELD,
         {id:"cta", label:"保存を促す一文", hint:"「あとで見返せるように」がおすすめ", rows:2, common:"save",
           ph:"例）忘れないように保存して、今夜から試してみてください",
-          ex:"忘れないように【保存】して、今夜から試してみてください📌"}
+          ex:"忘れないように保存して、今夜から試してみてください。"}
       ],
       build:function(v){
         var reasons = [];
@@ -756,11 +756,11 @@ input.one{font-size:16px;}
       build:function(v){
         return [
           v.hook,
-          v.worry  ? "【ご来店時のお悩み】\n" + v.worry  : "",
-          v.menu   ? "【施術内容】\n" + v.menu : "",
-          v.finish ? "【仕上がり】\n" + v.finish : "",
-          [v.menuName ? "【メニュー】" + v.menuName : "", v.price ? "【料金】" + v.price : "",
-           v.time ? "【施術時間】" + v.time : "", v.cust ? "【お客様】" + v.cust : ""].filter(Boolean).join("\n"),
+          v.worry  ? "ご来店時のお悩み\n" + v.worry  : "",
+          v.menu   ? "施術内容\n" + v.menu : "",
+          v.finish ? "仕上がり\n" + v.finish : "",
+          [v.menuName ? "メニュー：" + v.menuName : "", v.price ? "料金：" + v.price : "",
+           v.time ? "施術時間：" + v.time : "", v.cust ? "お客様：" + v.cust : ""].filter(Boolean).join("\n"),
           v.push
         ];
       }
@@ -955,9 +955,9 @@ input.one{font-size:16px;}
     if (tpl.bookLine) { segs.push({text:bookLine(), cls:"auto"}); segs.push({text:"\n\n"}); }
     var shop = trimAll(state.set.shop), staff = trimAll(state.set.staff);
     var sig = [];
-    if (shop)  sig.push("📍" + shop);
-    if (staff) sig.push("✂️ 担当：" + staff);
-    if (sig.length) { segs.push({text:"――――――――\n" + sig.join("\n"), cls:"auto"}); segs.push({text:"\n\n"}); }
+    if (shop)  sig.push(shop);
+    if (staff) sig.push("担当 " + staff);
+    if (sig.length) { segs.push({text:sig.join("\n"), cls:"auto"}); segs.push({text:"\n\n"}); }
     var tags = tagsList(tpl.id);
     if (tags.length) segs.push({text:tags.join(" "), cls:"tagline"});
     // trim trailing blank lines
