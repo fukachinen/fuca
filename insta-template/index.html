@@ -1550,7 +1550,8 @@ input.one{font-size:16px;}
     return [{name:"reel-cover", cap:"カバー", c:c}];
   }
   /* --- 知識投稿 6枚 1080×1350（参考デザイン：生成り×明朝×アクセントカラー） --- */
-  var ACCENTS = [{n:"モーヴ", c:"#A8787A"}, {n:"コーラル", c:"#C9735F"}, {n:"ネイビー", c:"#3E5375"}, {n:"セージ", c:"#6B8770"}, {n:"ブラウン", c:"#977658"}];
+  /* 男女どちらにも使える色（いちばん左が初期値） */
+  var ACCENTS = [{n:"ネイビー", c:"#3E5375"}, {n:"チャコール", c:"#4A4A48"}, {n:"グレージュ", c:"#8A7F74"}, {n:"セージ", c:"#62806A"}, {n:"ブラウン", c:"#8C6A4F"}, {n:"テラコッタ", c:"#B0654C"}];
   function accent(){ return state.set.accent || ACCENTS[0].c; }
   function rgb(h){ h = h.replace("#", ""); return [0,2,4].map(function(i){ return parseInt(h.substr(i, 2), 16); }); }
   function mix(h1, h2, t){ var a = rgb(h1), b = rgb(h2); return "rgb(" + a.map(function(v, i){ return Math.round(v + (b[i] - v) * t); }).join(",") + ")"; }
@@ -1619,14 +1620,14 @@ input.one{font-size:16px;}
     return y + lines.length * lh;
   }
   function makeKnow(img, ctaImg, staffImg){
-    var A = accent(), Al = mix(A, "#FFFFFF", .55), BG = mix("#F5F0EC", A, .06), out = [];
+    var A = accent(), Al = mix(A, "#FFFFFF", .55), BG = mix("#F2F1EE", A, .035), out = [];
     var v = state.v.know, hook = imgText("know", "cover") || "結論をひと言で";
     var reasons = [1,2,3].map(function(i){ var b = trimAll(v["r" + i]), h = imgText("know", "h" + i); return {h: h || b, b: b, same: h === b}; });
     var sub = imgText("know", "sub"), sum = imgText("know", "sum");
     function base(){ var a = mk(1080, 1350); a[1].fillStyle = BG; a[1].fillRect(0, 0, 1080, 1350); return a; }
     function photoRight(ctx, im, x0, y0, h){
       drawCoverImg(ctx, im, x0, y0, 1080 - x0, h, .5, .3);
-      var g = ctx.createLinearGradient(x0, 0, x0 + 170, 0); g.addColorStop(0, BG); g.addColorStop(1, "rgba(245,240,236,0)");
+      var g = ctx.createLinearGradient(x0, 0, x0 + 170, 0); g.addColorStop(0, BG); var bc = BG.match(/\d+/g); g.addColorStop(1, "rgba(" + bc.join(",") + ",0)");
       ctx.fillStyle = g; ctx.fillRect(x0, y0, 170, h);
     }
     // 1 表紙
@@ -1687,8 +1688,7 @@ input.one{font-size:16px;}
     a = base(); c = a[0]; ctx = a[1];
     photoRight(ctx, ctaImg, 560, 0, 900);
     ctx.font = "500 40px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "あとで見返せるように", 70, 110, 4, "left");
-    ctx.font = "800 76px " + F_MIN; var sw = spW(ctx, "保存してね。", 6); drawHead(ctx, ["保存してね。"], 70, 180, 110, 6, "left", A, Al);
-    sparkle(ctx, 70 + sw + 4, 170, 18, Al); sparkle(ctx, 70 + sw + 34, 214, 11, Al);
+    ctx.font = "800 68px " + F_MIN; drawHead(ctx, ["保存がおすすめ"], 70, 180, 104, 5, "left", A, Al);
     y = labelBox(ctx, "気になる方は\nお気軽にご相談ください。", 70, 360, 32, A, "left", 420) + 40;
     var cta = trimAll(v.cta);
     if (cta) { ctx.font = "500 32px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, cta, 440, 2, 4).forEach(function(l, k){ fillSp(ctx, l, 70, y + k * 54, 2, "left"); }); }
@@ -1730,7 +1730,7 @@ input.one{font-size:16px;}
     drawCoverImg(ctx, after, 544, 0, 536, 1350, .5, .35);
     pill(ctx, "BEFORE", 36, 40, 38, "rgba(31,47,77,.85)", C_.white);
     ctx.font = "700 38px " + F_BODY; var aw = ctx.measureText("AFTER").width + 38 * 1.4;
-    pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, C_.coralBtn, C_.white);
+    pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, accent(), C_.white);
     var t = imgText("ba", "cmp");
     if (t) {
       ctx.font = "800 80px " + F_HAND; var lines = wrap(ctx, t, 900, 2), by = 1350 - 110 - lines.length * 108;
