@@ -303,6 +303,9 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .book-opts{display:grid; gap:6px; margin:8px 0 4px;}
 input.one{font-size:16px;}
 
+/* 【恒久ルール】見本の文字は文節（<wbr>）でだけ改行する */
+[data-bind], [data-nbind], .cover .safe .tx, .ks .big, .ks .body, .cmp-tx, .telop{word-break:keep-all; overflow-wrap:anywhere; line-break:strict;}
+
 /* ---------- Image maker ---------- */
 .gen{margin-top:8px; border:1.5px solid var(--coral); background:var(--coral-soft); border-radius:14px; padding:12px;}
 .gen-lead{font-size:12.5px; margin:0 0 10px;}
@@ -827,6 +830,102 @@ input.one{font-size:16px;}
     }
     return out;
   }
+
+  /* ================================================================
+     【恒久ルール】改行は意味の切れ目（文節）で行う
+     - 文章を「文節」のかたまりに分け、かたまりの途中では改行しない
+     - 句読点・閉じかっこ・小さい文字は前のかたまりにくっつける
+     - 行の長さをそろえ、最後の行に1〜2文字だけ残る改行を避ける
+     - 1つのかたまりが1行に入りきらないときだけ、単語→文字の順で分ける
+     画像（canvas）と画面上の見本（<wbr>）の両方で、この関数を使うこと。
+     ================================================================ */
+  var JP_PUNCT = "、。，．・：；？！?!」』）)]｝〉》…‥〜～";
+  var JP_OPEN = "「『（([｛〈《";
+  var JP_PARTICLE = "のをにがはへとでもやかねよ";
+  function chClass(ch){
+    if (/[ぁ-ゟ]/.test(ch)) return "hira";
+    if ("」』）)]｝〉》".indexOf(ch) > -1) return "close";   // 閉じかっこの後の「だけ」「も」などはくっつける
+    if (JP_PUNCT.indexOf(ch) > -1 || /\p{Extended_Pictographic}|\uFE0F/u.test(ch)) return "punct";
+    if (JP_OPEN.indexOf(ch) > -1) return "open";
+    if (/\s/.test(ch)) return "space";
+    return "content";   // 漢字・カタカナ・英数字・記号
+  }
+  function phraseChunks(text){
+    var chunks = [], cur = "", curHasContent = false, prevCls = "", hiraRun = 0, lastKanji = false;
+    var arr = Array.from(String(text || ""));
+    function flush(){ if (cur) chunks.push(cur); cur = ""; curHasContent = false; }
+    arr.forEach(function(ch, i){
+      var c = chClass(ch), next = arr[i + 1] || "";
+      if (c === "space") { cur += ch; flush(); prevCls = c; return; }
+      if (c === "open") { if (cur && prevCls !== "open") flush(); cur += ch; prevCls = c; return; }
+      if (c === "punct" || c === "close") { cur += ch; prevCls = c; lastKanji = false; return; }
+      var endsPunct = prevCls === "punct";
+      if (c === "content") {
+        // 前が「ひらがな」か句読点なら、新しい文節のはじまり
+        // 「流れ出る」「吸い込み」「乾かし方」のような送りがな（2文字以内・助詞で終わらない）は切らない
+        var okuri = prevCls === "hira" && hiraRun <= 2 && lastKanji && JP_PARTICLE.indexOf(cur.slice(-1)) < 0 && !/(から|まで|より|など)$/.test(cur);
+        if (cur && (prevCls === "hira" || endsPunct) && !okuri && !(prevCls === "hira" && /^[おご]$/.test(cur.slice(-1)) && cur.length === 1)) flush();
+        lastKanji = /[\u4E00-\u9FFF々]/.test(ch); hiraRun = 0;
+        cur += ch; curHasContent = true; prevCls = c; return;
+      }
+      // ひらがな
+      if (endsPunct) flush();
+      // 「お」「ご」＋漢字（お悩み・ご来店）は次の文節の頭にする
+      if ((ch === "お" || ch === "ご") && chClass(next) === "content" && /[一-鿿]/.test(next) && cur && prevCls === "hira") { flush(); }
+      cur += ch; prevCls = c; hiraRun++;
+    });
+    flush();
+    return chunks;
+  }
+  /* 文節が長すぎるときに単語で分ける（Intl.Segmenter があれば使う） */
+  function splitWords(chunk){
+    try {
+      if (window.Intl && Intl.Segmenter) {
+        var seg = new Intl.Segmenter("ja", {granularity:"word"}), out = [];
+        Array.from(seg.segment(chunk)).forEach(function(x){
+          if (out.length && JP_PUNCT.indexOf(x.segment) > -1) out[out.length-1] += x.segment; else out.push(x.segment);
+        });
+        if (out.length > 1) return out;
+      }
+    } catch(e) {}
+    return Array.from(chunk);
+  }
+  function greedyLines(units, maxW, measure){
+    var lines = [], line = "";
+    units.forEach(function(u){
+      if (line && measure(line + u) > maxW) { lines.push(line); line = u.replace(/^\s+/, ""); }
+      else line += u;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+  function phraseUnits(para, maxW, measure){
+    var units = [];
+    phraseChunks(para).forEach(function(ch){
+      if (measure(ch) <= maxW) { units.push(ch); return; }
+      splitWords(ch).forEach(function(w){
+        if (measure(w) <= maxW) units.push(w);
+        else Array.from(w).forEach(function(c){ if (units.length && JP_PUNCT.indexOf(c) > -1) units[units.length-1] += c; else units.push(c); });
+      });
+    });
+    return units;
+  }
+  /* 段落を文節で折り返し、行の長さをそろえる */
+  function phraseWrap(para, maxW, measure){
+    var units = phraseUnits(para, maxW, measure), base = greedyLines(units, maxW, measure);
+    if (base.length < 2) return base;
+    var lo = maxW * .4, hi = maxW, best = base;
+    for (var k = 0; k < 14; k++) {
+      var mid = (lo + hi) / 2, t = greedyLines(phraseUnits(para, mid, measure), mid, measure);
+      if (t.length <= base.length) { best = t; hi = mid; } else lo = mid;
+    }
+    return best;
+  }
+  /* 画面用：文節の切れ目に <wbr> を入れた HTML（CSS で word-break:keep-all と組み合わせる） */
+  function phraseHTML(text){
+    return String(text || "").split("\n").map(function(line){ return phraseChunks(line).map(esc).join("<wbr>"); }).join("<br>");
+  }
+
   function bookOpts(){
     var list = ((CH.common.book || {})[state.set.book] || []).filter(Boolean);
     var shop = trimAll(state.set.shop) || "店名";
@@ -1036,7 +1135,7 @@ input.one{font-size:16px;}
       if (p[0] === "set") val = trimAll(state.set[p[1]]);
       else val = trimAll((state.v[p[0]] || {})[p[1]]);
       if (p[1] === "hook") val = val.split("\n")[0];
-      if (val) { el.textContent = val; el.classList.remove("empty"); }
+      if (val) { el.innerHTML = phraseHTML(val); el.classList.remove("empty"); }
       else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
     });
     $$("[data-nbind]").forEach(function(el){
@@ -1045,14 +1144,14 @@ input.one{font-size:16px;}
       if (!val && alt) { var q = alt.split("."); val = trimAll((state.v[q[0]] || {})[q[1]]); if (q[1] === "hook") val = val.split("\n")[0]; }
       var pre = el.getAttribute("data-prefix") || "";
       if (el.hasAttribute("data-prefix")) el.hidden = !val;
-      if (val) { el.textContent = pre + val; el.classList.remove("empty"); }
+      if (val) { el.innerHTML = esc(pre) + phraseHTML(val); el.classList.remove("empty"); }
       else { el.innerHTML = el.getAttribute("data-fallback") || ""; el.classList.add("empty"); }
     });
     $$("[data-showif]").forEach(function(el){
       var spec = el.getAttribute("data-showif").split(":"); el.hidden = !nval(spec[0], spec[1]);
     });
     // リールのカバー文字にはマーカーを付ける
-    var tx = $(".cover .tx"); if (tx && !tx.classList.contains("empty")) { var t = tx.textContent; tx.innerHTML = '<span class="mk">' + esc(t) + '</span>'; }
+    var tx = $(".cover .tx"); if (tx && !tx.classList.contains("empty")) { tx.innerHTML = '<span class="mk">' + phraseHTML(tx.textContent) + '</span>'; }
   }
 
   function renderSettings(){
@@ -1327,13 +1426,9 @@ input.one{font-size:16px;}
   var NO_HEAD = "、。，．・：；？！?!」』）)]｝〉》ーぁぃぅぇぉっゃゅょァィゥェォッャュョ…";
   function wrap(ctx, text, maxW, maxLines){
     var out = [];
+    var measure = function(t){ return ctx.measureText(t).width; };
     String(text || "").replace(/\r/g, "").split(/\n|／/).forEach(function(para){
-      var line = "";
-      Array.from(para).forEach(function(ch){
-        if (line && ctx.measureText(line + ch).width > maxW && NO_HEAD.indexOf(ch) < 0) { out.push(line); line = ch; }
-        else line += ch;
-      });
-      out.push(line);
+      out = out.concat(phraseWrap(para, maxW, measure));
     });
     if (maxLines && out.length > maxLines) { out = out.slice(0, maxLines); out[maxLines-1] = out[maxLines-1].replace(/.$/, "…"); }
     return out;
