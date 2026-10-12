@@ -9,7 +9,7 @@
 <title>インスタ投稿テンプレート ｜ 髪にドラマを。</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================================
    インスタ投稿テンプレート（受講生向け）
@@ -173,9 +173,9 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .cover .cut.top{top:0;} .cover .cut.bottom{bottom:0;}
 .cover .safe{position:absolute; left:6%; right:6%; top:12.5%; bottom:12.5%; border:2px dashed #fff; border-radius:6px; z-index:2;
   display:flex; align-items:center; justify-content:center; padding:8px;}
-.cover .safe .tx{font-family:var(--font-hand); font-weight:600; color:var(--navy); background:rgba(255,252,246,.92); border-radius:8px; padding:6px 8px;
-  font-size:13px; line-height:1.4; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,.15); word-break:break-word; max-width:100%;}
-.cover .safe .tx .mk{background:linear-gradient(transparent 60%, var(--coral-mark) 60%);}
+.cover .safe .tx{font-family:var(--font-logo); font-weight:800; color:#fff; font-size:15px; line-height:1.45; text-align:center; word-break:break-word; max-width:100%;
+  text-shadow:0 1px 6px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.7);}
+.cover .safe .tx .mk{background:none;}
 .cover .safe-lbl{position:absolute; top:calc(12.5% + 6px); right:8%; z-index:3; font-size:9.5px; font-weight:700; background:var(--coral-btn); color:#fff; border-radius:4px; padding:1px 5px;}
 .legend{list-style:none; margin:0; padding:0; display:grid; gap:10px; font-size:12.5px; line-height:1.55;}
 .legend li{display:grid; grid-template-columns:18px 1fr; gap:8px; align-items:start;}
@@ -214,7 +214,9 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .ks.cover{padding:0; position:absolute; aspect-ratio:auto; border-radius:0; box-shadow:none;} /* .cover（リール図解）のスタイルを打ち消す */
 .ks.cover .ph{position:absolute; inset:0; border-radius:0;}
 .ks.cover .ph img{filter:brightness(.92);}
-.ks.cover .box{position:absolute; left:8px; right:8px; bottom:12px; background:rgba(255,252,246,.94); border-radius:8px; padding:8px; z-index:2;}
+.ks.cover .box{position:absolute; left:8px; right:8px; bottom:12px; padding:0; z-index:2; color:#fff; text-shadow:0 1px 5px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.7);}
+.ks.cover .box .big, .ks.cover .box .body{color:#fff; font-family:var(--font-logo); font-weight:800;}
+.ks.cover .box .mk{background:none;}
 .ks.cover .box .big{font-size:11.5px; display:block !important;}
 .ks .body{display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; font-size:8.5px;}
 .ks.cover .box .body{-webkit-line-clamp:2; margin-top:3px;}
@@ -292,8 +294,8 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .warn-line{font-size:12px; color:var(--warn); margin-top:8px;}
 
 .telop{display:block; font-size:11px; font-weight:700; color:var(--navy); background:var(--coral-soft); border-radius:6px; padding:3px 6px; line-height:1.45;}
-.cmp-tx{position:absolute; left:6px; right:6px; bottom:8px; z-index:3; text-align:center; font-family:var(--font-hand); font-weight:600; font-size:11px; color:var(--navy);
-  background:rgba(255,252,246,.94); border-radius:6px; padding:3px 4px;}
+.cmp-tx{position:absolute; left:6px; right:6px; bottom:10px; z-index:3; text-align:center; font-family:var(--font-logo); font-weight:800; font-size:13px; color:#fff;
+  text-shadow:0 1px 5px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.7);}
 .cmp-tx:empty{display:none;}
 .opt .o-lb.season{color:var(--ok);}
 .opt .o-lb.psy{color:var(--navy-2);}
@@ -1302,13 +1304,18 @@ input.one{font-size:16px;}
   var genOut = {reel:[], know:[], ba:[]};      // [{name, url}]
   var C_ = {kinari:"#F7F2E8", kinari2:"#FFFCF6", coral:"#EE8E7C", coralBtn:"#D35C47", coralInk:"#BF4E3A", coralSoft:"#FCE6DF",
             mark:"rgba(238,142,124,.38)", navy:"#1F2F4D", navySoft:"#5B6780", white:"#FFFFFF"};
-  var F_HAND = '"Klee One", "Zen Kaku Gothic New", sans-serif', F_BODY = '"Zen Kaku Gothic New", "Hiragino Sans", sans-serif', F_LOGO = '"Shippori Mincho", serif';
+  var F_MIN = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif';
+  var F_HAND = F_MIN, F_BODY = F_MIN, F_LOGO = F_MIN;   // 画像の文字はすべて明朝体
 
   function loadImg(src){ return new Promise(function(ok, ng){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = ng; i.src = src; }); }
-  function fontsReady(){
+  /* 日本語フォントは文字ごとに分割配信されるため、画像に使う文字をすべて先に読み込む */
+  function fontsReady(tid){
     if (!document.fonts || !document.fonts.load) return Promise.resolve();
-    return Promise.all(['600 60px "Klee One"', '700 40px "Zen Kaku Gothic New"', '500 40px "Zen Kaku Gothic New"', '800 40px "Shippori Mincho"']
-      .map(function(f){ return document.fonts.load(f, "あ").catch(function(){}); }));
+    var n = nayamiOf(tid);
+    var text = JSON.stringify(state.v[tid] || {}) + JSON.stringify(n || {}) + (state.set.shop || "")
+      + "髪にドラマを。保存推奨理由まとめあとで見返せるように保存してね投稿の右下にある保存マークをタップBEFOREAFTER0123456789/";
+    return Promise.all(['500 40px "Shippori Mincho"', '700 40px "Shippori Mincho"', '800 40px "Shippori Mincho"']
+      .map(function(f){ return document.fonts.load(f, text).catch(function(){}); }));
   }
   function drawCoverImg(ctx, img, x, y, w, h, px, py){
     var r = Math.max(w / img.naturalWidth, h / img.naturalHeight), iw = img.naturalWidth * r, ih = img.naturalHeight * r;
@@ -1335,6 +1342,12 @@ input.one{font-size:16px;}
     opt = opt || {};
     lines.forEach(function(l, i){
       var ly = y + i * lh;
+      if (opt.shadow) {
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,.85)"; ctx.shadowBlur = opt.shadow * 1.6; ctx.shadowOffsetY = opt.shadow * .25; ctx.fillText(l, x, ly);
+        ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = opt.shadow * .45; ctx.shadowOffsetY = opt.shadow * .12; ctx.fillText(l, x, ly);
+        ctx.restore(); return;
+      }
       if (opt.marker) { var w = ctx.measureText(l).width, ax = opt.align === "center" ? x - w/2 : x; ctx.save(); ctx.fillStyle = C_.mark; ctx.fillRect(ax - 4, ly + lh * .38, w + 8, lh * .3); ctx.restore(); }
       ctx.fillText(l, x, ly);
     });
@@ -1357,10 +1370,9 @@ input.one{font-size:16px;}
     var a = mk(1080, 1920), c = a[0], ctx = a[1];
     drawCoverImg(ctx, img, 0, 0, 1080, 1920, .5, .35);
     var t = txt("reel", "cover", "hook") || "カバーの文字";
-    ctx.font = "600 92px " + F_HAND; var lines = wrap(ctx, t, 820, 4), lh = 128;
-    var bh = lines.length * lh + 90, by = 960 - bh / 2;
-    ctx.fillStyle = "rgba(255,252,246,.94)"; rr(ctx, 90, by, 900, bh, 36); ctx.fill();
-    ctx.fillStyle = C_.navy; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by + 45, lh, {marker:true, align:"center"}); ctx.textAlign = "left";
+    ctx.font = "800 92px " + F_HAND; var lines = wrap(ctx, t, 820, 4), lh = 128;
+    var by = 960 - (lines.length * lh) / 2;
+    ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, lh, {shadow:22}); ctx.textAlign = "left";
     return [{name:"reel-cover", cap:"カバー", c:c}];
   }
   /* --- 知識投稿 6枚 1080×1350 --- */
@@ -1371,22 +1383,21 @@ input.one{font-size:16px;}
     var a = mk(1080, 1350), c = a[0], ctx = a[1];
     drawCoverImg(ctx, img, 0, 0, 1080, 1350, .5, .35);
     pill(ctx, "保存推奨", 760, 60, 40, C_.coralBtn, C_.white);
-    ctx.font = "600 76px " + F_HAND; var hl = wrap(ctx, hook, 840, 4);
+    ctx.font = "800 76px " + F_HAND; var hl = wrap(ctx, hook, 840, 4);
     var sub = nval("know", "know.sub"); ctx.font = "500 40px " + F_BODY; var sl = sub ? wrap(ctx, sub, 840, 2) : [];
-    var bh = hl.length * 104 + (sl.length ? sl.length * 58 + 24 : 0) + 96, by = 1350 - 70 - bh;
-    ctx.fillStyle = "rgba(255,252,246,.95)"; rr(ctx, 60, by, 960, bh, 32); ctx.fill();
-    ctx.fillStyle = C_.navy; ctx.font = "600 76px " + F_HAND; var y = drawLines(ctx, hl, 120, by + 48, 104, {marker:true});
-    if (sl.length) { ctx.font = "500 40px " + F_BODY; ctx.fillStyle = C_.navySoft; drawLines(ctx, sl, 120, y + 24, 58); }
+    var bh = hl.length * 104 + (sl.length ? sl.length * 58 + 24 : 0), by = 1350 - 110 - bh;
+    ctx.fillStyle = C_.white; ctx.font = "800 76px " + F_HAND; var y = drawLines(ctx, hl, 90, by, 104, {shadow:20});
+    if (sl.length) { ctx.font = "700 40px " + F_BODY; drawLines(ctx, sl, 90, y + 24, 58, {shadow:14}); }
     out.push({name:"know-1", cap:"1枚目 表紙", c:c});
     // 2-4 理由
     reasons.forEach(function(r, i){
       var a = mk(1080, 1350), c = a[0], ctx = a[1];
       ctx.fillStyle = C_.kinari2; ctx.fillRect(0, 0, 1080, 1350);
       brand(ctx, 90, 80, 34);
-      ctx.font = "600 200px " + F_HAND; ctx.fillStyle = C_.coralInk; ctx.fillText(String(i + 1), 90, 170);
+      ctx.font = "800 200px " + F_HAND; ctx.fillStyle = C_.coralInk; ctx.fillText(String(i + 1), 90, 170);
       pill(ctx, "理由", 90, 420, 40, C_.coral, C_.white);
       var head = r.h || r.b || ("理由" + (i + 1));
-      ctx.font = "600 84px " + F_HAND; ctx.fillStyle = C_.navy; var y = drawLines(ctx, wrap(ctx, head, 900, 4), 90, 530, 116, {marker:true});
+      ctx.font = "800 84px " + F_HAND; ctx.fillStyle = C_.navy; var y = drawLines(ctx, wrap(ctx, head, 900, 4), 90, 530, 116, {marker:true});
       if (r.h && r.b) { ctx.font = "500 44px " + F_BODY; ctx.fillStyle = C_.navy; drawLines(ctx, wrap(ctx, r.b, 900, 7), 90, y + 50, 72); }
       ctx.font = "500 32px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.textAlign = "right"; ctx.fillText((i + 2) + "/6", 990, 1260); ctx.textAlign = "left";
       out.push({name:"know-" + (i + 2), cap:(i + 2) + "枚目 理由" + (i + 1), c:c});
@@ -1395,7 +1406,7 @@ input.one{font-size:16px;}
     a = mk(1080, 1350); c = a[0]; ctx = a[1];
     ctx.fillStyle = C_.navy; ctx.fillRect(0, 0, 1080, 1350);
     pill(ctx, "まとめ", 90, 90, 40, C_.coral, C_.white);
-    ctx.font = "600 76px " + F_HAND; ctx.fillStyle = C_.white; y = drawLines(ctx, wrap(ctx, hook, 900, 4), 90, 200, 104);
+    ctx.font = "800 76px " + F_HAND; ctx.fillStyle = C_.white; y = drawLines(ctx, wrap(ctx, hook, 900, 4), 90, 200, 104);
     ctx.font = "700 46px " + F_BODY; y += 40;
     reasons.forEach(function(r, i){ var lines = wrap(ctx, (i + 1) + ". " + (r.h || r.b || ""), 900, 2); ctx.fillStyle = "#E9ECF3"; y = drawLines(ctx, lines, 90, y, 68) + 16; });
     var sum = nval("know", "know.sum");
@@ -1407,7 +1418,7 @@ input.one{font-size:16px;}
     ctx.fillStyle = C_.coralSoft; ctx.fillRect(0, 0, 1080, 1350);
     ctx.save(); ctx.translate(540, 430); ctx.strokeStyle = C_.coralInk; ctx.lineWidth = 16; ctx.lineJoin = "round";
     ctx.beginPath(); ctx.moveTo(-80, -110); ctx.lineTo(80, -110); ctx.lineTo(80, 120); ctx.lineTo(0, 60); ctx.lineTo(-80, 120); ctx.closePath(); ctx.stroke(); ctx.restore();
-    ctx.textAlign = "center"; ctx.fillStyle = C_.navy; ctx.font = "600 80px " + F_HAND;
+    ctx.textAlign = "center"; ctx.fillStyle = C_.navy; ctx.font = "800 80px " + F_HAND;
     drawLines(ctx, ["あとで見返せるように", "保存してね"], 540, 640, 116, {marker:true, align:"center"});
     ctx.font = "500 40px " + F_BODY; ctx.fillStyle = C_.navySoft; ctx.fillText("投稿の右下にある保存マークをタップ", 540, 920);
     ctx.font = "800 44px " + F_LOGO; ctx.fillStyle = C_.navy; ctx.fillText(trimAll(state.set.shop) || "髪にドラマを。", 540, 1120);
@@ -1426,9 +1437,8 @@ input.one{font-size:16px;}
     pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, C_.coralBtn, C_.white);
     var t = nval("ba", "ba.cmp");
     if (t) {
-      ctx.font = "600 72px " + F_HAND; var lines = wrap(ctx, t, 860, 2), bh = lines.length * 100 + 70, by = 1350 - 60 - bh;
-      ctx.fillStyle = "rgba(255,252,246,.95)"; rr(ctx, 80, by, 920, bh, 30); ctx.fill();
-      ctx.fillStyle = C_.navy; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by + 35, 100, {marker:true, align:"center"}); ctx.textAlign = "left";
+      ctx.font = "800 80px " + F_HAND; var lines = wrap(ctx, t, 900, 2), by = 1350 - 110 - lines.length * 108;
+      ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, 108, {shadow:22}); ctx.textAlign = "left";
     }
     return [{name:"ba-compare", cap:"1枚目 比較", c:c}];
   }
@@ -1450,7 +1460,7 @@ input.one{font-size:16px;}
     var ph = genPhotos[tid], btn = $('[data-gen-make="' + tid + '"]');
     btn.disabled = true; btn.textContent = "つくっています…";
     var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : sampleImg(); });
-    fontsReady().then(function(){ return Promise.all(need); }).then(function(imgs){
+    fontsReady(tid).then(function(){ return Promise.all(need); }).then(function(imgs){
       var list = tid === "reel" ? makeReel(imgs[0]) : tid === "know" ? makeKnow(imgs[0]) : makeBA(imgs[0], imgs[1]);
       genOut[tid] = list.map(function(x){ return {name:x.name, cap:x.cap, url:x.c.toDataURL("image/jpeg", .92)}; });
       var out = $('[data-gen-out="' + tid + '"]');
