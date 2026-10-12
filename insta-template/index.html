@@ -9,7 +9,7 @@
 <title>インスタ投稿テンプレート ｜ 髪にドラマを。</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Noto+Serif+JP:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================================
    インスタ投稿テンプレート（受講生向け）
@@ -22,7 +22,7 @@
   --navy:#1F2F4D; --navy-2:#2E4168; --navy-soft:#5B6780; --rule:#E7DDCB;
   --ok:#2F8062; --ok-soft:#DDF0E7; --warn:#B86A0E; --warn-soft:#FDF0DC; --bad:#C9362B; --bad-soft:#FBE1DE;
   --font-hand:"Klee One","Zen Kaku Gothic New",sans-serif;
-  --font-logo:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --font-logo:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
   --font-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;
   --r:16px; --r-sm:10px;
   --shadow:0 2px 10px rgba(31,47,77,.06), 0 1px 3px rgba(31,47,77,.05);
@@ -1488,8 +1488,10 @@ input.one{font-size:16px;}
   var genOut = {reel:[], know:[], ba:[]};      // [{name, url}]
   var C_ = {kinari:"#F7F2E8", kinari2:"#FFFCF6", coral:"#EE8E7C", coralBtn:"#D35C47", coralInk:"#BF4E3A", coralSoft:"#FCE6DF",
             mark:"rgba(238,142,124,.38)", navy:"#1F2F4D", navySoft:"#5B6780", white:"#FFFFFF"};
-  var F_MIN = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif';
+  var MIN_NAME = 'Noto Serif JP';
+  var F_MIN = '"' + MIN_NAME + '", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif';
   var F_HAND = F_MIN, F_BODY = F_MIN, F_LOGO = F_MIN;   // 画像の文字はすべて明朝体
+  var W_HEAD = "600", W_BOLD = "500", W_BODY = "400";      // 明朝は太くしすぎない
 
   function loadImg(src){ return new Promise(function(ok, ng){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = ng; i.src = src; }); }
   /* 日本語フォントは文字ごとに分割配信されるため、画像に使う文字をすべて先に読み込む */
@@ -1498,8 +1500,7 @@ input.one{font-size:16px;}
     var n = nayamiOf(tid);
     var text = JSON.stringify(state.v[tid] || {}) + JSON.stringify(n || {}) + (state.set.shop || "")
       + "髪にドラマを。保存推奨理由まとめあとで見返せるように保存してね投稿の右下にある保存マークをタップBEFOREAFTER0123456789/";
-    return Promise.all(['500 40px "Shippori Mincho"', '700 40px "Shippori Mincho"', '800 40px "Shippori Mincho"',
-      '500 40px "Zen Kaku Gothic New"', '700 40px "Zen Kaku Gothic New"']
+    return Promise.all([W_BODY, W_BOLD, W_HEAD].map(function(w){ return w + ' 40px "' + MIN_NAME + '"'; }).concat(['500 40px "Zen Kaku Gothic New"', '700 40px "Zen Kaku Gothic New"'])
       .map(function(f){ return document.fonts.load(f, text).catch(function(){}); }));
   }
   function drawCoverImg(ctx, img, x, y, w, h, px, py){
@@ -1535,13 +1536,13 @@ input.one{font-size:16px;}
     return y + lines.length * lh;
   }
   function pill(ctx, text, x, y, size, bg, fg){
-    ctx.font = "700 " + size + "px " + F_BODY; var w = ctx.measureText(text).width + size * 1.4, h = size * 1.7;
+    ctx.font = W_BOLD + " " + size + "px " + F_BODY; var w = ctx.measureText(text).width + size * 1.4, h = size * 1.7;
     ctx.fillStyle = bg; rr(ctx, x, y, w, h, h/2); ctx.fill();
     ctx.fillStyle = fg; ctx.textBaseline = "middle"; ctx.fillText(text, x + size * .7, y + h/2 + 1); ctx.textBaseline = "top";
     return w;
   }
   function mk(w, h){ var c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.textBaseline = "top"; return [c, x]; }
-  function brand(ctx, x, y, size, color){ ctx.font = "800 " + size + "px " + F_LOGO; ctx.fillStyle = color || C_.navySoft; var shop = trimAll(state.set.shop); ctx.fillText(shop || "髪にドラマを。", x, y); }
+  function brand(ctx, x, y, size, color){ ctx.font = W_HEAD + " " + size + "px " + F_LOGO; ctx.fillStyle = color || C_.navySoft; var shop = trimAll(state.set.shop); ctx.fillText(shop || "髪にドラマを。", x, y); }
   function sampleImg(){ return loadImg(SAMPLE); }
 
   function txt(tid, nPath, vKey){ var v = nPath ? nval(tid, nPath) : ""; if (!v && vKey) v = trimAll(state.v[tid][vKey]).split("\n")[0]; return v; }
@@ -1565,7 +1566,7 @@ input.one{font-size:16px;}
     drawCoverImg(ctx, img, 0, 0, 1080, 1920, .5, .35);
     var t = imgText("reel", "cover") || "カバーの文字";
     // プロフィールで切れない中央（3:4）の範囲に収める：幅 860・高さ 1000 まで
-    var f = fitText(ctx, t, {weight:"800", font:F_HAND, max:96, min:44, lh:1.38, maxW:860, maxLines:4, maxH:1000});
+    var f = fitText(ctx, t, {weight:W_HEAD, font:F_HAND, max:96, min:44, lh:1.38, maxW:860, maxLines:4, maxH:1000});
     var by = 960 - (f.lines.length * f.lh) / 2;
     ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, f.lines, 540, by, f.lh, {shadow:Math.round(f.size * .24)}); ctx.textAlign = "left";
     return [{name:"reel-cover", cap:"カバー", c:c}];
@@ -1611,12 +1612,12 @@ input.one{font-size:16px;}
   }
   function numCircle(ctx, cx, cy, r, n, color){
     ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = color; ctx.font = "700 " + Math.round(r * 1.1) + "px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = color; ctx.font = W_BOLD + " " + Math.round(r * 1.1) + "px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(String(n), cx, cy + 2); ctx.restore();
   }
   function card(ctx, x, y, w, h){ ctx.save(); ctx.fillStyle = "rgba(255,255,255,.62)"; rr(ctx, x, y, w, h, 18); ctx.fill(); ctx.restore(); }
   function labelBox(ctx, text, x, y, size, color, align, maxW){
-    ctx.font = "500 " + size + "px " + F_MIN; var sp = size * .08, lines = wrapSp(ctx, text, maxW || 900, sp, 2);
+    ctx.font = W_BODY + " " + size + "px " + F_MIN; var sp = size * .08, lines = wrapSp(ctx, text, maxW || 900, sp, 2);
     var w = Math.max.apply(null, lines.map(function(l){ return spW(ctx, l, sp); })) + size * 1.4, h = lines.length * size * 1.5 + size * .8;
     var bx = align === "center" ? x - w / 2 : x;
     ctx.fillStyle = color; rr(ctx, bx, y, w, h, 6); ctx.fill();
@@ -1636,7 +1637,7 @@ input.one{font-size:16px;}
   }
   /* 2行に分け、1行目は濃い色・2行目はアクセント色 */
   function twoTone(ctx, text, x, y, maxW, size, sp, A, align){
-    ctx.font = "700 " + size + "px " + F_MIN; var lines = wrapSp(ctx, text, maxW, sp, 3), lh = size * 1.55;
+    ctx.font = W_BOLD + " " + size + "px " + F_MIN; var lines = wrapSp(ctx, text, maxW, sp, 3), lh = size * 1.55;
     lines.forEach(function(l, i){ ctx.fillStyle = i === 0 && lines.length > 1 ? INK : A; fillSp(ctx, l, x, y + i * lh, sp, align); });
     return y + lines.length * lh;
   }
@@ -1655,7 +1656,7 @@ input.one{font-size:16px;}
     var a = base(), c = a[0], ctx = a[1];
     photoRight(ctx, img, 520, 0, 1350);
     // 長い文は、5行に収まるまで文字を小さくする（「…」で切らない）
-    var f1 = fitText(ctx, hook, {weight:"800", font:F_MIN, max:74, min:40, lh:1.5, spacing:.08, maxW:440, maxLines:5, maxH:560});
+    var f1 = fitText(ctx, hook, {weight:W_HEAD, font:F_MIN, max:74, min:40, lh:1.5, spacing:.08, maxW:440, maxLines:5, maxH:560});
     var hl = f1.lines;
     var y = drawHead(ctx, hl, 70, 100, f1.lh, f1.sp, "left", A, Al) + 30;
     ctx.strokeStyle = mix(A, "#FFFFFF", .5); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(500, y); ctx.stroke(); y += 40;
@@ -1665,39 +1666,39 @@ input.one{font-size:16px;}
     });
     ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(500, y); ctx.stroke(); y += 36;
     if (sub) y = labelBox(ctx, sub, 70, y, 32, A, "left", 400) + 30;
-    if (sum && y < 1180) { ctx.font = "500 29px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, sum, 430, 2, 4).forEach(function(l, i){ fillSp(ctx, l, 70, y + i * 50, 2, "left"); }); }
+    if (sum && y < 1180) { ctx.font = W_BODY + " 29px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, sum, 430, 2, 4).forEach(function(l, i){ fillSp(ctx, l, 70, y + i * 50, 2, "left"); }); }
     out.push({name:"know-1", cap:"1枚目 表紙", c:c});
     // 2-4 理由
     reasons.forEach(function(r, i){
       var a = base(), c = a[0], ctx = a[1];
-      ctx.font = "800 70px " + F_MIN; var hl = wrapSp(ctx, r.h, 860, 6, 4);
-      ctx.font = "500 40px " + F_MIN; var bl = (r.b && !r.same) ? wrapSp(ctx, r.b, 780, 3, 8) : [], ch = bl.length ? bl.length * 72 + 100 : 0;
+      ctx.font = W_HEAD + " 70px " + F_MIN; var hl = wrapSp(ctx, r.h, 860, 6, 4);
+      ctx.font = W_BODY + " 40px " + F_MIN; var bl = (r.b && !r.same) ? wrapSp(ctx, r.b, 780, 3, 8) : [], ch = bl.length ? bl.length * 72 + 100 : 0;
       var total = 100 + hl.length * 108 + (ch ? 60 + ch : 0), top = Math.max(90, (1350 - total) / 2 - 30);
-      ctx.font = "700 34px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "理由 " + (i + 1), 540, top, 10, "center");
+      ctx.font = W_BOLD + " 34px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "理由 " + (i + 1), 540, top, 10, "center");
       ctx.strokeStyle = Al; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(330, top + 20); ctx.lineTo(450, top + 20); ctx.moveTo(630, top + 20); ctx.lineTo(750, top + 20); ctx.stroke();
-      ctx.font = "800 70px " + F_MIN;
+      ctx.font = W_HEAD + " 70px " + F_MIN;
       var y = drawHead(ctx, hl, 540, top + 100, 108, 6, "center", A, Al) + 60;
       if (ch) {
-        ctx.font = "500 40px " + F_MIN;
+        ctx.font = W_BODY + " 40px " + F_MIN;
         card(ctx, 90, y, 900, ch); checkBox(ctx, 130, y + 52, 46, A);
         ctx.fillStyle = INK; bl.forEach(function(l, k){ fillSp(ctx, l, 200, y + 50 + k * 72, 3, "left"); });
         y += ch;
       }
-      ctx.font = "700 30px " + F_MIN; ctx.fillStyle = mix(A, "#FFFFFF", .3); fillSp(ctx, trimAll(state.set.shop) || "", 540, 1250, 6, "center");
+      ctx.font = W_BOLD + " 30px " + F_MIN; ctx.fillStyle = mix(A, "#FFFFFF", .3); fillSp(ctx, trimAll(state.set.shop) || "", 540, 1250, 6, "center");
       out.push({name:"know-" + (i + 2), cap:(i + 2) + "枚目 理由" + (i + 1), c:c});
     });
     // 5 まとめ
     a = base(); c = a[0]; ctx = a[1];
-    ctx.font = "800 62px " + F_MIN; hl = wrapSp(ctx, hook, 880, 5, 3);
-    ctx.font = "700 36px " + F_MIN;
+    ctx.font = W_HEAD + " 62px " + F_MIN; hl = wrapSp(ctx, hook, 880, 5, 3);
+    ctx.font = W_BOLD + " 36px " + F_MIN;
     var cardsH = reasons.reduce(function(t, r){ return t + Math.max(150, wrapSp(ctx, r.h, 640, 3, 3).length * 56 + 70) + 22; }, 0);
     var sumH = sum ? wrapSp(ctx, sum, 820, 4, 3).length * 56 + 20 : 0;
     var top5 = Math.max(70, (1350 - (70 + hl.length * 96 + 50 + cardsH + sumH)) / 2);
-    ctx.font = "700 32px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "まとめ", 540, top5, 12, "center");
-    ctx.font = "800 62px " + F_MIN;
+    ctx.font = W_BOLD + " 32px " + F_MIN; ctx.fillStyle = A; fillSp(ctx, "まとめ", 540, top5, 12, "center");
+    ctx.font = W_HEAD + " 62px " + F_MIN;
     y = drawHead(ctx, hl, 540, top5 + 70, 96, 5, "center", A, Al) + 50;
     reasons.forEach(function(r, i){
-      ctx.font = "700 36px " + F_MIN; var lines = wrapSp(ctx, r.h, 640, 3, 3), ch = Math.max(150, lines.length * 56 + 70);
+      ctx.font = W_BOLD + " 36px " + F_MIN; var lines = wrapSp(ctx, r.h, 640, 3, 3), ch = Math.max(150, lines.length * 56 + 70);
       card(ctx, 120, y, 840, ch); numCircle(ctx, 210, y + ch / 2, 40, i + 1, A);
       var ty = y + (ch - lines.length * 56) / 2 + 2;
       lines.forEach(function(l, k){ ctx.fillStyle = k === 0 && lines.length > 1 ? INK : A; fillSp(ctx, l, 290, ty + k * 56, 3, "left"); });
@@ -1708,38 +1709,38 @@ input.one{font-size:16px;}
     // 6 保存・予約
     a = base(); c = a[0]; ctx = a[1];
     photoRight(ctx, ctaImg, 560, 0, 900);
-    ctx.font = "500 40px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "あとで見返せるように", 70, 110, 4, "left");
-    ctx.font = "800 68px " + F_MIN; drawHead(ctx, ["保存がおすすめ"], 70, 180, 104, 5, "left", A, Al);
+    ctx.font = W_BODY + " 40px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "あとで見返せるように", 70, 110, 4, "left");
+    ctx.font = W_HEAD + " 68px " + F_MIN; drawHead(ctx, ["保存がおすすめ"], 70, 180, 104, 5, "left", A, Al);
     y = labelBox(ctx, "気になる方は\nお気軽にご相談ください。", 70, 360, 32, A, "left", 420) + 40;
     var cta = trimAll(v.cta);
-    if (cta) { ctx.font = "500 32px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, cta, 440, 2, 4).forEach(function(l, k){ fillSp(ctx, l, 70, y + k * 54, 2, "left"); }); }
+    if (cta) { ctx.font = W_BODY + " 32px " + F_MIN; ctx.fillStyle = INK; wrapSp(ctx, cta, 440, 2, 4).forEach(function(l, k){ fillSp(ctx, l, 70, y + k * 54, 2, "left"); }); }
     // 予約パネル
     var shop = trimAll(state.set.shop) || "店名", py = 930;
     ctx.fillStyle = "rgba(255,255,255,.72)"; rr(ctx, 50, py, 980, 200, 18); ctx.fill();
     ctx.strokeStyle = mix(A, "#FFFFFF", .6); ctx.lineWidth = 2; rr(ctx, 50, py, 980, 200, 18); ctx.stroke();
     var head = {link:"ご予約・ご相談はプロフィールのリンクから", hpb:"ご予約・ご相談はホットペッパーから", dm:"ご予約・ご相談はDMから"}[state.set.book] || "ご予約・ご相談はこちらから";
-    ctx.font = "700 32px " + F_MIN; var hw = spW(ctx, head, 4) + 90;
+    ctx.font = W_BOLD + " 32px " + F_MIN; var hw = spW(ctx, head, 4) + 90;
     ctx.fillStyle = A; ctx.beginPath(); ctx.moveTo(540 - hw / 2, py - 30); ctx.lineTo(540 + hw / 2, py - 30); ctx.lineTo(540 + hw / 2 - 18, py); ctx.lineTo(540 + hw / 2, py + 30); ctx.lineTo(540 - hw / 2, py + 30); ctx.lineTo(540 - hw / 2 + 18, py); ctx.closePath(); ctx.fill();
     ctx.fillStyle = "#fff"; ctx.textBaseline = "middle"; fillSp(ctx, head, 540, py + 2, 4, "center"); ctx.textBaseline = "top";
     if (state.set.book === "hpb") {
-      ctx.font = "500 28px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "ホットペッパービューティーで", 540, py + 46, 2, "center");
+      ctx.font = W_BODY + " 28px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "ホットペッパービューティーで", 540, py + 46, 2, "center");
       ctx.fillStyle = "#fff"; rr(ctx, 230, py + 86, 620, 60, 10); ctx.fill(); ctx.strokeStyle = A; ctx.lineWidth = 3; rr(ctx, 230, py + 86, 620, 60, 10); ctx.stroke();
-      ctx.font = "700 32px " + F_MIN; ctx.fillStyle = INK; var sl2 = wrapSp(ctx, shop, 520, 2, 1)[0]; fillSp(ctx, sl2, 260, py + 99, 2, "left");
+      ctx.font = W_BOLD + " 32px " + F_MIN; ctx.fillStyle = INK; var sl2 = wrapSp(ctx, shop, 520, 2, 1)[0]; fillSp(ctx, sl2, 260, py + 99, 2, "left");
       ctx.strokeStyle = A; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(806, py + 112, 12, 0, Math.PI * 2); ctx.moveTo(815, py + 121); ctx.lineTo(826, py + 132); ctx.stroke();
-      ctx.font = "500 26px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "と検索してご予約ください。", 540, py + 158, 2, "center");
+      ctx.font = W_BODY + " 26px " + F_MIN; ctx.fillStyle = INK; fillSp(ctx, "と検索してご予約ください。", 540, py + 158, 2, "center");
     } else {
       var msg = state.set.book === "dm" ? ["このアカウントへの DM で、", "お気軽にご相談ください。"] : ["プロフィールのリンクから", "ご予約いただけます。"];
-      ctx.font = "500 34px " + F_MIN; ctx.fillStyle = INK; msg.forEach(function(l, k){ fillSp(ctx, l, 540, py + 66 + k * 54, 3, "center"); });
+      ctx.font = W_BODY + " 34px " + F_MIN; ctx.fillStyle = INK; msg.forEach(function(l, k){ fillSp(ctx, l, 540, py + 66 + k * 54, 3, "center"); });
     }
     // 担当者の帯
     var by = 1170; ctx.fillStyle = mix(A, "#FFFFFF", .12); ctx.fillRect(0, by, 1080, 180);
     ctx.save(); ctx.beginPath(); ctx.arc(150, by + 90, 70, 0, Math.PI * 2); ctx.clip();
     if (staffImg) drawCoverImg(ctx, staffImg, 80, by + 20, 140, 140, .5, .3);
-    else { ctx.fillStyle = mix(A, "#FFFFFF", .7); ctx.fillRect(80, by + 20, 140, 140); ctx.fillStyle = A; ctx.font = "800 60px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(Array.from(trimAll(state.set.staff) || shop)[0], 150, by + 92); ctx.textAlign = "left"; ctx.textBaseline = "top"; }
+    else { ctx.fillStyle = mix(A, "#FFFFFF", .7); ctx.fillRect(80, by + 20, 140, 140); ctx.fillStyle = A; ctx.font = W_HEAD + " 60px " + F_MIN; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(Array.from(trimAll(state.set.staff) || shop)[0], 150, by + 92); ctx.textAlign = "left"; ctx.textBaseline = "top"; }
     ctx.restore(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(150, by + 90, 70, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.font = "800 44px " + F_MIN; fillSp(ctx, trimAll(state.set.staff) || "担当者名", 260, by + 38, 4, "left");
+    ctx.fillStyle = "#fff"; ctx.font = W_HEAD + " 44px " + F_MIN; fillSp(ctx, trimAll(state.set.staff) || "担当者名", 260, by + 38, 4, "left");
     var meta = [shop, trimAll(state.set.area)].filter(Boolean).join(" / ");
-    ctx.font = "500 28px " + F_MIN; fillSp(ctx, meta, 260, by + 104, 2, "left");
+    ctx.font = W_BODY + " 28px " + F_MIN; fillSp(ctx, meta, 260, by + 104, 2, "left");
     out.push({name:"know-6", cap:"6枚目 保存・予約", c:c});
     return out;
   }
@@ -1874,11 +1875,11 @@ input.one{font-size:16px;}
     drawCoverImg(ctx, before, 0, 0, 536, 1350, .5, .35);
     drawCoverImg(ctx, after, 544, 0, 536, 1350, .5, .35);
     pill(ctx, "BEFORE", 36, 40, 38, "rgba(31,47,77,.85)", C_.white);
-    ctx.font = "700 38px " + F_BODY; var aw = ctx.measureText("AFTER").width + 38 * 1.4;
+    ctx.font = W_BOLD + " 38px " + F_BODY; var aw = ctx.measureText("AFTER").width + 38 * 1.4;
     pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, accent(), C_.white);
     var t = imgText("ba", "cmp");
     if (t) {
-      var f = fitText(ctx, t, {weight:"800", font:F_HAND, max:80, min:40, lh:1.35, maxW:920, maxLines:2, maxH:300});
+      var f = fitText(ctx, t, {weight:W_HEAD, font:F_HAND, max:80, min:40, lh:1.35, maxW:920, maxLines:2, maxH:300});
       var by = 1350 - 110 - f.lines.length * f.lh;
       ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, f.lines, 540, by, f.lh, {shadow:Math.round(f.size * .26)}); ctx.textAlign = "left";
     }
