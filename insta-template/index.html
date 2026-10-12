@@ -1174,6 +1174,8 @@ input.one{font-size:16px;}
     });
     // リールのカバー文字にはマーカーを付ける
     var tx = $(".cover .tx"); if (tx && !tx.classList.contains("empty")) { tx.innerHTML = '<span class="mk">' + phraseHTML(tx.textContent) + '</span>'; }
+    // 見本の図も、長い文字は小さくして枠に収める
+    if (tx) { var n = len(tx.textContent); tx.style.fontSize = n <= 20 ? "" : n <= 35 ? "12px" : "10px"; }
   }
 
   function renderSettings(){
@@ -1418,10 +1420,10 @@ input.one{font-size:16px;}
      自分で入力：入力した文字を使う（「投稿文に合わせる」で自動に戻せる）
      ================================================================ */
   var IMG_SLOTS = {
-    reel: [{key:"cover", label:"カバーの文字", max:"15字くらい。「／」を入れるとそこで改行"}],
-    know: [{key:"cover", label:"表紙の大きい文字"}, {key:"sub", label:"表紙の小さい文字"},
+    reel: [{key:"cover", label:"カバーの文字", max:"15字くらい。「／」を入れるとそこで改行", ideal:20}],
+    know: [{key:"cover", label:"表紙の大きい文字", ideal:30}, {key:"sub", label:"表紙の小さい文字"},
            {key:"h1", label:"2枚目の見出し"}, {key:"h2", label:"3枚目の見出し"}, {key:"h3", label:"4枚目の見出し"}, {key:"sum", label:"5枚目のまとめの一文"}],
-    ba:   [{key:"cmp", label:"比較画像に入れる一言", max:"10字くらい"}]
+    ba:   [{key:"cmp", label:"比較画像に入れる一言", max:"10字くらい", ideal:16}]
   };
   function firstLine(t){ return trimAll(t).split("\n")[0] || ""; }
   /* 自動の文字と、ほかの候補 */
@@ -1459,6 +1461,9 @@ input.one{font-size:16px;}
       var inp = $("textarea", row);
       if (sl.key !== skipKey && document.activeElement !== inp) { inp.value = custom ? c.text : a.auto; autosize(inp); }
       $(".slot-mode", row).textContent = custom ? "自分で入力" : "投稿文に合わせて自動";
+      var cur = custom ? trimAll(c.text) : a.auto, n = len(cur.replace(/[／\n]/g, "")), cn = $(".slot-cnt", row);
+      cn.textContent = sl.ideal ? (n + "字" + (n > sl.ideal ? "（長いので文字が小さくなります。" + sl.ideal + "字くらいまでが読みやすいです）" : "")) : "";
+      cn.classList.toggle("warn", !!sl.ideal && n > sl.ideal);
       $(".slot-mode", row).classList.toggle("own", custom);
       var ex = $(".slot-extra", row);
       ex.innerHTML = (custom ? '<button type="button" class="chip" data-slot-reset="' + tid + '" data-k="' + sl.key + '">投稿文に合わせる</button>' : '')
@@ -1540,13 +1545,27 @@ input.one{font-size:16px;}
   function txt(tid, nPath, vKey){ var v = nPath ? nval(tid, nPath) : ""; if (!v && vKey) v = trimAll(state.v[tid][vKey]).split("\n")[0]; return v; }
 
   /* --- リールのカバー 1080×1920 --- */
+  /* 決めた枠（幅 maxW・高さ maxH・行数 maxLines）に収まるまで文字を小さくする。
+     「…」で切らない。いちばん小さくしても入らないときだけ、行数の上限をゆるめる */
+  function fitText(ctx, text, opt){
+    var size = opt.max, lines, lh, sp;
+    for (; size >= opt.min; size -= 2) {
+      ctx.font = opt.weight + " " + size + "px " + opt.font; sp = size * (opt.spacing || 0); lh = Math.round(size * opt.lh);
+      lines = sp ? wrapSp(ctx, text, opt.maxW, sp) : wrap(ctx, text, opt.maxW);
+      if (lines.length <= opt.maxLines && lines.length * lh <= opt.maxH) break;
+    }
+    if (size < opt.min) { size = opt.min; ctx.font = opt.weight + " " + size + "px " + opt.font; sp = size * (opt.spacing || 0); lh = Math.round(size * opt.lh);
+      lines = sp ? wrapSp(ctx, text, opt.maxW, sp) : wrap(ctx, text, opt.maxW); }
+    return {lines:lines, size:size, lh:lh, sp:sp};
+  }
   function makeReel(img){
     var a = mk(1080, 1920), c = a[0], ctx = a[1];
     drawCoverImg(ctx, img, 0, 0, 1080, 1920, .5, .35);
     var t = imgText("reel", "cover") || "カバーの文字";
-    ctx.font = "800 92px " + F_HAND; var lines = wrap(ctx, t, 820, 4), lh = 128;
-    var by = 960 - (lines.length * lh) / 2;
-    ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, lh, {shadow:22}); ctx.textAlign = "left";
+    // プロフィールで切れない中央（3:4）の範囲に収める：幅 860・高さ 1000 まで
+    var f = fitText(ctx, t, {weight:"800", font:F_HAND, max:96, min:44, lh:1.38, maxW:860, maxLines:4, maxH:1000});
+    var by = 960 - (f.lines.length * f.lh) / 2;
+    ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, f.lines, 540, by, f.lh, {shadow:Math.round(f.size * .24)}); ctx.textAlign = "left";
     return [{name:"reel-cover", cap:"カバー", c:c}];
   }
   /* --- 知識投稿 6枚 1080×1350（参考デザイン：生成り×明朝×アクセントカラー） --- */
@@ -1634,9 +1653,9 @@ input.one{font-size:16px;}
     var a = base(), c = a[0], ctx = a[1];
     photoRight(ctx, img, 520, 0, 1350);
     // 長い文は、5行に収まるまで文字を小さくする（「…」で切らない）
-    var fs = 74, hl;
-    for (; fs >= 48; fs -= 4) { ctx.font = "800 " + fs + "px " + F_MIN; hl = wrapSp(ctx, hook, 440, fs * .08); if (hl.length <= 5) break; }
-    var y = drawHead(ctx, hl, 70, 100, Math.round(fs * 1.5), fs * .08, "left", A, Al) + 30;
+    var f1 = fitText(ctx, hook, {weight:"800", font:F_MIN, max:74, min:40, lh:1.5, spacing:.08, maxW:440, maxLines:5, maxH:560});
+    var hl = f1.lines;
+    var y = drawHead(ctx, hl, 70, 100, f1.lh, f1.sp, "left", A, Al) + 30;
     ctx.strokeStyle = mix(A, "#FFFFFF", .5); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(500, y); ctx.stroke(); y += 40;
     reasons.forEach(function(r){
       checkCircle(ctx, 92, y + 22, 20, A);
@@ -1733,8 +1752,9 @@ input.one{font-size:16px;}
     pill(ctx, "AFTER", 1080 - 36 - aw, 40, 38, accent(), C_.white);
     var t = imgText("ba", "cmp");
     if (t) {
-      ctx.font = "800 80px " + F_HAND; var lines = wrap(ctx, t, 900, 2), by = 1350 - 110 - lines.length * 108;
-      ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, lines, 540, by, 108, {shadow:22}); ctx.textAlign = "left";
+      var f = fitText(ctx, t, {weight:"800", font:F_HAND, max:80, min:40, lh:1.35, maxW:920, maxLines:2, maxH:300});
+      var by = 1350 - 110 - f.lines.length * f.lh;
+      ctx.fillStyle = C_.white; ctx.textAlign = "center"; drawLines(ctx, f.lines, 540, by, f.lh, {shadow:Math.round(f.size * .26)}); ctx.textAlign = "left";
     }
     return [{name:"ba-compare", cap:"1枚目 比較", c:c}];
   }
@@ -1753,7 +1773,7 @@ input.one{font-size:16px;}
       + '<div class="slots" data-slots="' + tid + '">' + IMG_SLOTS[tid].map(function(sl){
           return '<div class="slot" data-slot="' + sl.key + '"><div class="slot-h"><b>' + esc(sl.label) + '</b><span class="slot-mode"></span></div>'
             + '<textarea rows="1" data-slot-in="' + tid + '" data-k="' + sl.key + '" placeholder="' + esc(sl.max || "") + '"></textarea>'
-            + '<div class="chips slot-extra"></div></div>';
+            + '<div class="cnt slot-cnt"></div><div class="chips slot-extra"></div></div>';
         }).join("") + '</div>'
       + '<button type="button" class="btn btn-copy" style="min-height:48px;font-size:15px" data-gen-make="' + tid + '">画像をつくる</button>'
       + '<div class="gen-out" data-gen-out="' + tid + '" hidden></div>'
