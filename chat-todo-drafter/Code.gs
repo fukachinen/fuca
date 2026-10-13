@@ -7,7 +7,7 @@
  */
 
 const CONFIG = {
-  MODEL: 'claude-opus-5-5',
+  MODEL: 'claude-haiku-5-5',
   // まずこの言葉を含む自分の投稿だけを候補にする（本当に約束かどうかは Claude が判定）
   KEYWORDS: /(やっと|やっておき|しとき|しておき|送っと|送っておき|送ります|送付します|共有します|共有しと|共有しておき|確認します|確認しと|確認しておき|対応します|対応しと|対応しておき|作ります|作っと|作っておき|まとめます|まとめと|まとめておき|連絡します|連絡しと|連絡しておき|調べます|調べと|調べておき|手配します|手配しと|手配しておき|入れとき|入れておき|上げとき|上げておき|修正します|直しと|直しておき|予約しと|予約しておき|お願いしと|伝えと|伝えておき|伝えます)/,
   // 文案づくりに渡す、直前の会話の件数
@@ -148,12 +148,10 @@ function askClaude_(conversation) {
     headers: {
       'x-api-key': key,
       'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'server-side-fallback-2026-07-01',
     },
     payload: JSON.stringify({
       model: CONFIG.MODEL,
       max_tokens: 4000,
-      fallbacks: 'default',
       output_config: { effort: 'low' },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: conversation }],
