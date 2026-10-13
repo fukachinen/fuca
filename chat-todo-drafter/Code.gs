@@ -3,7 +3,7 @@
  *
  * 5分おきに自分の Google Chat 投稿をチェックし、
  * 「やっときます」「送っときます」などの約束を見つけたら、
- * Claude で文案を作って自分宛てにメールで届ける。
+ * Claude で文案を作って自分の LINE に届ける。
  */
 
 const CONFIG = {
@@ -41,9 +41,10 @@ const SYSTEM_PROMPT = `あなたは、社内チャットで「やっときます
 
 /** 最初に1回だけ手動で実行する。権限の許可と、定期実行の登録をする。 */
 function setup() {
-  const key = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
-  if (!key) {
-    throw new Error('スクリプト プロパティに ANTHROPIC_API_KEY を設定してから実行してください。');
+  const missing = ['ANTHROPIC_API_KEY', 'LINE_CHANNEL_ACCESS_TOKEN', 'LINE_USER_ID']
+    .filter(k => !PropertiesService.getScriptProperties().getProperty(k));
+  if (missing.length) {
+    throw new Error(`スクリプト プロパティに ${missing.join(', ')} を設定してから実行してください。`);
   }
   ScriptApp.getProjectTriggers()
     .filter(t => t.getHandlerFunction() === 'checkChat')
@@ -96,7 +97,7 @@ function checkChat() {
   }
 }
 
-/** API キーと文案づくりの動作確認用。手動で実行するとサンプルの文案がメールで届く。 */
+/** API キーと文案づくりの動作確認用。手動で実行するとサンプルの文案が LINE に届く。 */
 function testDraft() {
   const conversation = [
     '相手: 来週の講習の案内、参加者の皆さんにもう送りましたっけ？',
@@ -104,14 +105,14 @@ function testDraft() {
     '★自分: まだでした！地図付けて今日中に送っときます',
   ].join('\n');
   const result = askClaude_(conversation);
-  sendDraftMail_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result);
+  sendDraft_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result);
   Logger.log(JSON.stringify(result, null, 2));
 }
 
 function handleCommitment_(space, message, me) {
   const result = askClaude_(buildConversation_(space, message, me));
   if (result.is_commitment) {
-    sendDraftMail_(space, message, result);
+    sendDraft_(space, message, result);
   }
 }
 
@@ -170,28 +171,54 @@ function askClaude_(conversation) {
   return JSON.parse(json);
 }
 
-function sendDraftMail_(space, message, result) {
-  let body = `■ 約束したこと：${result.task}\n`;
-  if (result.to) body += `■ 宛先：${result.to}\n`;
-  body += `■ 期限：${result.deadline || '未定'}\n\n`;
-  body += `■ 文案\n────────────\n${result.draft}\n────────────\n`;
-  if (result.note) body += `\n※ ${result.note}\n`;
-  body += `\n元の発言（${space.displayName || 'DM'}）：\n「${message.text}」\n`;
-  if (space.spaceUri) body += `${space.spaceUri}\n`;
-  MailApp.sendEmail({
-    to: Session.getActiveUser().getEmail(),
-    subject: `【文案】${result.task}`,
-    body: body,
-  });
+/** 1通目に概要、2通目に文案だけを送る（長押しで文案だけコピーできるように）。 */
+function sendDraft_(space, message, result) {
+  let summary = `【文案】${result.task}\n`;
+  if (result.to) summary += `宛先：${result.to}\n`;
+  summary += `期限：${result.deadline || '未定'}\n`;
+  if (result.note) summary += `※ ${result.note}\n`;
+  summary += `\n元の発言（${space.displayName || 'DM'}）：\n「${message.text}」`;
+  if (space.spaceUri) summary += `\n${space.spaceUri}`;
+  notify_(`【文案】${result.task}`, [summary, result.draft]);
 }
 
 function notifyError_(space, message, error) {
   console.error(error);
-  MailApp.sendEmail({
-    to: Session.getActiveUser().getEmail(),
-    subject: '【文案】作成に失敗しました',
-    body: `次の発言の文案を作れませんでした。\n\n「${message.text}」（${space.displayName || 'DM'}）\n\nエラー: ${error.message}`,
+  notify_('【文案】作成に失敗しました', [
+    `文案を作れませんでした。\n\n「${message.text}」（${space.displayName || 'DM'}）\n\nエラー: ${error.message}`,
+  ]);
+}
+
+/** LINE に送る。LINE に送れなかったときは取りこぼさないようメールで送る。 */
+function notify_(subject, texts) {
+  try {
+    pushLine_(texts);
+  } catch (e) {
+    console.error(e);
+    MailApp.sendEmail({
+      to: Session.getActiveUser().getEmail(),
+      subject: subject,
+      body: texts.join('\n\n────────────\n\n') + `\n\n（LINE に送れなかったためメールで送りました: ${e.message}）`,
+    });
+  }
+}
+
+function pushLine_(texts) {
+  const props = PropertiesService.getScriptProperties();
+  const res = UrlFetchApp.fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'post',
+    contentType: 'application/json',
+    muteHttpExceptions: true,
+    headers: { Authorization: 'Bearer ' + props.getProperty('LINE_CHANNEL_ACCESS_TOKEN') },
+    payload: JSON.stringify({
+      to: props.getProperty('LINE_USER_ID'),
+      // LINE の1吹き出しは5000文字まで
+      messages: texts.map(t => ({ type: 'text', text: String(t).slice(0, 5000) })),
+    }),
   });
+  if (res.getResponseCode() !== 200) {
+    throw new Error(`LINE API エラー (${res.getResponseCode()}): ${res.getContentText()}`);
+  }
 }
 
 /** Chat の users/{id} は People API の people/{id} と同じ ID。 */
