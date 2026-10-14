@@ -677,23 +677,25 @@ input.one{font-size:16px;}
   "use strict";
 
   /* ---------------------------------------------------------------
-     見本写真の設定
+     見本（イラスト）の設定
      正式版の写真に差し替えるときは src を変えるだけでOK。
      （pos = 見せたい位置 / z = ズーム倍率）
      --------------------------------------------------------------- */
-  var SAMPLE = "assets/sample-salon.jpg";
+  var ILL = function(k){ return "assets/illust-" + k + ".svg"; };   // 見本はイラスト（実在の人物の写真は使わない）
+  var SAMPLE = ILL("after");
   var PHOTOS = {
-    reelCover:  {src:SAMPLE, pos:"52% 32%", z:1.0},
-    reelBefore: {src:SAMPLE, pos:"50% 30%", z:1.1},
-    reelDuring: {src:SAMPLE, pos:"62% 44%", z:1.6},
-    reelAfter:  {src:SAMPLE, pos:"49% 32%", z:1.25},
-    knowCover:  {src:SAMPLE, pos:"52% 32%", z:1.05},
-    baBefore:   {src:SAMPLE, pos:"50% 32%", z:1.35},
-    baFront:    {src:SAMPLE, pos:"49% 32%", z:1.35},
-    baSide:     {src:SAMPLE, pos:"53% 34%", z:1.6},
-    baBack:     {src:SAMPLE, pos:"56% 38%", z:2.0},
-    baShine:    {src:SAMPLE, pos:"52% 26%", z:3.0}
+    reelCover:  {src:ILL("after"),  pos:"50% 42%", z:1.0},
+    reelBefore: {src:ILL("before"), pos:"50% 40%", z:1.0},
+    reelDuring: {src:ILL("during"), pos:"58% 48%", z:1.15},
+    reelAfter:  {src:ILL("after"),  pos:"50% 40%", z:1.0},
+    knowCover:  {src:ILL("after"),  pos:"50% 42%", z:1.0},
+    baBefore:   {src:ILL("before"), pos:"50% 42%", z:1.15},
+    baFront:    {src:ILL("after"),  pos:"50% 42%", z:1.15},
+    baSide:     {src:ILL("side"),   pos:"50% 42%", z:1.15},
+    baBack:     {src:ILL("back"),   pos:"50% 42%", z:1.15},
+    baShine:    {src:ILL("after"),  pos:"47% 36%", z:2.4}
   };
+
 
   var CH = window.CHOICES || {nayami:[], common:{comment:[], save:[], tags:[]}};
   /* data-more.js の追加候補を足す（同じ文は重ねない） */
@@ -1599,7 +1601,7 @@ input.one{font-size:16px;}
   }
   function mk(w, h){ var c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); x.textBaseline = "top"; return [c, x]; }
   function brand(ctx, x, y, size, color){ ctx.font = W_HEAD + " " + size + "px " + F_LOGO; ctx.fillStyle = color || C_.navySoft; var shop = trimAll(state.set.shop); ctx.fillText(shop || "髪にドラマを。", x, y); }
-  function sampleImg(){ return loadImg(SAMPLE); }
+  function sampleImg(key){ return loadImg(key === "before" ? ILL("before") : SAMPLE); }
 
   function txt(tid, nPath, vKey){ var v = nPath ? nval(tid, nPath) : ""; if (!v && vKey) v = trimAll(state.v[tid][vKey]).split("\n")[0]; return v; }
 
@@ -1964,12 +1966,12 @@ input.one{font-size:16px;}
       + '<button type="button" class="btn btn-copy" style="min-height:48px;font-size:15px" data-gen-make="' + tid + '">画像をつくる</button>'
       + '<div class="gen-out" data-gen-out="' + tid + '" hidden></div>'
       + '<div class="row-btns" data-gen-all="' + tid + '" hidden style="margin-top:8px"><button type="button" class="btn btn-ghost" data-gen-saveall="' + tid + '" style="width:100%">まとめて保存する</button></div>'
-      + '<p class="gen-note">写真を選ばないときは見本写真で作ります。選んだ写真はこのスマホの中だけで使い、どこにも送信しません。文字や投稿文を変えたら、もう一度「画像をつくる」を押してください。</p>';
+      + '<p class="gen-note">写真を選ばないときは見本のイラストで作ります。選んだ写真はこのスマホの中だけで使い、どこにも送信しません。文字や投稿文を変えたら、もう一度「画像をつくる」を押してください。</p>';
   }
   function makeImages(tid){
     var ph = genPhotos[tid], btn = $('[data-gen-make="' + tid + '"]');
     btn.disabled = true; btn.textContent = "つくっています…";
-    var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : (p.optional ? Promise.resolve(null) : sampleImg()); });
+    var need = GEN[tid].photos.map(function(p){ return ph[p.key] ? Promise.resolve(ph[p.key]) : (p.optional ? Promise.resolve(null) : sampleImg(p.key)); });
     fontsReady(tid).then(function(){ return Promise.all(need); }).then(function(imgs){
       var list = tid === "reel" ? makeReel(imgs[0])
         : tid === "know" ? (knowStyle() === "simple" ? makeKnowSimple() : makeKnow(imgs[0], imgs[1] || imgs[0], imgs[2]))
