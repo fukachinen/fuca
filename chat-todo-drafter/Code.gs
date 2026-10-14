@@ -136,7 +136,7 @@ function testDraft() {
     '★自分: まだでした！地図付けて今日中に送っときます',
   ].join('\n');
   const result = askClaude_(conversation, SYSTEM_PROMPT);
-  sendDraft_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result, '【文案】');
+  sendDraft_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result, '【文案】', ['テストさん']);
   Logger.log(JSON.stringify(result, null, 2));
 }
 
@@ -147,21 +147,23 @@ function testReply() {
     '★相手A: 来週の打ち合わせ、20日の午後でご都合いかがでしょうか？難しければ候補日をいただけると助かります',
   ].join('\n');
   const result = askClaude_(conversation, REPLY_PROMPT);
-  sendDraft_({ displayName: 'テスト' }, { text: '来週の打ち合わせ、20日の午後でご都合いかがでしょうか？' }, result, '【返信案】');
+  sendDraft_({ displayName: 'テスト' }, { text: '来週の打ち合わせ、20日の午後でご都合いかがでしょうか？' }, result, '【返信案】', ['テストさん']);
   Logger.log(JSON.stringify(result, null, 2));
 }
 
 function handleCommitment_(space, message, me) {
-  const result = askClaude_(buildConversation_(space, message, me), SYSTEM_PROMPT);
+  const conv = buildConversation_(space, message, me);
+  const result = askClaude_(conv.text, SYSTEM_PROMPT);
   if (result.is_commitment) {
-    sendDraft_(space, message, result, '【文案】');
+    sendDraft_(space, message, result, '【文案】', conv.participants);
   }
 }
 
 function handleIncoming_(space, message, me) {
-  const result = askClaude_(buildConversation_(space, message, me), REPLY_PROMPT);
+  const conv = buildConversation_(space, message, me);
+  const result = askClaude_(conv.text, REPLY_PROMPT);
   if (result.needs_reply) {
-    sendDraft_(space, message, result, '【返信案】');
+    sendDraft_(space, message, result, '【返信案】', conv.participants);
   }
 }
 
@@ -185,7 +187,7 @@ function isForMe_(space, message, me) {
     a.type === 'USER_MENTION' && a.userMention && a.userMention.user && a.userMention.user.name === me);
 }
 
-/** 対象の投稿までの直前の会話を、「自分」「相手」の形で並べる。 */
+/** 対象の投稿までの直前の会話を、「自分」「◯◯さん」の形で並べる。会話の相手の名前の一覧も返す。 */
 function buildConversation_(space, message, me) {
   const sent = new Date(message.createTime).getTime();
   const from = new Date(sent - 24 * 60 * 60 * 1000).toISOString();
@@ -197,15 +199,47 @@ function buildConversation_(space, message, me) {
   const label = m => {
     const name = m.sender ? m.sender.name : '';
     if (name === me) return '自分';
-    if (!labels[name]) labels[name] = '相手' + String.fromCharCode(65 + Object.keys(labels).length);
+    if (!labels[name]) {
+      const real = displayNameOf_(name);
+      labels[name] = real ? real + 'さん' : '相手' + String.fromCharCode(65 + Object.keys(labels).length);
+    }
     return labels[name];
   };
   const lines = recent.map(m => (m.name === message.name ? '★' : '') + label(m) + ': ' + (m.text || '（テキストなし）'));
   if (!recent.some(m => m.name === message.name)) {
     lines.push('★' + label(message) + ': ' + message.text);
   }
-  const title = space.displayName || 'DM';
-  return `スペース名: ${title}\n\n${lines.join('\n')}`;
+  const participants = Object.keys(labels).map(k => labels[k]);
+  const title = space.displayName || `${participants.join('、')}とのDM`;
+  return { text: `スペース名: ${title}\n\n${lines.join('\n')}`, participants: participants };
+}
+
+/** Chat の users/{id} から社内名簿の名前を引く。引けなければ空文字（6時間キャッシュ）。 */
+function displayNameOf_(userName) {
+  if (!userName || !userName.startsWith('users/')) return '';
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get(userName);
+  if (cached !== null) return cached;
+  let name = '';
+  try {
+    const person = People.People.get(userName.replace('users/', 'people/'), {
+      personFields: 'names',
+      sources: ['READ_SOURCE_TYPE_PROFILE', 'READ_SOURCE_TYPE_DOMAIN_CONTACT'],
+    });
+    name = (person.names && person.names[0] && person.names[0].displayName) || '';
+  } catch (e) {
+    console.warn(`名前を取得できませんでした (${userName}): ${e.message}`);
+  }
+  cache.put(userName, name, 6 * 60 * 60);
+  return name;
+}
+
+/** チャットを開くリンク。 */
+function chatUrl_(space) {
+  if (space.spaceUri) return space.spaceUri;
+  if (!space.name) return '';
+  const id = space.name.replace('spaces/', '');
+  return space.spaceType === 'DIRECT_MESSAGE' ? `https://chat.google.com/dm/${id}` : `https://chat.google.com/room/${id}`;
 }
 
 function askClaude_(conversation, systemPrompt) {
@@ -239,13 +273,17 @@ function askClaude_(conversation, systemPrompt) {
 }
 
 /** 1通目に概要、2通目に文案だけを送る（長押しで文案だけコピーできるように）。 */
-function sendDraft_(space, message, result, heading) {
-  let summary = `${heading}${result.task}\n`;
-  if (result.to) summary += `宛先：${result.to}\n`;
+function sendDraft_(space, message, result, heading, participants) {
+  const others = (participants || []).join('、');
+  const where = space.displayName ? `スペース「${space.displayName}」` : 'DM';
+  let summary = `${heading}${result.task}\n\n`;
+  summary += `やりとり：${others || '（名前を取得できませんでした）'}（${where}）\n`;
+  summary += `送る相手：${result.to || '（会話から判断できませんでした）'}\n`;
   summary += `期限：${result.deadline || '未定'}\n`;
   if (result.note) summary += `※ ${result.note}\n`;
-  summary += `\n元の発言（${space.displayName || 'DM'}）：\n「${message.text}」`;
-  if (space.spaceUri) summary += `\n${space.spaceUri}`;
+  summary += `\n元の発言：\n「${message.text}」`;
+  const url = chatUrl_(space);
+  if (url) summary += `\n\nチャットを開く：\n${url}`;
   notify_(`${heading}${result.task}`, [summary, result.draft]);
 }
 
