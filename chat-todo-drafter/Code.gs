@@ -79,8 +79,7 @@ function checkChat() {
     listSpaces_()
       .filter(space => !space.lastActiveTime || space.lastActiveTime > since)
       .forEach(space => {
-        const filter = `createTime > "${since}" AND createTime <= "${until}"`;
-        listMessages_(space.name, { filter: filter, orderBy: 'createTime asc', pageSize: 100 })
+        listMessages_(space.name, { filter: timeFilter_(since, until), pageSize: 1000 })
           .filter(m => m.sender && m.sender.name === me && CONFIG.KEYWORDS.test(m.text || ''))
           .forEach(m => {
             try {
@@ -118,11 +117,11 @@ function handleCommitment_(space, message, me) {
 
 /** 対象の投稿までの直前の会話を、「自分」「相手」の形で並べる。 */
 function buildConversation_(space, message, me) {
-  const from = new Date(new Date(message.createTime).getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
-  const filter = `createTime > "${from}" AND createTime <= "${message.createTime}"`;
-  const recent = listMessages_(space.name, {
-    filter: filter, orderBy: 'createTime desc', pageSize: CONFIG.CONTEXT_MESSAGES,
-  }, 1).reverse();
+  const sent = new Date(message.createTime).getTime();
+  const from = new Date(sent - 24 * 60 * 60 * 1000).toISOString();
+  const to = new Date(sent + 1).toISOString();
+  const recent = listMessages_(space.name, { filter: timeFilter_(from, to), pageSize: 1000 }, 5)
+    .slice(-CONFIG.CONTEXT_MESSAGES);
 
   const labels = {};
   const label = m => {
@@ -225,6 +224,11 @@ function fetchMyUserName_() {
   return me.resourceName.replace('people/', 'users/');
 }
 
+/** Chat API の時刻の絞り込みは create_time と「>」「<」だけが使える。 */
+function timeFilter_(after, before) {
+  return `create_time > "${after}" AND create_time < "${before}"`;
+}
+
 function listSpaces_() {
   const spaces = [];
   let pageToken;
@@ -247,4 +251,30 @@ function listMessages_(spaceName, options, maxPages) {
     pages++;
   } while (pageToken && (!maxPages || pages < maxPages));
   return messages;
+}
+
+/** 調べる用：直近2時間の自分の投稿が読めているか、反応する言葉に当たるかを表示する（Claude と LINE は使わない）。 */
+function debugRecent() {
+  const props = PropertiesService.getScriptProperties();
+  const me = fetchMyUserName_();
+  Logger.log('自分のID（今取得）: %s', me);
+  Logger.log('自分のID（保存済み）: %s', props.getProperty('MY_USER_NAME'));
+  Logger.log('前回チェックした時刻: %s', props.getProperty('LAST_CHECK'));
+  Logger.log('自動実行の数: %s', ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'checkChat').length);
+
+  const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  const until = new Date().toISOString();
+  const spaces = listSpaces_();
+  Logger.log('参加しているスペース・DMの数: %s', spaces.length);
+  spaces
+    .filter(space => !space.lastActiveTime || space.lastActiveTime > since)
+    .forEach(space => {
+      const messages = listMessages_(space.name, { filter: timeFilter_(since, until), pageSize: 1000 });
+      const mine = messages.filter(m => m.sender && m.sender.name === me);
+      Logger.log('■ %s（%s）: 投稿 %s件 / うち自分 %s件', space.displayName || 'DM', space.name, messages.length, mine.length);
+      mine.forEach(m => Logger.log('   %s %s「%s」', CONFIG.KEYWORDS.test(m.text || '') ? '○反応する' : '×反応しない', m.createTime, (m.text || '').slice(0, 40)));
+      if (messages.length && !mine.length) {
+        Logger.log('   投稿者のID例: %s', messages.slice(0, 3).map(m => m.sender && m.sender.name).join(', '));
+      }
+    });
 }
