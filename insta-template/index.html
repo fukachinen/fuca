@@ -289,7 +289,15 @@ input[type=text]:focus, textarea:focus{border-color:var(--navy); background:var(
 .opt[aria-pressed=true]{border-color:var(--navy); background:#EEF1F7;}
 .opt[aria-pressed=true]::before{border-color:var(--navy); background:var(--navy); box-shadow:inset 0 0 0 3px #fff;}
 .opt .o-lb{display:block; font-size:10.5px; font-weight:700; color:var(--coral-ink);}
-.opts-h{font-size:11.5px; font-weight:700; color:var(--navy-soft); margin:0 0 4px;}
+.opts-h{font-size:11.5px; font-weight:700; color:var(--navy-soft); margin:0 0 4px; display:flex; align-items:center; gap:8px;}
+.opt-toggle{appearance:none; width:100%; display:flex; justify-content:space-between; align-items:center; gap:8px; border:1.5px dashed var(--rule); background:var(--surface); color:var(--navy); border-radius:10px; padding:8px 12px; font-size:12.5px; font-weight:700; min-height:40px; margin:0 0 6px; text-align:left;}
+.opt-toggle::after{content:"▾"; font-size:11px; color:var(--navy-soft);}
+.opt-toggle .now{margin-left:auto; flex:none; font-weight:500; font-size:11.5px; color:var(--navy-soft);}
+.opt-close{appearance:none; margin-left:auto; border:1px solid var(--rule); background:var(--surface); color:var(--navy); border-radius:999px; padding:3px 12px; font-size:11.5px; font-weight:700; min-height:30px;}
+.book-now{font-size:13px; line-height:1.6; color:var(--navy); margin:2px 0 6px;}
+.shuffle-row{display:flex; align-items:center; gap:10px; margin:6px 0 10px;}
+.shuffle-row p{flex:1; margin:0; font-size:12px; line-height:1.6; color:var(--navy-soft);}
+.btn-shuffle{appearance:none; flex:none; border:1.5px solid var(--navy); background:var(--surface); color:var(--navy); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:700; min-height:38px;}
 .free-note{font-size:12px; color:var(--navy-soft); margin:-2px 0 6px;}
 .warn-line{font-size:12px; color:var(--warn); margin-top:8px;}
 
@@ -663,6 +671,7 @@ input.one{font-size:16px;}
 </template>
 
 <script src="data.js"></script>
+<script src="data-more.js"></script>
 <script>
 (function(){
   "use strict";
@@ -687,6 +696,22 @@ input.one{font-size:16px;}
   };
 
   var CH = window.CHOICES || {nayami:[], common:{comment:[], save:[], tags:[]}};
+  /* data-more.js の追加候補を足す（同じ文は重ねない） */
+  (function(more){
+    if (!more) return;
+    function add(list, extra){ (extra || []).forEach(function(t){ if (list.indexOf(t) < 0) list.push(t); }); return list; }
+    function arr(v){ return Array.isArray(v) ? v : (v ? [v] : []); }
+    CH.nayami.forEach(function(n){
+      var m = (more.nayami || {})[n.name]; if (!m) return;
+      n.reel = add(arr(n.reel), m.reel); n.point = add(arr(n.point), m.point);
+      if (m.ba) ["hook", "worry", "menu", "finish"].forEach(function(k){ n.ba[k] = add(arr(n.ba[k]), m.ba[k]); });
+      ["know", "know2"].forEach(function(k){ if (n[k] && m[k]) n[k].hookAlt = add(arr(n[k].hookAlt), m[k].hookAlt); });
+    });
+    var c = more.common || {};
+    ["comment", "save"].forEach(function(k){ CH.common[k] = add(arr(CH.common[k]), c[k]); });
+    if (c.book) CH.common.book = CH.common.book || {};
+    if (c.book) Object.keys(c.book).forEach(function(k){ CH.common.book[k] = add(arr(CH.common.book[k]), c.book[k]); });
+  })(window.CHOICES_MORE);
   var FIRST_LIMIT = 30, TOTAL_LIMIT = 2200, TAG_LIMIT = 30;
   var STORE_KEY = "kamidora-insta-template-v2";
 
@@ -724,7 +749,7 @@ input.one{font-size:16px;}
     { id:"know", no:2, name:"知識投稿", goal:"保存・シェアしてもらう",
       prepTitle:"画像を準備する", prepTpl:"tpl-know-prep",
       fields:[
-        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2, opt:function(n){ return [knowTh(n).hook]; },
+        {id:"hook", label:"1行目の結論", hint:"「〇〇は△△で変わる」のように、先に答えを書く", first:true, rows:2, opt:function(n){ var k = knowTh(n); return [k.hook].concat(k.hookAlt || []); },
           ph:"例）うねりは「乾かし方」を変えるだけで落ち着きます",
           ex:"うねりは「乾かし方」を変えるだけで落ち着きます"},
         {id:"r1", label:"理由1", rows:2, opt:function(n){ return [knowTh(n).r1]; }, ph:"例）濡れたままだと湿気を吸いやすいから",
@@ -1004,7 +1029,8 @@ input.one{font-size:16px;}
       + '<div class="card"><div class="part-h"><span class="no">②</span><h3>キャプションを書く</h3></div>'
       + '<p class="part-lead">お悩みを選ぶと、文章とハッシュタグが自動で入ります。候補を選びなおしたり、自分の言葉に書きかえたりもできます。</p>'
       + '<div class="choose"><div class="lbl2"><span class="step-n">STEP 1</span>お悩みを選ぶ</div><div class="chips" data-nay></div><div class="small muted" data-theme style="margin-top:8px"></div></div>'
-      + '<div class="lbl2" style="display:flex;align-items:center;gap:8px;font-weight:700;margin-top:18px"><span class="step-n" style="font-size:11px;color:#fff;background:var(--coral-btn);border-radius:999px;padding:1px 9px">STEP 2</span>文章を確認する</div>';
+      + '<div class="lbl2" style="display:flex;align-items:center;gap:8px;font-weight:700;margin-top:18px"><span class="step-n" style="font-size:11px;color:#fff;background:var(--coral-btn);border-radius:999px;padding:1px 9px">STEP 2</span>文章を確認する</div>'
+      + '<div class="shuffle-row"><p>お悩みを選ぶと、各項目に候補が1つずつ入ります。気になる項目だけ「ほかの候補を見る」から選びなおせます。</p><button type="button" class="btn-shuffle" data-shuffle="' + t.id + '">ほかの組み合わせにする</button></div>';
     t.fields.forEach(function(f, i){
       var fid = "f_" + t.id + "_" + f.id;
       html += '<div class="field" data-field="' + f.id + '"><label for="' + fid + '"><span class="num">' + (i+1) + '</span>' + esc(f.label) + '</label>'
@@ -1049,6 +1075,7 @@ input.one{font-size:16px;}
   /* ---------------- Render ---------------- */
   function countClass(n, limit, warnAt){ return n > limit ? "bad" : (n >= warnAt ? "warn" : ""); }
 
+  var optOpen = {};   // 候補の一覧を開いている項目（保存しない）
   function renderChoices(t){
     var sec = $("#panel-" + t.id), n = nayamiOf(t.id);
     $("[data-nay]", sec).innerHTML = CH.nayami.map(function(x, i){
@@ -1065,8 +1092,15 @@ input.one{font-size:16px;}
       var box = $('[data-opts="' + f.id + '"]', sec), o = optsOf(f, n), cur = trimAll(state.v[t.id][f.id]);
       if (f.free) { box.innerHTML = ""; return; }
       if (!o.length) { box.innerHTML = n ? "" : '<div class="free-note">STEP 1でお悩みを選ぶと、候補が出ます</div>'; return; }
+      var key = t.id + "|" + f.id, sel = -1;
+      o.forEach(function(x, i){ if (sel < 0 && cur && cur === trimAll(x.t)) sel = i; });
+      if (o.length > 1 && !optOpen[key] && (cur || f.optional)) {
+        var now = sel > -1 ? o[sel].lb : (cur ? "自分の文" : "なし");
+        box.innerHTML = '<button type="button" class="opt-toggle" data-opt-open="' + key + '"><span>' + (cur ? 'ほかの候補を見る' : '候補を見る') + '（' + o.length + '個）</span><span class="now">いま：' + esc(now) + '</span></button>';
+        return;
+      }
       box.innerHTML = (f.common === "psy" ? '<div class="psy-note">※お店に本当にあてはまる文だけを選んでください（例：人数を限定していないなら「希少性」は使わない）</div>' : '')
-        + (o.length > 1 ? '<div class="opts-h">候補をタップ（' + o.length + '個）' + (f.optional ? '・もう一度タップで外す' : '') + '</div>' : '')
+        + (o.length > 1 ? '<div class="opts-h">候補をタップ（' + o.length + '個）' + (f.optional ? '・もう一度タップで外す' : '') + (cur || f.optional ? '<button type="button" class="opt-close" data-opt-close="' + key + '">たたむ</button>' : '') + '</div>' : '')
         + o.map(function(x, i){
           return '<button type="button" class="opt" data-opt-t="' + t.id + '" data-opt-f="' + f.id + '" data-opt-i="' + i + '" aria-pressed="' + (cur === trimAll(x.t)) + '">'
             + '<span class="o-lb' + (x.cls ? " " + x.cls : "") + '">' + esc(x.lb) + '</span>' + esc(x.t) + '</button>';
@@ -1105,7 +1139,10 @@ input.one{font-size:16px;}
     var bl = $("[data-bookline]", sec);
     if (bl) {
       var bo = bookOpts();
-      bl.innerHTML = '<div class="book-opts">' + bo.map(function(x, i){
+      var bsel = bo[state.set.bookIdx] ? (state.set.bookIdx || 0) : 0;
+      if (bo.length > 1 && !optOpen[t.id + "|book"]) {
+        bl.innerHTML = '<div class="book-now">' + esc(bo[bsel] || "") + '</div><button type="button" class="opt-toggle" data-opt-open="' + t.id + '|book"><span>ほかの候補を見る（' + bo.length + '個）</span><span class="now">いま：候補' + (bsel + 1) + '</span></button>';
+      } else bl.innerHTML = '<div class="opts-h">候補をタップ（' + bo.length + '個）<button type="button" class="opt-close" data-opt-close="' + t.id + '|book">たたむ</button></div><div class="book-opts">' + bo.map(function(x, i){
         return '<button type="button" class="opt" data-book-i="' + i + '" aria-pressed="' + ((state.set.bookIdx || 0) === i || (!bo[state.set.bookIdx] && i === 0)) + '"><span class="o-lb">候補' + (i+1) + '</span>' + esc(x) + '</button>';
       }).join("") + '</div>';
     }
@@ -1248,7 +1285,10 @@ input.one{font-size:16px;}
     if (tg) toggleTag(tg.getAttribute("data-tag-t"), tg.getAttribute("data-tag-r"));
     var thb = e.target.closest("[data-theme-i]"), bk = e.target.closest("[data-book-i]");
     if (thb) pickTheme(+thb.getAttribute("data-theme-i"));
-    if (bk) { state.set.bookIdx = +bk.getAttribute("data-book-i"); save(); renderAll(); }
+    if (bk) { state.set.bookIdx = +bk.getAttribute("data-book-i"); ORDER.forEach(function(k){ optOpen[k + "|book"] = false; }); save(); renderAll(); }
+    var oo = e.target.closest("[data-opt-open]"), oc = e.target.closest("[data-opt-close]"), sh = e.target.closest("[data-shuffle]");
+    if (oo || oc) { var ok = (oo || oc).getAttribute(oo ? "data-opt-open" : "data-opt-close"); optOpen[ok] = !!oo; afterChange(tplOf(ok.split("|")[0])); }
+    if (sh) shuffleTpl(sh.getAttribute("data-shuffle"));
     if (cl) clearTpl(cl.getAttribute("data-clear"));
     if (cp) doCopy(cp.getAttribute("data-copy"));
   });
@@ -1286,6 +1326,21 @@ input.one{font-size:16px;}
       setField(id, f.id, o.length ? o[0].t : "");
     });
   }
+  /* 候補の組み合わせを入れかえる（季節の1行目と自分で入れる項目はそのまま） */
+  function shuffleTpl(id){
+    var t = tplOf(id), n = nayamiOf(id); if (!n) return;
+    if (hasOwnText(t) && !confirm("書きかえた文章を、ほかの候補に入れかえます。よろしいですか？")) return;
+    t.fields.forEach(function(f){
+      if (f.free || f.noAuto || f.optional || f.common === "psy") return;
+      var o = optsOf(f, n).filter(function(x){ return !x.season; }), cur = trimAll(state.v[id][f.id]);
+      if (o.length < 2) return;
+      var rest = o.filter(function(x){ return trimAll(x.t) !== cur; });
+      setField(id, f.id, rest[Math.floor(Math.random() * rest.length)].t);
+    });
+    if (t.bookLine) { var bo = bookOpts(); if (bo.length > 1) { var b = state.set.bookIdx || 0, nb = b; while (nb === b) nb = Math.floor(Math.random() * bo.length); state.set.bookIdx = nb; } }
+    afterChange(t); renderAll();
+    toast("ほかの組み合わせにしました");
+  }
   function pickTheme(i){
     var t = tplOf("know"), n = nayamiOf("know"); if (!n || (state.theme.know || 0) === i) return;
     if (hasOwnText(t) && !confirm("書きかえた文章を、選んだテーマの文章に置きかえます。よろしいですか？")) return;
@@ -1298,6 +1353,7 @@ input.one{font-size:16px;}
     var o = optsOf(f, nayamiOf(id)); if (o[i] === undefined) return;
     if (f.optional && trimAll(state.v[id][fid]) === trimAll(o[i].t)) setField(id, fid, "");
     else setField(id, fid, o[i].t);
+    optOpen[id + "|" + fid] = false;
     afterChange(t);
   }
   function toggleTag(id, raw){
