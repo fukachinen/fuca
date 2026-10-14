@@ -4,6 +4,7 @@
  * 5分おきに自分の Google Chat 投稿をチェックし、
  * 「やっときます」「送っときます」などの約束を見つけたら、
  * Claude で文案を作って自分の LINE に届ける。
+ * 自分宛ての DM や @メンションで、返したほうがいいものにも返信案を届ける。
  */
 
 const CONFIG = {
@@ -38,6 +39,31 @@ const SYSTEM_PROMPT = `あなたは、社内チャットで「やっときます
   "note": "送る前に確認したほうがいいこと（無ければ空文字）"
 }
 約束でない場合は is_commitment を false にし、他は空文字でよい。`;
+
+const REPLY_PROMPT = `あなたは、社内チャットで自分宛てに来たメッセージへの返信を下書きするアシスタントです。
+
+渡されるのは Google Chat の会話の抜粋です。「自分」がこの返信案を受け取る本人、「相手」はそれ以外の参加者です。「★」の付いた投稿が、今回チェックする相手からのメッセージです。
+
+やること:
+1. ★のメッセージに、自分が返信や対応をしたほうがいいかを判定する。
+   - 返したほうがいい: 質問、お願い・依頼、確認や返事を求めている、日程調整、資料などを待っている。
+   - 返さなくていい: お礼だけ、了解・承知だけ、ただのお知らせ、雑談の相づち、★より後に自分がもう返している。
+2. 返したほうがいいなら、自分が返す文面を下書きする。
+   - そのままチャットに送れる返信にする。
+   - 自分にしか分からない答え（日時、数字、URL、可否など）は【　】で空欄にする。作り話で埋めない。
+   - すぐ答えられない内容なら「確認して◯◯までにお返事します」のような一次返信にする。
+   - 社内チャット向けの、丁寧すぎない自然な敬語で。会話の口調に合わせる。
+
+出力は次の JSON だけにする（前後に説明やコードブロックを付けない）:
+{
+  "needs_reply": true または false,
+  "task": "何を返すか（20字程度）",
+  "to": "誰への返信か（分からなければ空文字）",
+  "deadline": "会話に期限があれば。無ければ空文字",
+  "draft": "返信の下書き",
+  "note": "送る前に確認したほうがいいこと（無ければ空文字）"
+}
+返さなくていい場合は needs_reply を false にし、他は空文字でよい。`;
 
 /** 最初に1回だけ手動で実行する。権限の許可と、定期実行の登録をする。 */
 function setup() {
@@ -79,15 +105,21 @@ function checkChat() {
     listSpaces_()
       .filter(space => !space.lastActiveTime || space.lastActiveTime > since)
       .forEach(space => {
-        listMessages_(space.name, { filter: timeFilter_(since, until), pageSize: 1000 })
-          .filter(m => m.sender && m.sender.name === me && CONFIG.KEYWORDS.test(m.text || ''))
-          .forEach(m => {
-            try {
-              handleCommitment_(space, m, me);
-            } catch (e) {
-              notifyError_(space, m, e);
-            }
-          });
+        const messages = listMessages_(space.name, { filter: timeFilter_(since, until), pageSize: 1000 });
+
+        messages
+          .filter(m => isMine_(m, me) && CONFIG.KEYWORDS.test(m.text || ''))
+          .forEach(m => runSafely_(space, m, () => handleCommitment_(space, m, me)));
+
+        // 自分宛ての DM・@メンションは、まとめて来ても一番新しいもの1つにだけ返信案を作る。
+        // そのあと自分がもう返していれば作らない。
+        const incoming = messages.filter(m => isForMe_(space, m, me));
+        // 止まっていた間の古いメッセージにはさかのぼって作らない（1時間以内のものだけ）。
+        const latest = incoming[incoming.length - 1];
+        const recentEnough = latest && new Date(latest.createTime).getTime() > Date.now() - 60 * 60 * 1000;
+        if (recentEnough && !messages.some(m => isMine_(m, me) && m.createTime > latest.createTime)) {
+          runSafely_(space, latest, () => handleIncoming_(space, latest, me));
+        }
       });
 
     props.setProperty('LAST_CHECK', until);
@@ -103,16 +135,54 @@ function testDraft() {
     '相手: 会場の地図も一緒に付けてもらえると助かります',
     '★自分: まだでした！地図付けて今日中に送っときます',
   ].join('\n');
-  const result = askClaude_(conversation);
-  sendDraft_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result);
+  const result = askClaude_(conversation, SYSTEM_PROMPT);
+  sendDraft_({ displayName: 'テスト' }, { text: '地図付けて今日中に送っときます' }, result, '【文案】');
+  Logger.log(JSON.stringify(result, null, 2));
+}
+
+/** 返信案の動作確認用。手動で実行するとサンプルの返信案が LINE に届く。 */
+function testReply() {
+  const conversation = [
+    '相手A: お疲れさまです！',
+    '★相手A: 来週の打ち合わせ、20日の午後でご都合いかがでしょうか？難しければ候補日をいただけると助かります',
+  ].join('\n');
+  const result = askClaude_(conversation, REPLY_PROMPT);
+  sendDraft_({ displayName: 'テスト' }, { text: '来週の打ち合わせ、20日の午後でご都合いかがでしょうか？' }, result, '【返信案】');
   Logger.log(JSON.stringify(result, null, 2));
 }
 
 function handleCommitment_(space, message, me) {
-  const result = askClaude_(buildConversation_(space, message, me));
+  const result = askClaude_(buildConversation_(space, message, me), SYSTEM_PROMPT);
   if (result.is_commitment) {
-    sendDraft_(space, message, result);
+    sendDraft_(space, message, result, '【文案】');
   }
+}
+
+function handleIncoming_(space, message, me) {
+  const result = askClaude_(buildConversation_(space, message, me), REPLY_PROMPT);
+  if (result.needs_reply) {
+    sendDraft_(space, message, result, '【返信案】');
+  }
+}
+
+function runSafely_(space, message, fn) {
+  try {
+    fn();
+  } catch (e) {
+    notifyError_(space, message, e);
+  }
+}
+
+function isMine_(message, me) {
+  return message.sender && message.sender.name === me;
+}
+
+/** 人から自分宛てに来たメッセージか（DM・グループDM、または自分への @メンション）。 */
+function isForMe_(space, message, me) {
+  if (!message.sender || message.sender.name === me || message.sender.type === 'BOT') return false;
+  if (space.spaceType === 'DIRECT_MESSAGE' || space.spaceType === 'GROUP_CHAT') return true;
+  return (message.annotations || []).some(a =>
+    a.type === 'USER_MENTION' && a.userMention && a.userMention.user && a.userMention.user.name === me);
 }
 
 /** 対象の投稿までの直前の会話を、「自分」「相手」の形で並べる。 */
@@ -132,13 +202,13 @@ function buildConversation_(space, message, me) {
   };
   const lines = recent.map(m => (m.name === message.name ? '★' : '') + label(m) + ': ' + (m.text || '（テキストなし）'));
   if (!recent.some(m => m.name === message.name)) {
-    lines.push('★自分: ' + message.text);
+    lines.push('★' + label(message) + ': ' + message.text);
   }
   const title = space.displayName || 'DM';
   return `スペース名: ${title}\n\n${lines.join('\n')}`;
 }
 
-function askClaude_(conversation) {
+function askClaude_(conversation, systemPrompt) {
   const key = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
   const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
     method: 'post',
@@ -152,7 +222,7 @@ function askClaude_(conversation) {
       model: CONFIG.MODEL,
       max_tokens: 4000,
       output_config: { effort: 'low' },
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: [{ role: 'user', content: conversation }],
     }),
   });
@@ -169,14 +239,14 @@ function askClaude_(conversation) {
 }
 
 /** 1通目に概要、2通目に文案だけを送る（長押しで文案だけコピーできるように）。 */
-function sendDraft_(space, message, result) {
-  let summary = `【文案】${result.task}\n`;
+function sendDraft_(space, message, result, heading) {
+  let summary = `${heading}${result.task}\n`;
   if (result.to) summary += `宛先：${result.to}\n`;
   summary += `期限：${result.deadline || '未定'}\n`;
   if (result.note) summary += `※ ${result.note}\n`;
   summary += `\n元の発言（${space.displayName || 'DM'}）：\n「${message.text}」`;
   if (space.spaceUri) summary += `\n${space.spaceUri}`;
-  notify_(`【文案】${result.task}`, [summary, result.draft]);
+  notify_(`${heading}${result.task}`, [summary, result.draft]);
 }
 
 function notifyError_(space, message, error) {
