@@ -13,8 +13,8 @@
   <rect x="405" y="640" width="90" height="140" rx="30" fill="#D9AF8F"/>
   <path d="M450 740 C 330 740 210 790 170 900 L 120 1200 L 780 1200 L 730 900 C 690 790 570 740 450 740 Z" fill="#4B525C"/>
   <path d="M390 742 Q 450 790 510 742" fill="none" stroke="#F4F1EC" stroke-width="16" stroke-linecap="round"/>
-  <ellipse cx="327" cy="540" rx="20" ry="32" fill="#D9AF8F"/><ellipse cx="573" cy="540" rx="20" ry="32" fill="#D9AF8F"/>
-  <path d="M450 330 C 330 330 300 420 300 520 C 300 610 318 680 350 712 C 400 730 500 730 550 712 C 582 680 600 610 600 520 C 600 420 570 330 450 330 Z" fill="#3A302B"/>
+  <path d="M450 330 C 320 330 296 430 300 560 C 304 720 290 870 284 1000 C 390 1025 510 1025 616 1000 C 610 870 596 720 600 560 C 604 430 580 330 450 330 Z" fill="#3A302B"/>
   <path d="M340 470 C 370 395 530 395 560 470" fill="none" stroke="#6E5B50" stroke-width="18" stroke-linecap="round" opacity=".9"/>
-  <g stroke="#2A2320" stroke-width="4" fill="none" opacity=".6"><path d="M450 350 C 440 480 440 600 450 720"/><path d="M400 360 C 370 480 372 620 392 716"/><path d="M500 360 C 530 480 528 620 508 716"/></g>
+  <g stroke="#2A2320" stroke-width="4" fill="none" opacity=".6"><path d="M450 350 C 440 560 440 800 450 1010"/><path d="M396 360 C 360 560 356 800 360 1008"/><path d="M504 360 C 540 560 544 800 540 1008"/></g>
+  <g stroke="#6E5B50" stroke-width="8" fill="none" stroke-linecap="round" opacity=".6"><path d="M330 620 C 326 760 324 860 322 960"/><path d="M570 620 C 574 760 576 860 578 960"/></g>
 </svg>
